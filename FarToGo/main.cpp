@@ -7,5 +7,4 @@ int main()
 {
 	std::cout << "Version: " << Version << "\n";
 	std::cout << "Press any key to continue... " << Math::GetInt();
-	std::getchar();
 }

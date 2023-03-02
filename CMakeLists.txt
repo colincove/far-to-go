@@ -30,4 +30,4 @@ configure_file(
 
 install(TARGETS FarToGo CONFIGURATIONS Debug DESTINATION Debug)
 
-add_test(NAME Runs COMMAND FarToGo 25)
+add_test(NAME Runs COMMAND FarToGo 25 CONFIGURATIONS Debug)
