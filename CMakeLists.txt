@@ -11,7 +11,10 @@ add_executable(
 	FarToGo 
 	FarToGo/main.cpp)
 
+enable_testing()
+
 add_subdirectory(Math)
+add_subdirectory(MathTests)
 
 target_link_libraries(
 	FarToGo 
@@ -26,3 +29,5 @@ configure_file(
 	"${PROJECT_SOURCE_DIR}/FarToGo/Config.h")
 
 install(TARGETS FarToGo CONFIGURATIONS Debug DESTINATION Debug)
+
+add_test(NAME Runs COMMAND FarToGo 25)
