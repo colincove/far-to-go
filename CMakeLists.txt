@@ -7,11 +7,21 @@ project(
 	"Far to Go" 
 	VERSION 0.0.1.0)
 
+enable_testing()
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+find_package(GTest)
+
 add_executable(
 	FarToGo 
 	FarToGo/main.cpp)
-
-enable_testing()
 
 add_subdirectory(Math)
 add_subdirectory(MathTests)
@@ -29,5 +39,4 @@ configure_file(
 	"${PROJECT_SOURCE_DIR}/FarToGo/Config.h")
 
 install(TARGETS FarToGo CONFIGURATIONS Debug DESTINATION Debug)
-
 add_test(NAME Runs COMMAND FarToGo 25 CONFIGURATIONS Debug)

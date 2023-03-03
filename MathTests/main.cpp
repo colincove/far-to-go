@@ -4,5 +4,4 @@
 int main()
 {
 	std::cout << "Press any key to continue... " << (Math::GetInt() + 1);
-	std::getchar();
 }
