@@ -32,6 +32,7 @@ add_executable(
 	FarToGo/main.cpp)
 
 add_subdirectory(Math)
+add_subdirectory(Physics)
 add_subdirectory(MathTests)
 add_subdirectory(bullet3)
 
@@ -48,4 +49,4 @@ configure_file(
 	"${PROJECT_SOURCE_DIR}/FarToGo/Config.h")
 
 install(TARGETS FarToGo CONFIGURATIONS Debug DESTINATION Debug)
-add_test(NAME Runs COMMAND FarToGo 25 CONFIGURATIONS Debug)
+add_test(NAME Runs COMMAND FarToGo CONFIGURATIONS Debug)
