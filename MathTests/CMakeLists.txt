@@ -6,9 +6,8 @@ add_executable(
 target_link_libraries(
 	MathTests 
 	PUBLIC Math
-	#GTest::gtest
-	#GTest::gtest_main
-	gtest
+	GTest::gtest
+	GTest::gtest_main
 )
 
 install(TARGETS MathTests CONFIGURATIONS Debug DESTINATION Debug)

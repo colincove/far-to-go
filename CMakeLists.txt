@@ -34,11 +34,16 @@ add_executable(
 add_subdirectory(Math)
 add_subdirectory(Physics)
 add_subdirectory(MathTests)
-add_subdirectory(bullet3)
+add_subdirectory(Scripting)
+add_subdirectory(Rendering)
+add_subdirectory(RenderingTests)
 
 target_link_libraries(
 	FarToGo 
-	PUBLIC Math)
+	PUBLIC Math
+	Physics
+	Scripting
+	Rendering)
 
 target_include_directories(
 	FarToGo 

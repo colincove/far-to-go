@@ -1,3 +1,5 @@
+add_subdirectory(bullet3)
+
 add_library(
 	Physics
 	physics_test.cpp)
@@ -5,7 +7,6 @@ add_library(
 target_include_directories(Physics
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
         )
-
 
 install(TARGETS Physics CONFIGURATIONS Debug DESTINATION Debug/lib)
 
