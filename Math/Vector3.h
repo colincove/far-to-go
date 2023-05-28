@@ -51,4 +51,96 @@ namespace BoulderLeaf::Math
 
 	template<typename T>
 	inline bool operator!=(const Vector3<T>& lhs, const Vector3<T>& rhs) { return !(lhs == rhs); }
+
+	template<typename T>
+	inline Vector3<T> operator*(const Vector3<T>& lhs, const Vector3<T>& rhs) 
+	{
+		return Vector3<T>(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z);
+	}
+
+	template<typename T>
+	inline void operator*=(Vector3<T>& lhs, const Vector3<T>& rhs)
+	{
+		lhs.x *= rhs.x;
+		lhs.y *= rhs.y;
+		lhs.z *= rhs.z;
+	}
+
+	template<typename T>
+	inline void operator*=(Vector3<T>& lhs, const T& rhs)
+	{
+		lhs.x *= rhs;
+		lhs.y *= rhs;
+		lhs.z *= rhs;
+	}
+
+	template<typename T>
+	inline Vector3<T> operator*(const Vector3<T>& lhs, const T& rhs)
+	{
+		return Vector3<T>(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
+	}
+
+	template<typename T>
+	inline Vector3<T> operator/(const Vector3<T>& lhs, const Vector3<T>& rhs)
+	{
+		return Vector3<T>(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z);
+	}
+
+	template<typename T>
+	inline Vector3<T> operator/(const Vector3<T>& lhs, const T& rhs)
+	{
+		return Vector3<T>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
+	}
+
+	template<typename T>
+	inline void operator/=(Vector3<T>& lhs, const Vector3<T>& rhs)
+	{
+		lhs.x /= rhs.x;
+		lhs.y /= rhs.y;
+		lhs.z /= rhs.z;
+	}
+
+	template<typename T>
+	inline void operator/=(Vector3<T>& lhs, const T& rhs)
+	{
+		lhs.x /= rhs;
+		lhs.y /= rhs;
+		lhs.z /= rhs;
+	}
+
+	template<typename T>
+	inline Vector3<T> operator+(const Vector3<T>& lhs, const Vector3<T>& rhs)
+	{
+		return Vector3<T>(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
+	}
+
+	template<typename T>
+	inline Vector3<T> operator-(const Vector3<T>& lhs, const Vector3<T>& rhs)
+	{
+		return Vector3<T>(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z);
+	}
+
+	template<typename T>
+	inline void operator+=(Vector3<T>& lhs, const Vector3<T>& rhs)
+	{
+		lhs.x += rhs.x;
+		lhs.y += rhs.y;
+		lhs.z += rhs.z;
+	}
+
+	template<typename T>
+	inline void operator+=(Vector3<T>& lhs, const T& rhs)
+	{
+		lhs.x += rhs;
+		lhs.y += rhs;
+		lhs.z += rhs;
+	}
+
+	template<typename T>
+	inline void operator-=(Vector3<T>& lhs, const Vector3<T>& rhs)
+	{
+		lhs.x -= rhs.x;
+		lhs.y -= rhs.y;
+		lhs.z -= rhs.z;
+	}
 }

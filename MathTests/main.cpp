@@ -1,7 +1,7 @@
 #include <iostream>
 #include <gtest/gtest.h>
-#include "../Math/Vector3.h"
-#include "../Math/BLMath.h"
+#include <Vector3.h>
+#include <BLMath.h>
 
 int main()
 {

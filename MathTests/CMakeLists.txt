@@ -1,6 +1,6 @@
 add_executable(
 	MathTests
-	Vector3Tests.cpp
+	Vector3.cpp
 	main.cpp)
 
 target_link_libraries(

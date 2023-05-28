@@ -2,6 +2,8 @@ add_library(
 	Math 
 	Vector3.h
 	Vector3.cpp
+	Matrix4x4.h
+	Matrix4x4.cpp
 	BLMath.h
 	BLMath.inl)
 
