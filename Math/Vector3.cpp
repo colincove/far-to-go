@@ -1,6 +1,5 @@
 #include "Vector3.h"
 
-int Math::GetInt()
+namespace BoulderLeaf::Math
 {
-	return 6;
-}
+};

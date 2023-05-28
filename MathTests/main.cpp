@@ -1,7 +1,10 @@
 #include <iostream>
+#include <gtest/gtest.h>
 #include "../Math/Vector3.h"
+#include "../Math/BLMath.h"
 
 int main()
 {
-	std::cout << "Press any key to continue... " << (Math::GetInt() + 1);
+	testing::InitGoogleTest();
+	RUN_ALL_TESTS();
 }

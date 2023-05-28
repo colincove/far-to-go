@@ -11,7 +11,7 @@ target_include_directories(Rendering
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
         )
 
-target_link_libraries(Rendering PRIVATE 
+target_link_libraries(Rendering PRIVATE
 	DirectX-Headers DirectX-Guids ${dxlibs})
 
 install(TARGETS Rendering CONFIGURATIONS Debug DESTINATION Debug/lib)
