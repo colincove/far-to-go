@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "../Math/Vector3.h"
+#include "../Math/BLMathFloat.h"
 
-using Vector3 = BoulderLeaf::Math::Vector3<float>;
+using Vector3 = BoulderLeaf::Math::Vector3;
 
 TEST(Vector3, Initialization)
 {

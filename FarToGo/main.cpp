@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Config.h"
-#include "../Math/Vector3.h"
+#include "../Math/Vector3.inl"
 
 int main()
 {

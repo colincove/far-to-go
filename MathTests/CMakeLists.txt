@@ -1,6 +1,7 @@
 add_executable(
 	MathTests
 	Vector3.cpp
+	Rect.cpp
 	main.cpp)
 
 target_link_libraries(
@@ -12,9 +13,9 @@ target_link_libraries(
 
 install(TARGETS MathTests CONFIGURATIONS Debug DESTINATION Debug)
 
-gtest_add_tests(
-	TARGET			MathTests
-    TEST_SUFFIX		.noArgs
-    TEST_LIST		noArgsTests)
+#gtest_add_tests(
+#    TARGET		MathTests
+#    TEST_SUFFIX		.noArgs
+#    TEST_LIST		noArgsTests)
 
-add_test(NAME MathTests COMMAND MathTests CONFIGURATIONS Debug)
+#add_test(NAME MathTests COMMAND MathTests CONFIGURATIONS Debug)

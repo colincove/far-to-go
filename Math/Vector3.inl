@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace BoulderLeaf::Math
+namespace BoulderLeaf::Math::Templates
 {
 	template<typename T>
 	struct Vector3
