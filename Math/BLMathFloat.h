@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Matrix4x4.inl"
-#include "Rect.inl"
-#include "Vector3.inl"
-#include "Vector2.inl"
-#include "Quad.inl"
+#include <blMatrix4x4.inl>
+#include <blRect.inl>
+#include <blVector3.inl>
+#include <blVector2.inl>
+#include <blQuad.inl>
 
 namespace BoulderLeaf::Math
 {

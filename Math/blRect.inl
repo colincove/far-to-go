@@ -1,4 +1,4 @@
-#include "Vector2.inl"
+#include <blVector2.inl>
 
 namespace BoulderLeaf::Math::Templates
 {

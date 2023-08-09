@@ -1,17 +1,17 @@
 add_library(
 	Math 
-	BLMath.inl
-	BLMathFloat.h
-	Line.inl
-	LineSegment.inl
-	Matrix4x4.inl
-	Plane.inl
-	Quad.inl
-	Ray.inl
-	Rect.inl
-	Vector2.inl
-	Vector3.inl
-	Vector3.cpp
+	blMath.inl
+	blMathFloat.h
+	blLine.inl
+	blLineSegment.inl
+	blMatrix4x4.inl
+	blPlane.inl
+	blQuad.inl
+	blRay.inl
+	blRect.inl
+	blVector2.inl
+	blVector3.inl
+	blVector3.cpp
 	)
 
 # Note: I need this because I did not include any *.cpp files to be linked. 
