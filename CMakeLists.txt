@@ -37,13 +37,15 @@ add_subdirectory(MathTests)
 add_subdirectory(Scripting)
 add_subdirectory(Rendering)
 add_subdirectory(RenderingTests)
+add_subdirectory(RapidXML)
 
 target_link_libraries(
 	FarToGo 
 	PUBLIC Math
 	Physics
 	Scripting
-	Rendering)
+	Rendering
+	RapidXML)
 
 target_include_directories(
 	FarToGo 
