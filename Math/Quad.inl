@@ -1,4 +1,4 @@
-#include "Vector3.inl";
+#include "Vector3.inl"
 
 namespace BoulderLeaf::Math::Templates
 {

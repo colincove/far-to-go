@@ -36,7 +36,7 @@ namespace BoulderLeaf::Math::Templates
 			return data[i];
 		}
 
-		inline Vector2<T> Cross(Vector2<T> other) { return Vector2<T>(); }
+		inline T Cross(Vector2<T> other) { return 0; }
 		inline T Dot(Vector2<T> other) { return 0; }
 		inline Vector2<T> Normalize() { return Vector2<T>(); }
 		inline T Magnitude() { return 0; }
