@@ -80,7 +80,7 @@ namespace BoulderLeaf::Math
 	TEST(Vector3, Subtract)
 	{
 		Vector3 vector(10, 5.5f, 2);
-		Vector3 result = vector - Vector3(2, 3, 1);
+		const Vector3 result = vector - Vector3(2, 3, 1);
 		EXPECT_EQ(result, Vector3(8, 2.5f, 1));
 
 		vector = Vector3(10, 5.5f, 2);
@@ -90,31 +90,51 @@ namespace BoulderLeaf::Math
 
 	TEST(Vector3, Cross)
 	{
-		Vector3 vector(1, 2, 3);
-		Vector3 result = vector.Cross(Vector3(1, 5, 7));
+		const Vector3 vector(1, 2, 3);
+		const Vector3 result = vector.Cross(Vector3(1, 5, 7));
 		EXPECT_EQ(result, Vector3(-1, -4, 3));
 	}
 
 	TEST(Vector3, Normalize)
 	{
-		Vector3 vector(1, 2, 3);
-		Vector3 result = vector.Normalize();
-		EXPECT_EQ(result.Magnitude(), 1);
+		const Vector3 vector(1, 2, 3);
+		const Vector3 result = vector.Normalize();
+		const float resultMagnitude = result.Magnitude();
+		EXPECT_FLOAT_EQ(resultMagnitude, 1.0f);
 		EXPECT_GT(result.y, result.x);
 		EXPECT_GT(result.z, result.y);
 	}
 
 	TEST(Vector3, Magnitude)
 	{
-		Vector3 vector(2, 4, 4);
-		float result = vector.Magnitude();
-		EXPECT_EQ(result, 6);
+		const Vector3 vector(2, 4, 4);
+		const float resultMagnitude = vector.Magnitude();
+		EXPECT_FLOAT_EQ(resultMagnitude, 6);
 	}
 
 	TEST(Vector3, Dot)
 	{
-		Vector3 vector(1, 2, 3);
-		float result = vector.Dot(Vector3(1, 5, 7));
-		EXPECT_EQ(result, 32);
+		const Vector3 vector(1, 2, 3);
+		const float result = vector.Dot(Vector3(1, 5, 7));
+		EXPECT_FLOAT_EQ(result, 32);
+	}
+
+	TEST(Vector3, Orthoginal)
+	{
+		EXPECT_TRUE(Vector3(5, 5, 0).IsOrthoginal(Vector3(5, -5, 0)));
+		EXPECT_TRUE(Vector3(1, 2, 3).IsOrthoginal(Vector3(1, 4, -3)));
+		EXPECT_FALSE(Vector3(45, 23, 2).IsOrthoginal(Vector3(32, 2, 3)));
+	}
+
+	TEST(Vector3, Acute)
+	{
+		EXPECT_TRUE(Vector3(1, 2, 3).IsAngleAcute(Vector3(1, 5, -3)));
+		EXPECT_FALSE(Vector3(3, 2, 3).IsAngleAcute(Vector3(1, -10, 5)));
+	}
+
+	TEST(Vector3, Obtuse)
+	{
+		EXPECT_FALSE(Vector3(1, 2, 3).IsAngleObtuse(Vector3(1, 5, -3)));
+		EXPECT_TRUE(Vector3(3, 2, 3).IsAngleObtuse(Vector3(1, -10, 5)));
 	}
 }

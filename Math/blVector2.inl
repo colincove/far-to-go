@@ -36,10 +36,38 @@ namespace BoulderLeaf::Math::Templates
 			return data[i];
 		}
 
-		inline T Cross(Vector2<T> other) { return 0; }
-		inline T Dot(Vector2<T> other) { return 0; }
-		inline Vector2<T> Normalize() { return Vector2<T>(); }
-		inline T Magnitude() { return 0; }
+		inline Vector2<T> Cross(const Vector2<T>& other) const { return Vector2<T>(); }
+
+		inline T Dot(Vector2<T> other) const 
+		{ 
+			return x * other.x + y * other.y;
+		}
+
+		inline Vector2<T> Normalize() const
+		{
+			const T magnitude = Magnitude();
+			return Vector2<T>(x / magnitude, y / magnitude);
+		}
+
+		inline T Magnitude() const
+		{ 
+			return std::sqrtf(x * x + y * y);
+		}
+
+		inline bool IsOrthoginal(const Vector2<T>& other) const
+		{
+			return Dot(other) == 0;
+		}
+
+		inline bool IsAngleAcute(const Vector2<T>& other) const
+		{
+			return Dot(other) > 0;
+		}
+
+		inline bool IsAngleObtuse(const Vector2<T>& other) const
+		{
+			return Dot(other) < 0;
+		}
 	};
 
 	template<typename T>

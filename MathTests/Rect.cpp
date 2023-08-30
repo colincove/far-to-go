@@ -43,6 +43,6 @@ namespace BoulderLeaf::Math
 	TEST(Rect, Area)
 	{
 		Rect rect(5, 10, Vector2(20, 30));
-		EXPECT_EQ(rect.Area(), 200);
+		EXPECT_FLOAT_EQ(rect.Area(), 200);
 	}
 }

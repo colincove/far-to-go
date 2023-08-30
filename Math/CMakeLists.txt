@@ -7,6 +7,7 @@ add_library(
 	blMatrix4x4.inl
 	blPlane.inl
 	blQuad.inl
+	blQuaternion.inl
 	blRay.inl
 	blRect.inl
 	blVector2.inl

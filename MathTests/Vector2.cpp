@@ -23,7 +23,7 @@ namespace BoulderLeaf::Math
 		EXPECT_NE(vector, Vector2(0, 6));
 
 		EXPECT_NE(vector, Vector2(-10.6f, 4.5f));
-		EXPECT_NE(vector, Vector2(0, 4));
+		EXPECT_NE(vector, Vector2(4, 0));
 	}
 
 	TEST(Vector2, Multiply)
@@ -87,30 +87,49 @@ namespace BoulderLeaf::Math
 
 	TEST(Vector2, Cross)
 	{
-		Vector2 vector(1, 2);
-		float result = vector.Cross(Vector2(1, 5));
-		EXPECT_EQ(result, 3);
+		const Vector2 vector(1, 2);
+		const Vector2 result = vector.Cross(Vector2(1, 5));
+		EXPECT_FLOAT_EQ(result.x, 3);
+		EXPECT_FLOAT_EQ(result.y, 3);
 	}
 
 	TEST(Vector2, Normalize)
 	{
-		Vector2 vector(1, 2);
-		Vector2 result = vector.Normalize();
-		EXPECT_EQ(result.Magnitude(), 1);
+		const Vector2 vector(1, 2);
+		const Vector2 result = vector.Normalize();
+		EXPECT_FLOAT_EQ(result.Magnitude(), 1);
 		EXPECT_GT(result.y, result.x);
 	}
 
 	TEST(Vector2, Magnitude)
 	{
-		Vector2 vector(2, 4);
-		float result = vector.Magnitude();
-		EXPECT_EQ(result, 6);
+		const Vector2 vector(5, 12);
+		const float result = vector.Magnitude();
+		EXPECT_FLOAT_EQ(result, 13);
 	}
 
 	TEST(Vector2, Dot)
 	{
-		Vector2 vector(1, 2);
-		float result = vector.Dot(Vector2(1, 5));
-		EXPECT_EQ(result, 11);
+		const Vector2 vector(1, 2);
+		const float result = vector.Dot(Vector2(1, 5));
+		EXPECT_FLOAT_EQ(result, 11);
+	}
+
+	TEST(Vector2, Orthoginal)
+	{
+		EXPECT_TRUE(Vector2(5, 5).IsOrthoginal(Vector2(5, -5)));
+		EXPECT_FALSE(Vector2(45, 23).IsOrthoginal(Vector2(32, 2)));
+	}
+
+	TEST(Vector2, Acute)
+	{
+		EXPECT_TRUE(Vector2(1, 2).IsAngleAcute(Vector2(1, 5)));
+		EXPECT_FALSE(Vector2(3, 2).IsAngleAcute(Vector2(1, -10)));
+	}
+
+	TEST(Vector2, Obtuse)
+	{
+		EXPECT_FALSE(Vector2(1, 2).IsAngleObtuse(Vector2(1, 5)));
+		EXPECT_TRUE(Vector2(3, 2).IsAngleObtuse(Vector2(1, -10)));
 	}
 }

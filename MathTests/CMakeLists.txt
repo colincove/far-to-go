@@ -1,8 +1,16 @@
 add_executable(
 	MathTests
-	Vector3.cpp
+	Line.cpp
+	LineSegment.cpp
+	main.cpp
+	Matrix4x4.cpp
+	Quad.cpp
+	Quaternion.cpp
+	Ray.cpp
 	Rect.cpp
-	main.cpp)
+	Vector2.cpp
+	Vector3.cpp
+	)
 
 target_link_libraries(
 	MathTests 
@@ -13,9 +21,8 @@ target_link_libraries(
 
 install(TARGETS MathTests CONFIGURATIONS Debug DESTINATION Debug)
 
-#gtest_add_tests(
-#    TARGET		MathTests
-#    TEST_SUFFIX		.noArgs
-#    TEST_LIST		noArgsTests)
+gtest_add_tests(
+    TARGET		MathTests
+    TEST_LIST		noArgsTests)
 
 #add_test(NAME MathTests COMMAND MathTests CONFIGURATIONS Debug)

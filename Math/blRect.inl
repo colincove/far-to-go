@@ -27,7 +27,7 @@ namespace BoulderLeaf::Math::Templates
 		inline Vector2<T> BottomRight() const { return Vector2<T>(); }
 
 		inline Rect Overlap(Rect other) const { return Rect(); }
-		inline T Area() const { return 0; }
+		inline T Area() const { return halfHeight * halfWidth * 4; }
 	};
 
 	template<typename T>

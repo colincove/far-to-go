@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdlib>
 
 namespace BoulderLeaf::Math::Templates
 {
@@ -37,10 +38,38 @@ namespace BoulderLeaf::Math::Templates
 			return data[i];
 		}
 
-		inline Vector3<T> Cross(Vector3<T> other) { return Vector3<T>(); }
-		inline T Dot(Vector3<T> other) { return 0; }
-		inline Vector3<T> Normalize() { return Vector3<T>(); }
-		inline T Magnitude() { return 0; }
+		inline Vector3<T> Cross(const Vector3<T>& other) const { return Vector3<T>(); }
+
+		inline T Dot(const Vector3<T>& other) const
+		{
+			return x * other.x + y * other.y + z * other.z;
+		}
+		
+		inline Vector3<T> Normalize() const
+		{ 
+			const T magnitude = Magnitude();
+			return Vector3<T>(x / magnitude, y / magnitude, z / magnitude);
+		}
+
+		inline T Magnitude() const
+		{ 
+			return std::sqrtf(x * x + y * y + z * z);
+		}
+
+		inline bool IsOrthoginal(const Vector3<T>& other) const
+		{
+			return Dot(other) == 0;
+		}
+
+		inline bool IsAngleAcute(const Vector3<T>& other) const
+		{
+			return Dot(other) > 0;
+		}
+
+		inline bool IsAngleObtuse(const Vector3<T>& other) const
+		{
+			return Dot(other) < 0;
+		}
 	};
 
 	template<typename T>
