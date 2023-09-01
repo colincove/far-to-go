@@ -1,6 +1,5 @@
-namespace BoulderLeaf::Math::Templates
+namespace BoulderLeaf::Math
 {
-	template<typename T>
 	struct Quaternion
 	{
 		Quaternion()

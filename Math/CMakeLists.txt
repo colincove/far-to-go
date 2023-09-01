@@ -1,7 +1,5 @@
 add_library(
-	Math 
-	blMath.inl
-	blMathFloat.h
+	Math
 	blLine.inl
 	blLineSegment.inl
 	blMatrix4x4.inl
@@ -12,7 +10,6 @@ add_library(
 	blRect.inl
 	blVector2.inl
 	blVector3.inl
-	blVector3.cpp
 	)
 
 # Note: I need this because I did not include any *.cpp files to be linked. 

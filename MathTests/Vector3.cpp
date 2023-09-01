@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <blMathFloat.h>
+#include <blVector3.inl>
 
 namespace BoulderLeaf::Math
 {

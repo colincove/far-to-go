@@ -2,16 +2,15 @@
 
 #include <algorithm>
 
-namespace BoulderLeaf::Math::Templates
+namespace BoulderLeaf::Math
 {
-	template<typename T>
 	struct Vector2
 	{
 		Vector2() : 
 			Vector2(0, 0)
 		{}
 
-		Vector2(T x, T y):
+		Vector2(float x, float y):
 			x(x),
 			y(y)
 		{}
@@ -20,145 +19,131 @@ namespace BoulderLeaf::Math::Templates
 		{
 			struct
 			{
-				T x, y;
+				float x, y;
 			};
 
-			T data[2];
+			float data[2];
 		};
 
-		const T& operator[](const size_t i) const
+		const float& operator[](const size_t i) const
 		{
 			return data[i];
 		}
 
-		T& operator[](const size_t i)
+		float& operator[](const size_t i)
 		{
 			return data[i];
 		}
 
-		inline Vector2<T> Cross(const Vector2<T>& other) const { return Vector2<T>(); }
+		inline Vector2 Cross(const Vector2& other) const { return Vector2(); }
 
-		inline T Dot(Vector2<T> other) const 
+		inline float Dot(Vector2 other) const
 		{ 
 			return x * other.x + y * other.y;
 		}
 
-		inline Vector2<T> Normalize() const
+		inline Vector2 Normalize() const
 		{
-			const T magnitude = Magnitude();
-			return Vector2<T>(x / magnitude, y / magnitude);
+			const float magnitude = Magnitude();
+			return Vector2(x / magnitude, y / magnitude);
 		}
 
-		inline T Magnitude() const
+		inline float Magnitude() const
 		{ 
-			return std::sqrtf(x * x + y * y);
+			return sqrtf(x * x + y * y);
 		}
 
-		inline bool IsOrthoginal(const Vector2<T>& other) const
+		inline bool IsOrthoginal(const Vector2& other) const
 		{
 			return Dot(other) == 0;
 		}
 
-		inline bool IsAngleAcute(const Vector2<T>& other) const
+		inline bool IsAngleAcute(const Vector2& other) const
 		{
 			return Dot(other) > 0;
 		}
 
-		inline bool IsAngleObtuse(const Vector2<T>& other) const
+		inline bool IsAngleObtuse(const Vector2& other) const
 		{
 			return Dot(other) < 0;
 		}
 	};
 
-	template<typename T>
-	inline bool operator==(const Vector2<T>& lhs, const Vector2<T>& rhs)
+	inline bool operator==(const Vector2& lhs, const Vector2& rhs)
 	{
 		return std::equal(std::begin(lhs.data), std::end(lhs.data), std::begin(rhs.data));
 	}
 
-	template<typename T>
-	inline bool operator!=(const Vector2<T>& lhs, const Vector2<T>& rhs) { return !(lhs == rhs); }
+	
+	inline bool operator!=(const Vector2& lhs, const Vector2& rhs) { return !(lhs == rhs); }
 
-	template<typename T>
-	inline Vector2<T> operator*(const Vector2<T>& lhs, const Vector2<T>& rhs) 
+	inline Vector2 operator*(const Vector2& lhs, const Vector2& rhs) 
 	{
-		return Vector2<T>(lhs.x * rhs.x, lhs.y * rhs.y);
+		return Vector2(lhs.x * rhs.x, lhs.y * rhs.y);
 	}
-
-	template<typename T>
-	inline void operator*=(Vector2<T>& lhs, const Vector2<T>& rhs)
+	
+	inline void operator*=(Vector2& lhs, const Vector2& rhs)
 	{
 		lhs.x *= rhs.x;
 		lhs.y *= rhs.y;
 	}
-
-	template<typename T>
-	inline void operator*=(Vector2<T>& lhs, const T& rhs)
+	
+	inline void operator*=(Vector2& lhs, const float& rhs)
 	{
 		lhs.x *= rhs;
 		lhs.y *= rhs;
 	}
-
-	template<typename T>
-	inline Vector2<T> operator*(const Vector2<T>& lhs, const T& rhs)
+	
+	inline Vector2 operator*(const Vector2& lhs, const float& rhs)
 	{
-		return Vector2<T>(lhs.x * rhs, lhs.y * rhs);
+		return Vector2(lhs.x * rhs, lhs.y * rhs);
 	}
-
-	template<typename T>
-	inline Vector2<T> operator/(const Vector2<T>& lhs, const Vector2<T>& rhs)
+	
+	inline Vector2 operator/(const Vector2& lhs, const Vector2& rhs)
 	{
-		return Vector2<T>(lhs.x / rhs.x, lhs.y / rhs.y);
+		return Vector2(lhs.x / rhs.x, lhs.y / rhs.y);
 	}
-
-	template<typename T>
-	inline Vector2<T> operator/(const Vector2<T>& lhs, const T& rhs)
+	
+	inline Vector2 operator/(const Vector2& lhs, const float& rhs)
 	{
-		return Vector2<T>(lhs.x / rhs, lhs.y / rhs);
+		return Vector2(lhs.x / rhs, lhs.y / rhs);
 	}
-
-	template<typename T>
-	inline void operator/=(Vector2<T>& lhs, const Vector2<T>& rhs)
+	
+	inline void operator/=(Vector2& lhs, const Vector2& rhs)
 	{
 		lhs.x /= rhs.x;
 		lhs.y /= rhs.y;
 	}
-
-	template<typename T>
-	inline void operator/=(Vector2<T>& lhs, const T& rhs)
+	
+	inline void operator/=(Vector2& lhs, const float& rhs)
 	{
 		lhs.x /= rhs;
 		lhs.y /= rhs;
 	}
-
-	template<typename T>
-	inline Vector2<T> operator+(const Vector2<T>& lhs, const Vector2<T>& rhs)
+	
+	inline Vector2 operator+(const Vector2& lhs, const Vector2& rhs)
 	{
-		return Vector2<T>(lhs.x + rhs.x, lhs.y + rhs.y);
+		return Vector2(lhs.x + rhs.x, lhs.y + rhs.y);
 	}
-
-	template<typename T>
-	inline Vector2<T> operator-(const Vector2<T>& lhs, const Vector2<T>& rhs)
+	
+	inline Vector2 operator-(const Vector2& lhs, const Vector2& rhs)
 	{
-		return Vector2<T>(lhs.x - rhs.x, lhs.y - rhs.y);
+		return Vector2(lhs.x - rhs.x, lhs.y - rhs.y);
 	}
-
-	template<typename T>
-	inline void operator+=(Vector2<T>& lhs, const Vector2<T>& rhs)
+	
+	inline void operator+=(Vector2& lhs, const Vector2& rhs)
 	{
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
 	}
-
-	template<typename T>
-	inline void operator+=(Vector2<T>& lhs, const T& rhs)
+	
+	inline void operator+=(Vector2& lhs, const float& rhs)
 	{
 		lhs.x += rhs;
 		lhs.y += rhs;
 	}
-
-	template<typename T>
-	inline void operator-=(Vector2<T>& lhs, const Vector2<T>& rhs)
+	
+	inline void operator-=(Vector2& lhs, const Vector2& rhs)
 	{
 		lhs.x -= rhs.x;
 		lhs.y -= rhs.y;

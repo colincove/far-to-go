@@ -1,8 +1,7 @@
 #pragma once
 
-namespace BoulderLeaf::Math::Templates
+namespace BoulderLeaf::Math
 {
-	template<typename T>
 	struct Matrix4x4
 	{
 

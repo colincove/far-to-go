@@ -1,20 +1,19 @@
 #include <blVector3.inl>
 
-namespace BoulderLeaf::Math::Templates
+namespace BoulderLeaf::Math
 {
-	template<typename T>
 	struct Quad
 	{
 		union
 		{
 			struct
 			{
-				Vector3<T> a, b, c, d;
+				Vector3 a, b, c, d;
 			};
 
-			Vector3<T> data[4];
+			Vector3 data[4];
 		};
 
-		Vector3<T> center() const;
+		Vector3 center() const;
 	};
 };

@@ -1,14 +1,13 @@
 #include <blVector3.inl>
 
-namespace BoulderLeaf::Math::Templates
+namespace BoulderLeaf::Math
 {
-	template<typename T>
 	struct Ray
 	{
-		Vector3<T> origin;
-		Vector3<T> direction;
+		Vector3 origin;
+		Vector3 direction;
 
-		Ray(Vector3<T> origin, Vector3<T> direction) :
+		Ray(Vector3 origin, Vector3 direction) :
 			origin(origin),
 			direction(direction)
 		{};
