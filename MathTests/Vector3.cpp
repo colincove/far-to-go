@@ -137,4 +137,21 @@ namespace BoulderLeaf::Math
 		EXPECT_FALSE(Vector3(1, 2, 3).IsAngleObtuse(Vector3(1, 5, -3)));
 		EXPECT_TRUE(Vector3(3, 2, 3).IsAngleObtuse(Vector3(1, -10, 5)));
 	}
+
+	TEST(Vector3, Orthogonalize)
+	{
+		Vector3 testArray[3]
+		{
+			Vector3(2, 2, 2),
+			Vector3(1, 2, 1),
+			Vector3(-1, -1, -1)
+		};
+
+		Vector3* start = testArray;
+		Vector3* end = start + 3;
+
+		EXPECT_FALSE(Vector3::IsOrthogonalized(start, end));
+		Vector3::Orthogonalize(start, end);
+		EXPECT_TRUE(Vector3::IsOrthogonalized(start, end));
+	}
 }

@@ -132,4 +132,38 @@ namespace BoulderLeaf::Math
 		EXPECT_FALSE(Vector2(1, 2).IsAngleObtuse(Vector2(1, 5)));
 		EXPECT_TRUE(Vector2(3, 2).IsAngleObtuse(Vector2(1, -10)));
 	}
+
+	TEST(Vector2, Orthogonalize)
+	{
+		Vector2 a = Vector2(2, 2);
+		Vector2 b = Vector2(1, 2);
+
+		EXPECT_FALSE(a.IsOrthoginal(b));
+		Vector2 result = b.Orthogonalize(a);
+		EXPECT_TRUE(a.IsOrthoginal(result));
+	}
+
+	TEST(Vector2, OrthogonalizeSet)
+	{
+		Vector2 testArray[2]
+		{
+			Vector2(2, 2),
+			Vector2(1, 2)
+		};
+
+		Vector2* start = testArray;
+		Vector2* end = start + 2;
+
+		EXPECT_FALSE(Vector2::IsOrthogonalized(start, end));
+		Vector2::Orthogonalize(start, end);
+		EXPECT_TRUE(Vector2::IsOrthogonalized(start, end));
+	}
+
+	TEST(Vector2, Project)
+	{
+		Vector2 v = Vector2(-4, 2);
+		Vector2 u = Vector2(3, 1);
+		Vector2 projection = v.ProjectOnto(u);
+		EXPECT_EQ(projection, Vector2(-3, -1));
+	}
 }

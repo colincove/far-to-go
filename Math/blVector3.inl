@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <cstdlib>
+#include <blMath.inl>
 
 namespace BoulderLeaf::Math
 {
@@ -50,6 +50,11 @@ namespace BoulderLeaf::Math
 			return Vector3(x / magnitude, y / magnitude, z / magnitude);
 		}
 
+		inline bool IsNormalized() const
+		{
+			return IsNearExpected(1, Magnitude());
+		}
+
 		inline float Magnitude() const
 		{ 
 			return sqrtf(x * x + y * y + z * z);
@@ -57,7 +62,7 @@ namespace BoulderLeaf::Math
 
 		inline bool IsOrthoginal(const Vector3& other) const
 		{
-			return Dot(other) == 0;
+			return IsNearZero(Dot(other));
 		}
 
 		inline bool IsAngleAcute(const Vector3& other) const
@@ -68,6 +73,26 @@ namespace BoulderLeaf::Math
 		inline bool IsAngleObtuse(const Vector3& other) const
 		{
 			return Dot(other) < 0;
+		}
+
+		inline Vector3 ProjectOnto(const Vector3& other)
+		{
+			return BoulderLeaf::Math::Project<Vector3>(*this, other);
+		}
+
+		inline Vector3 Orthogonalize(const Vector3& other)
+		{
+			return BoulderLeaf::Math::Orthogonalize<Vector3>(*this, other);
+		}
+
+		static void Orthogonalize(Vector3* start, Vector3* end)
+		{
+			BoulderLeaf::Math::Orthogonalize<Vector3>(start, end);
+		}
+
+		static bool IsOrthogonalized(const Vector3* start, const Vector3* end)
+		{
+			return BoulderLeaf::Math::IsOrthogonalized<Vector3>(start, end);
 		}
 	};
 

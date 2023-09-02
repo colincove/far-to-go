@@ -1,5 +1,6 @@
 add_library(
 	Math
+	blMath.inl
 	blLine.inl
 	blLineSegment.inl
 	blMatrix4x4.inl
