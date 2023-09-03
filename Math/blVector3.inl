@@ -85,9 +85,16 @@ namespace BoulderLeaf::Math
 			return BoulderLeaf::Math::Orthogonalize<Vector3>(*this, other);
 		}
 
-		static void Orthogonalize(Vector3* start, Vector3* end)
+		static void Orthogonalize(Vector3* start)
 		{
-			BoulderLeaf::Math::Orthogonalize<Vector3>(start, end);
+			Vector3& x1 = *start;
+			Vector3& x2 = *(start+1);
+			Vector3& x3 = *(start+2);
+
+			x2 = x2.Orthogonalize(x1);
+			x3 = x3.Orthogonalize(x1);
+			x3 = x3.Orthogonalize(x2);
+			x1 = x1.Normalize();
 		}
 
 		static bool IsOrthogonalized(const Vector3* start, const Vector3* end)

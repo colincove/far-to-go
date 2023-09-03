@@ -145,18 +145,12 @@ namespace BoulderLeaf::Math
 
 	TEST(Vector2, OrthogonalizeSet)
 	{
-		Vector2 testArray[2]
-		{
-			Vector2(2, 2),
-			Vector2(1, 2)
-		};
+		Vector2 x1 = Vector2(2, 2);
+		Vector2 x2 = Vector2(1, 2);
 
-		Vector2* start = testArray;
-		Vector2* end = start + 2;
-
-		EXPECT_FALSE(Vector2::IsOrthogonalized(start, end));
-		Vector2::Orthogonalize(start, end);
-		EXPECT_TRUE(Vector2::IsOrthogonalized(start, end));
+		EXPECT_FALSE(x1.IsOrthoginal(x2));
+		x2 = x2.Orthogonalize(x1);
+		EXPECT_TRUE(x1.IsOrthoginal(x2));
 	}
 
 	TEST(Vector2, Project)

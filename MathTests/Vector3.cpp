@@ -144,14 +144,14 @@ namespace BoulderLeaf::Math
 		{
 			Vector3(2, 2, 2),
 			Vector3(1, 2, 1),
-			Vector3(-1, -1, -1)
+			Vector3(3, -4, -1)
 		};
 
 		Vector3* start = testArray;
 		Vector3* end = start + 3;
 
 		EXPECT_FALSE(Vector3::IsOrthogonalized(start, end));
-		Vector3::Orthogonalize(start, end);
+		Vector3::Orthogonalize(start);
 		EXPECT_TRUE(Vector3::IsOrthogonalized(start, end));
 	}
 }
