@@ -1,7 +1,9 @@
 add_library(
 	Math
 	blMath.inl
-	blMathUtils.cpp
+	blMathUtils.cpp #We need at least 1 *.cpp file. Otherwise, the lib will not get generated, and cannot be linked
+	#Alternatively, we remove linking to the Math lib. And make it stricktly an inline code repository. 
+	#But I "suspect" that I will want more than just inline code in the future. So lets make it work for now.
 	blLine.inl
 	blLineSegment.inl
 	blMatrix4x4.inl
