@@ -4,6 +4,7 @@ add_executable(
 	LineSegment.cpp
 	main.cpp
 	Matrix4x4.cpp
+	Point3.cpp
 	Quad.cpp
 	Quaternion.cpp
 	Ray.cpp
@@ -14,7 +15,7 @@ add_executable(
 
 target_link_libraries(
 	MathTests 
-	PUBLIC Math
+	PUBLIC blMath
 	GTest::gtest
 	GTest::gtest_main
 )

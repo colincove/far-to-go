@@ -1,10 +1,11 @@
 add_library(
-	Math
+	blMath
 	blMath.inl
 	blLine.inl
 	blLineSegment.inl
 	blMatrix4x4.inl
 	blPlane.inl
+	blPoint3.inl
 	blQuad.inl
 	blQuaternion.inl
 	blRay.inl
@@ -15,11 +16,11 @@ add_library(
 
 # Note: I need this because I did not include any *.cpp files to be linked. 
 # I had renamed them all to *.inl. 
-set_target_properties(Math PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(blMath PROPERTIES LINKER_LANGUAGE CXX)
 
-target_include_directories(Math
+target_include_directories(blMath
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
         )
 
 
-install(TARGETS Math CONFIGURATIONS Debug DESTINATION Debug/lib)
+install(TARGETS blMath CONFIGURATIONS Debug DESTINATION Debug/lib)

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <blVector2.inl>
 
-namespace BoulderLeaf::Math 
+namespace BoulderLeaf::Math::Test
 {
 	TEST(Vector2, Initialization)
 	{

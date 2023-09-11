@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <blRect.inl>
 
-namespace BoulderLeaf::Math
+namespace BoulderLeaf::Math::Test
 {
 	TEST(Rect, Initialization)
 	{
@@ -26,17 +26,17 @@ namespace BoulderLeaf::Math
 	{
 		Rect rect(5, 10, Vector2(20, 30));
 
-		EXPECT_EQ(rect.TopLeft(), Vector2(rect.Left(), rect.Top()));
-		EXPECT_EQ(rect.TopRight(), Vector2(rect.Right(), rect.Top()));
-		EXPECT_EQ(rect.BottomLeft(), Vector2(rect.Left(), rect.Bottom()));
-		EXPECT_EQ(rect.BottomRight(), Vector2(rect.Left(), rect.Bottom()));
+		EXPECT_EQ(rect.TopLeft(), Vector2(15, 40));
+		EXPECT_EQ(rect.TopRight(), Vector2(25, 40));
+		EXPECT_EQ(rect.BottomLeft(), Vector2(15, 20));
+		EXPECT_EQ(rect.BottomRight(), Vector2(25, 20));
 	}
 
 	TEST(Rect, Overlap)
 	{
 		Rect rect(5, 10, Vector2(20, 30));
 		Rect result = rect.Overlap(Rect(10, 20, Vector2(10, 55)));
-		Rect expected(5, 5, Vector2(17.5, 35));
+		Rect expected(2.5f, 2.5f, Vector2(17.5f, 37.5f));
 		EXPECT_EQ(result, expected);
 	}
 

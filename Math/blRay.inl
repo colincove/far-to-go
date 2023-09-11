@@ -1,3 +1,5 @@
+#pragma once
+
 #include <blVector3.inl>
 
 namespace BoulderLeaf::Math
