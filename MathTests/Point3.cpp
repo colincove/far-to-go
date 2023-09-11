@@ -35,7 +35,6 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_EQ(Vector3(3, 9, 0), Point3(-5, -5, 10) - Point3(-2, 4, 10));
 		EXPECT_EQ(Vector3(-150, -25, -7), Point3(100, 50, -7) - Point3(-50, 25, -14));
 		EXPECT_EQ(Vector3(0, 0, 0), Point3(20, 40, 23.5) - Point3(20, 40, 23.5));
-
 	}
 
 	TEST(Point3, AddVector)
@@ -47,7 +46,7 @@ namespace BoulderLeaf::Math::Test
 	TEST(Point3, Vector3Ref)
 	{
 		Point3 point(3, 4, 5);
-		/*Vector3& vector = point;
+		Vector3& vector = point;
 
 		EXPECT_EQ(Vector3(3, 4, 5), vector);
 
@@ -57,6 +56,6 @@ namespace BoulderLeaf::Math::Test
 
 		EXPECT_EQ(point.x, 100);
 		EXPECT_EQ(point.y, 200);
-		EXPECT_EQ(point.z, 300);*/
+		EXPECT_EQ(point.z, 300);
 	}
 }

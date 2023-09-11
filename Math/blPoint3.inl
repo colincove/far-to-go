@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blVector3.inl>
+#include "blVector3.inl"
 
 namespace BoulderLeaf::Math
 {
@@ -41,7 +41,7 @@ namespace BoulderLeaf::Math
 			return data[i];
 		}
 
-		//operator Vector3& () { return *this; }
+		operator Vector3& () { return *reinterpret_cast<Vector3*>(this); }
 		operator Vector3() const { return Vector3(x, y, z); }
 	};
 

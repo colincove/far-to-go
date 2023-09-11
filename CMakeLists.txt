@@ -41,7 +41,7 @@ add_subdirectory(RapidXML)
 
 target_link_libraries(
 	FarToGo 
-	PUBLIC blMath
+	PUBLIC Math
 	Physics
 	Scripting
 	Rendering

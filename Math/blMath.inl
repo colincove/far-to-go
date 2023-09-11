@@ -27,7 +27,7 @@ namespace BoulderLeaf::Math
 	}
 
 	template<typename TVector>
-	static bool IsOrthogonalized(const TVector* start, const TVector* end)
+	bool IsOrthogonalized(const TVector* start, const TVector* end)
 	{
 		if (start == end)
 		{

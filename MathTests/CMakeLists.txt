@@ -15,7 +15,7 @@ add_executable(
 
 target_link_libraries(
 	MathTests 
-	PUBLIC blMath
+	PUBLIC Math
 	GTest::gtest
 	GTest::gtest_main
 )
