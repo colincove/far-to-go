@@ -6,7 +6,7 @@ namespace BoulderLeaf::Math
 
 	inline bool IsNearExpected(float expected, float actual)
 	{
-		return expected - Epsilon < actual&& expected + Epsilon > actual;
+		return fabs(expected - actual) < Epsilon;
 	}
 
 	inline bool IsNearZero(float value)

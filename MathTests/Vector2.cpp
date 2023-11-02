@@ -85,14 +85,6 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_EQ(vector, Vector2(5, 0.5f));
 	}
 
-	TEST(Vector2, Cross)
-	{
-		const Vector2 vector(1, 2);
-		const Vector2 result = vector.Cross(Vector2(1, 5));
-		EXPECT_FLOAT_EQ(result.x, 3);
-		EXPECT_FLOAT_EQ(result.y, 3);
-	}
-
 	TEST(Vector2, Normalize)
 	{
 		const Vector2 vector(1, 2);

@@ -36,8 +36,6 @@ namespace BoulderLeaf::Math
 			return data[i];
 		}
 
-		inline Vector2 Cross(const Vector2& other) const { return Vector2(); }
-
 		inline float Dot(Vector2 other) const
 		{ 
 			return x * other.x + y * other.y;

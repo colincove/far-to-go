@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <blMath.inl>
+#include "blMath.inl"
 
 namespace BoulderLeaf::Math
 {
@@ -37,7 +37,14 @@ namespace BoulderLeaf::Math
 			return data[i];
 		}
 
-		inline Vector3 Cross(const Vector3& other) const { return Vector3(); }
+		inline Vector3 Cross(const Vector3& other) const 
+		{ 
+			return Vector3(
+				y * other.z - z * other.y,
+				z * other.x - x * other.z,
+				x * other.y - y * other.x
+			);
+		}
 
 		inline float Dot(const Vector3& other) const
 		{
