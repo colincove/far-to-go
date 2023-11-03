@@ -8,6 +8,7 @@ namespace BoulderLeaf::Math::Test
 		Matrix2x3 m2x3(
 			-1, 5, -4, 
 			3, 2, 1);
+
 		Matrix3x3 m3x3(
 			2, 1, 0,
 			0, -2, 1,
@@ -22,5 +23,15 @@ namespace BoulderLeaf::Math::Test
 				5, 1, 5),
 			result
 		);
+	}
+
+	TEST(blMatrix2x3, Identity)
+	{
+		Matrix2x3 m(
+			-1, 5, -4,
+			3, 2, 1);
+
+		Matrix2x3 result(Matrix2x3::Identity() * m);
+		EXPECT_EQ(m, result);
 	}
 }

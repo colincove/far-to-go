@@ -29,7 +29,8 @@ find_package(GTest)
 
 add_executable(
 	FarToGo 
-	FarToGo/main.cpp)
+	FarToGo/main.cpp
+	Test/blAssert.h)
 
 add_subdirectory(Math)
 add_subdirectory(Physics)

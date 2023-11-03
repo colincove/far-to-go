@@ -1,23 +1,28 @@
 #pragma once
 
+#include "..\Test\blAssert.h";
+
 #include "blVector3.inl";
 #include "blVector2.inl";
 #include "blMatrix3x3.inl";
+#include "blMatrix2x2.inl";
 
 namespace BoulderLeaf::Math
 {
 	struct Matrix2x3
 	{
-#define ELEMENT_INDEX(i, j) i * 3 + j
+		static constexpr size_t k_NumberOfRows = 2;
+		static constexpr size_t k_NumberOfColumns = 3;
+		static constexpr size_t k_NumberOfElements = k_NumberOfRows * k_NumberOfColumns;
 
-		static constexpr size_t s_NumberOfElements = 6;
+		#define ELEMENT_INDEX(row, column) row * k_NumberOfColumns + column
 
 		typedef Vector3 RowVector;
 		typedef Vector2 ColumnVector;
 
 		union
 		{
-			float elements[s_NumberOfElements];
+			float elements[k_NumberOfElements];
 
 			struct
 			{
@@ -45,31 +50,40 @@ namespace BoulderLeaf::Math
 
 		const float& operator[](const size_t i) const
 		{
+			BL_ASSERT_INDEX(i, k_NumberOfElements);
 			return elements[i];
 		}
 
 		float& operator[](const size_t i)
 		{
+			BL_ASSERT_INDEX(i, k_NumberOfElements);
 			return elements[i];
 		}
 
 		inline float SetElement(const int row, const int column, const float value)
 		{
-			elements[ELEMENT_INDEX(row, column)] = value;
+			const size_t index = ELEMENT_INDEX(row, column);
+			BL_ASSERT_INDEX(index, k_NumberOfElements);
+			elements[index] = value;
 		}
 
 		inline float GetElement(const int row, const int column) const
 		{
-			return elements[ELEMENT_INDEX(row, column)];
+			const size_t index = ELEMENT_INDEX(row, column);
+			BL_ASSERT_INDEX(index, k_NumberOfElements);
+			return elements[index];
 		}
 
 		inline float& GetElementMutable(const int row, const int column)
 		{
-			return elements[ELEMENT_INDEX(row, column)];
+			const size_t index = ELEMENT_INDEX(row, column);
+			BL_ASSERT_INDEX(index, k_NumberOfElements);
+			return elements[index];
 		}
 
 		inline RowVector GetRow(const int i) const
 		{
+			BL_ASSERT_INDEX(i, k_NumberOfRows);
 			return RowVector(
 				GetElement(i, 0),
 				GetElement(i, 1),
@@ -79,9 +93,18 @@ namespace BoulderLeaf::Math
 
 		inline ColumnVector GetColumn(const int j) const
 		{
+			BL_ASSERT_INDEX(j, k_NumberOfColumns);
 			return ColumnVector(
 				GetElement(0, j),
 				GetElement(1, j)
+			);
+		}
+
+		static inline Matrix2x2 Identity()
+		{
+			return Matrix2x2(
+				1, 0,
+				0, 1
 			);
 		}
 	};
@@ -105,18 +128,6 @@ namespace BoulderLeaf::Math
 			, lhs.m10 - rhs.m10, lhs.m11 - rhs.m11, lhs.m12 - rhs.m12);
 	}
 
-	inline Matrix2x3 operator*(const Matrix2x3& lhs, const Matrix2x3& rhs)
-	{
-		return Matrix2x3(lhs.m00 * rhs.m00, lhs.m01 * rhs.m01, lhs.m02 * rhs.m02
-			, lhs.m10 * rhs.m10, lhs.m11 * rhs.m11, lhs.m12 * rhs.m12);
-	}
-
-	inline Matrix2x3 operator/(const Matrix2x3& lhs, const Matrix2x3& rhs)
-	{
-		return Matrix2x3(lhs.m00 / rhs.m00, lhs.m01 / rhs.m01, lhs.m02 / rhs.m02
-			, lhs.m10 / rhs.m10, lhs.m11 / rhs.m11, lhs.m12 / rhs.m12);
-	}
-
 	inline Matrix2x3 operator*(const Matrix2x3& lhs, const float& rhs)
 	{
 		return Matrix2x3(lhs.m00 * rhs, lhs.m01 * rhs, lhs.m02 * rhs
@@ -131,7 +142,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator*=(Matrix2x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix2x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix2x3::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] *= rhs;
 		}
@@ -139,7 +150,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator/=(Matrix2x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix2x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix2x3::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] /= rhs;
 		}
@@ -153,7 +164,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator+=(Matrix2x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix2x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix2x3::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] += rhs;
 		}
@@ -167,7 +178,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator-=(Matrix2x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix2x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix2x3::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] -= rhs;
 		}
@@ -178,6 +189,14 @@ namespace BoulderLeaf::Math
 		return Matrix2x3(
 		lhs.GetRow(0).Dot(rhs.GetColumn(0)), lhs.GetRow(0).Dot(rhs.GetColumn(1)), lhs.GetRow(0).Dot(rhs.GetColumn(2)),
 		lhs.GetRow(1).Dot(rhs.GetColumn(0)), lhs.GetRow(1).Dot(rhs.GetColumn(1)), lhs.GetRow(1).Dot(rhs.GetColumn(2))
+		);
+	}
+
+	inline Matrix2x3 operator*(const Matrix2x2& lhs, const Matrix2x3 rhs)
+	{
+		return Matrix2x3(
+			lhs.GetRow(0).Dot(rhs.GetColumn(0)), lhs.GetRow(0).Dot(rhs.GetColumn(1)), lhs.GetRow(0).Dot(rhs.GetColumn(2)),
+			lhs.GetRow(1).Dot(rhs.GetColumn(0)), lhs.GetRow(1).Dot(rhs.GetColumn(1)), lhs.GetRow(1).Dot(rhs.GetColumn(2))
 		);
 	}
 }

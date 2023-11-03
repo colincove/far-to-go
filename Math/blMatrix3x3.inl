@@ -1,21 +1,25 @@
 #pragma once
+
+#include "..\Test\blAssert.h";
+
 #include "blVector3.inl";
-#include <assert.h>;
 
 namespace BoulderLeaf::Math
 {
 	struct Matrix3x3
 	{
-		#define ELEMENT_INDEX(i, j) i * 3 + j
+		static constexpr size_t k_NumberOfRows = 3;
+		static constexpr size_t k_NumberOfColumns = 3;
+		static constexpr size_t k_NumberOfElements = k_NumberOfRows * k_NumberOfColumns;
 
-		static constexpr size_t s_NumberOfElements = 9;
+		#define ELEMENT_INDEX(row, column) row * k_NumberOfColumns + column
 
 		typedef Vector3 RowVector;
 		typedef Vector3 ColumnVector;
 
 		union
 		{
-			float elements[s_NumberOfElements];
+			float elements[k_NumberOfElements];
 
 			struct
 			{
@@ -48,28 +52,33 @@ namespace BoulderLeaf::Math
 
 		const float& operator[](const size_t i) const
 		{
-			assert((i > 0 && i < s_NumberOfElements));
+			BL_ASSERT_INDEX(i, k_NumberOfElements);
 			return elements[i];
 		}
 
 		float& operator[](const size_t i)
 		{
-			assert((i > 0 && i < s_NumberOfElements));
+			BL_ASSERT_INDEX(i, k_NumberOfElements);
 			return elements[i];
 		}
 
 		inline float GetElement(const int row, const int column) const
 		{
-			return elements[ELEMENT_INDEX(row, column)];
+			const size_t index = ELEMENT_INDEX(row, column);
+			BL_ASSERT_INDEX(index, k_NumberOfElements);
+			return elements[index];
 		}
 
 		inline float& GetElementMutable(const int row, const int column)
 		{
-			return elements[ELEMENT_INDEX(row, column)];
+			const size_t index = ELEMENT_INDEX(row, column);
+			BL_ASSERT_INDEX(index, k_NumberOfElements);
+			return elements[index];
 		}
 
 		inline RowVector GetRow(const int i) const
 		{
+			BL_ASSERT_INDEX(i, k_NumberOfRows);
 			return RowVector(
 				GetElement(i, 0),
 				GetElement(i, 1),
@@ -79,6 +88,7 @@ namespace BoulderLeaf::Math
 
 		inline ColumnVector GetColumn(const int j) const
 		{
+			BL_ASSERT_INDEX(j, k_NumberOfColumns);
 			return ColumnVector(
 				GetElement(0, j),
 				GetElement(1, j),
@@ -126,6 +136,13 @@ namespace BoulderLeaf::Math
 			, lhs.m20 - rhs.m20, lhs.m21 - rhs.m21, lhs.m22 - rhs.m22);
 	}
 
+	inline Matrix3x3 operator*(const Matrix3x3& lhs, const Matrix3x3& rhs)
+	{
+		return Matrix3x3(lhs.GetRow(0).Dot(rhs.GetColumn(0)), lhs.GetRow(0).Dot(rhs.GetColumn(1)), lhs.GetRow(0).Dot(rhs.GetColumn(2)),
+			lhs.GetRow(1).Dot(rhs.GetColumn(0)), lhs.GetRow(1).Dot(rhs.GetColumn(1)), lhs.GetRow(1).Dot(rhs.GetColumn(2)),
+			lhs.GetRow(2).Dot(rhs.GetColumn(0)), lhs.GetRow(2).Dot(rhs.GetColumn(1)), lhs.GetRow(2).Dot(rhs.GetColumn(2)));
+	}
+
 	inline Matrix3x3 operator*(const Matrix3x3& lhs, const float& rhs)
 	{
 		return Matrix3x3(lhs.m00 * rhs, lhs.m01 * rhs, lhs.m02 * rhs
@@ -135,7 +152,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator*=(Matrix3x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix3x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix3x3::k_NumberOfElements; i++)
 		{
 			lhs[i] *= rhs;
 		}
@@ -152,7 +169,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator/=(Matrix3x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix3x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix3x3::k_NumberOfElements; i++)
 		{
 			lhs[i] /= rhs;
 		}
@@ -169,7 +186,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator+=(Matrix3x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix3x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix3x3::k_NumberOfElements; i++)
 		{
 			lhs[i] += rhs;
 		}
@@ -186,7 +203,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator-=(Matrix3x3& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix3x3::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix3x3::k_NumberOfElements; i++)
 		{
 			lhs[i] -= rhs;
 		}

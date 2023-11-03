@@ -31,4 +31,16 @@ namespace BoulderLeaf::Math::Test
 			3, 2, 4
 		));
 	}
+
+	TEST(blMatrix3x3, Identity)
+	{
+		Matrix3x3 m(
+			5, 10, 3,
+			9, 2, 2,
+			8, 9, 4
+		);
+
+		Matrix3x3 result(m * Matrix3x3::Identity());
+		EXPECT_EQ(m, result);
+	}
 }

@@ -298,6 +298,19 @@ namespace BoulderLeaf::Math::Test
 				279, 46, 239, 376));
 	}
 
+	TEST(Matrix3x3, Multiplication_Vector)
+	{
+		Matrix4x4 m(
+			1, 2, 3, 4,
+			5, 6, 7, 8,
+			9, 10, 11, 12,
+			13, 14, 15, 16);
+
+		Vector4 v(1, 2, 3, 4);
+		Vector4 result = v * m;
+		EXPECT_EQ(Vector4(90, 100, 110, 120), result);
+	}
+
 	TEST(blMatrix4x4, DevisionInPlace)
 	{
 		Matrix4x4 m(

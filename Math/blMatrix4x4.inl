@@ -1,21 +1,25 @@
 #pragma once
 
+#include <assert.h>;
+
 #include "blVector4.inl";
 
 namespace BoulderLeaf::Math
 {
 	struct Matrix4x4
 	{
-		#define ELEMENT_INDEX(i, j) i * 4 + j
+		static constexpr size_t k_NumberOfRows = 4;
+		static constexpr size_t k_NumberOfColumns = 4;
+		static constexpr size_t k_NumberOfElements = k_NumberOfRows * k_NumberOfColumns;
 
-		static constexpr size_t s_NumberOfElements = 16;
+		#define ELEMENT_INDEX(row, column) row * k_NumberOfColumns + column
 
 		typedef Vector4 RowVector;
 		typedef Vector4 ColumnVector;
 
 		union
 		{
-			float elements[s_NumberOfElements];
+			float elements[k_NumberOfElements];
 
 			struct
 			{
@@ -57,11 +61,13 @@ namespace BoulderLeaf::Math
 
 		const float& operator[](const size_t i) const
 		{
+			assert(i >= 0 && i < k_NumberOfElements);
 			return elements[i];
 		}
 
 		float& operator[](const size_t i)
 		{
+			assert(i >= 0 && i < k_NumberOfElements);
 			return elements[i];
 		}
 
@@ -170,7 +176,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator*=(Matrix4x4& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix4x4::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix4x4::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] *= rhs;
 		}
@@ -178,7 +184,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator/=(Matrix4x4& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix4x4::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix4x4::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] /= rhs;
 		}
@@ -194,7 +200,7 @@ namespace BoulderLeaf::Math
 
 	inline void operator+=(Matrix4x4& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix4x4::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix4x4::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] += rhs;
 		}
@@ -210,9 +216,14 @@ namespace BoulderLeaf::Math
 
 	inline void operator-=(Matrix4x4& lhs, const float& rhs)
 	{
-		for (int i = 0; i < Matrix4x4::s_NumberOfElements; i++)
+		for (int i = 0; i < Matrix4x4::k_NumberOfElements; i++)
 		{
 			lhs.elements[i] -= rhs;
 		}
+	}
+
+	inline Vector4 operator*(const Vector4& lhs, const Matrix4x4& rhs)
+	{
+		return Vector4(lhs.Dot(rhs.GetColumn(0)), lhs.Dot(rhs.GetColumn(1)), lhs.Dot(rhs.GetColumn(2)) , lhs.Dot(rhs.GetColumn(3)));
 	}
 }
