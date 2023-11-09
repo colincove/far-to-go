@@ -3,7 +3,7 @@
 
 namespace BoulderLeaf::Math::Test
 {
-	TEST(blMatrix4x4, Initialization)
+	TEST(Matrix4x4, Initialization)
 	{
 		Matrix4x4 m(
 			1,  2,  3,  4,
@@ -29,7 +29,7 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_FLOAT_EQ(m.m33, 16);
 	}
 
-	TEST(blMatrix4x4, Rows)
+	TEST(Matrix4x4, Rows)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -43,7 +43,7 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_EQ(m.GetRow(3), Matrix4x4::RowVector(13, 14, 15, 16));
 	}
 
-	TEST(blMatrix4x4, Columns)
+	TEST(Matrix4x4, Columns)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -57,7 +57,7 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_EQ(m.GetColumn(3), Matrix4x4::ColumnVector(4, 8, 12, 16));
 	}
 
-	TEST(blMatrix4x4, GetElement)
+	TEST(Matrix4x4, GetElement)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -83,7 +83,7 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_FLOAT_EQ(m.GetElement(3, 3), 16);
 	}
 
-	TEST(blMatrix4x4, IndexOperator)
+	TEST(Matrix4x4, IndexOperator)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -109,7 +109,7 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_FLOAT_EQ(m[15], 16);
 	}
 
-	TEST(blMatrix4x4, GetElementMutable)
+	TEST(Matrix4x4, GetElementMutable)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -122,9 +122,13 @@ namespace BoulderLeaf::Math::Test
 
 		m.GetElementMutable(2, 1) = 5.75f;
 		EXPECT_FLOAT_EQ(m.GetElement(2, 1), 5.75f);
+
+		float& element = m.GetElementMutable(3, 1);
+		element = 10.2f;
+		EXPECT_FLOAT_EQ(m.GetElement(3, 1), 10.2f);
 	}
 
-	TEST(blMatrix4x4, AdditionInPlace)
+	TEST(Matrix4x4, AdditionInPlace)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -142,7 +146,7 @@ namespace BoulderLeaf::Math::Test
 			18, 19, 20, 21));
 	}
 
-	TEST(blMatrix4x4, Addition)
+	TEST(Matrix4x4, Addition)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -158,7 +162,7 @@ namespace BoulderLeaf::Math::Test
 				18, 19, 20, 21));
 	}
 
-	TEST(blMatrix4x4, MatrixAddition)
+	TEST(Matrix4x4, MatrixAddition)
 	{
 		Matrix4x4 m1(
 			1, 2, 3, 4,
@@ -182,7 +186,7 @@ namespace BoulderLeaf::Math::Test
 				26, 28, 30, 32));
 	}
 
-	TEST(blMatrix4x4, SubtractionInPlace)
+	TEST(Matrix4x4, SubtractionInPlace)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -200,7 +204,7 @@ namespace BoulderLeaf::Math::Test
 				12, 13, 14, 15));
 	}
 
-	TEST(blMatrix4x4, Subtraction)
+	TEST(Matrix4x4, Subtraction)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -216,7 +220,7 @@ namespace BoulderLeaf::Math::Test
 				12, 13, 14, 15));
 	}
 
-	TEST(blMatrix4x4, MatrixSubtraction)
+	TEST(Matrix4x4, MatrixSubtraction)
 	{
 		Matrix4x4 m1(
 			1, 2, 3, 4,
@@ -240,7 +244,7 @@ namespace BoulderLeaf::Math::Test
 				0, 0, 0, 0));
 	}
 
-	TEST(blMatrix4x4, MultiplicationInPlace)
+	TEST(Matrix4x4, MultiplicationInPlace)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -258,7 +262,7 @@ namespace BoulderLeaf::Math::Test
 				26, 28, 30, 32));
 	}
 
-	TEST(blMatrix4x4, Multiplication)
+	TEST(Matrix4x4, Multiplication)
 	{
 		Matrix4x4 m(
 			1, 2, 3, 4,
@@ -274,7 +278,7 @@ namespace BoulderLeaf::Math::Test
 				26, 28, 30, 32));
 	}
 
-	TEST(blMatrix4x4, MatrixMultiplication)
+	TEST(Matrix4x4, MatrixMultiplication)
 	{
 		Matrix4x4 m1(
 			1, 2, 3, 4,
@@ -311,7 +315,7 @@ namespace BoulderLeaf::Math::Test
 		EXPECT_EQ(Vector4(90, 100, 110, 120), result);
 	}
 
-	TEST(blMatrix4x4, DevisionInPlace)
+	TEST(Matrix4x4, DevisionInPlace)
 	{
 		Matrix4x4 m(
 			10, 10, 20, 30,
@@ -329,7 +333,7 @@ namespace BoulderLeaf::Math::Test
 				6.5f, 7, 7.5f, 8));
 	}
 
-	TEST(blMatrix4x4, Devision)
+	TEST(Matrix4x4, Devision)
 	{
 		Matrix4x4 m(
 			10, 10, 20, 30,
@@ -345,7 +349,7 @@ namespace BoulderLeaf::Math::Test
 				6.5f, 7, 7.5f, 8));
 	}
 
-	TEST(blMatrix4x4, Transpose)
+	TEST(Matrix4x4, Transpose)
 	{
 		Matrix4x4 m(
 			5, 10, 3, 2,
@@ -363,7 +367,7 @@ namespace BoulderLeaf::Math::Test
 		));
 	}
 
-	TEST(blMatrix4x4, Identity)
+	TEST(Matrix4x4, Identity)
 	{
 		Matrix4x4 m(
 			5, 10, 3, 2,
@@ -374,5 +378,100 @@ namespace BoulderLeaf::Math::Test
 
 		Matrix4x4 result(m * Matrix4x4::Identity());
 		EXPECT_EQ(m, result);
+	}
+
+	TEST(Matrix4x4, Minor)
+	{
+		Matrix4x4 m(
+			5, 10, 3, 2,
+			9, 2, 2, 3,
+			8, 9, 4, 3,
+			1, 1, 2, 2
+		);
+
+		EXPECT_EQ(m.Minor(0, 0), Matrix3x3(
+			2, 2, 3,
+			9, 4, 3,
+			1, 2, 2
+		));
+
+		EXPECT_EQ(m.Minor(1, 0), Matrix3x3(
+			10, 3, 2,
+			9, 4, 3,
+			1, 2, 2
+		));
+
+		EXPECT_EQ(m.Minor(1, 1), Matrix3x3(
+			5, 3, 2,
+			8, 4, 3,
+			1, 2, 2
+		));
+
+		EXPECT_EQ(m.Minor(0, 1), Matrix3x3(
+			9, 2, 3,
+			8, 4, 3,
+			1, 2, 2
+		));
+
+		EXPECT_EQ(m.Minor(2, 0), Matrix3x3(
+			10, 3, 2,
+			2, 2, 3,
+			1, 2, 2
+		));
+
+		EXPECT_EQ(m.Minor(0, 2), Matrix3x3(
+			9, 2, 3,
+			8, 9, 3,
+			1, 1, 2
+		));
+
+		EXPECT_EQ(m.Minor(3, 3), Matrix3x3(
+			5, 10, 3,
+			9, 2, 2,
+			8, 9, 4
+		));
+
+		EXPECT_EQ(m.Minor(3, 0), Matrix3x3(
+			10, 3, 2,
+			2, 2, 3,
+			9, 4, 3
+		));
+	}
+
+	TEST(Matrix4x4, Determinant)
+	{
+		Matrix4x4 m(
+			5, 10, 3, 2,
+			9, 2, 2, 3,
+			8, 9, 4, 3,
+			1, 1, 2, 2
+		);
+
+		float determinant(m.Determinant());
+		EXPECT_FLOAT_EQ(-82, determinant);
+	}
+
+	TEST(Matrix4x4, Adjoint)
+	{
+		Matrix4x4 m(
+			1, 2, 3, 8,
+			4, 5, 6, 9,
+			7, 8, 9, 15,
+			5, 2, 2, 5
+		);
+
+		Matrix4x4 adjoint(m.Adjoint());
+
+		EXPECT_EQ(Matrix4x4(
+			-3, -21, 6, 9,
+			16, -113, 118, -18,
+			-13, 89, -79, 9,
+			15, -30, 15, 0
+		), adjoint);
+	}
+
+	TEST(Matrix4x4, IsInvertible)
+	{
+		EXPECT_TRUE(Matrix4x4::k_isInvertible);
 	}
 }

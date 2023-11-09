@@ -3,7 +3,7 @@
 
 namespace BoulderLeaf::Math::Test
 {
-	TEST(blMatrix2x3, Multiplication_3x3)
+	TEST(Matrix2x3, Multiplication_3x3)
 	{
 		Matrix2x3 m2x3(
 			-1, 5, -4, 
@@ -25,7 +25,7 @@ namespace BoulderLeaf::Math::Test
 		);
 	}
 
-	TEST(blMatrix2x3, Identity)
+	TEST(Matrix2x3, Identity)
 	{
 		Matrix2x3 m(
 			-1, 5, -4,
@@ -33,5 +33,10 @@ namespace BoulderLeaf::Math::Test
 
 		Matrix2x3 result(Matrix2x3::Identity() * m);
 		EXPECT_EQ(m, result);
+	}
+
+	TEST(Matrix2x3, IsInvertible)
+	{
+		EXPECT_FALSE(Matrix2x3::k_isInvertible);
 	}
 }

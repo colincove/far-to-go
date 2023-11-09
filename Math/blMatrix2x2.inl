@@ -1,17 +1,22 @@
 #pragma once
 
-#include "..\Test\blAssert.h";
+#include "..\Test\blAssert.h"
 
-#include "blVector2.inl";
-#include "blMatrix3x3.inl";
+#include "blVector2.inl"
 
 namespace BoulderLeaf::Math
 {
+	//need to forward declare these in order for the Inverse function to link
+	struct Matrix2x2;
+	inline Matrix2x2 operator*(const Matrix2x2& lhs, const float& rhs);
+
 	struct Matrix2x2
 	{
 		static constexpr size_t k_NumberOfRows = 2;
 		static constexpr size_t k_NumberOfColumns = 2;
 		static constexpr size_t k_NumberOfElements = k_NumberOfRows * k_NumberOfColumns;
+
+		static constexpr bool k_isInvertible = k_NumberOfColumns == k_NumberOfRows;
 
 #define ELEMENT_INDEX(row, column) row * k_NumberOfColumns + column
 
@@ -54,28 +59,21 @@ namespace BoulderLeaf::Math
 			return elements[i];
 		}
 
-		inline float SetElement(const int row, const int column, const float value)
-		{
-			const size_t index = ELEMENT_INDEX(row, column);
-			BL_ASSERT_INDEX(index, k_NumberOfElements);
-			elements[index] = value;
-		}
-
-		inline float GetElement(const int row, const int column) const
+		inline float GetElement(const size_t row, const size_t column) const
 		{
 			const size_t index = ELEMENT_INDEX(row, column);
 			BL_ASSERT_INDEX(index, k_NumberOfElements);
 			return elements[index];
 		}
 
-		inline float& GetElementMutable(const int row, const int column)
+		inline float& GetElementMutable(const size_t row, const size_t column)
 		{
 			const size_t index = ELEMENT_INDEX(row, column);
 			BL_ASSERT_INDEX(index, k_NumberOfElements);
 			return elements[index];
 		}
 
-		inline RowVector GetRow(const int i) const
+		inline RowVector GetRow(const size_t i) const
 		{
 			BL_ASSERT_INDEX(i, k_NumberOfRows);
 			return RowVector(
@@ -84,7 +82,7 @@ namespace BoulderLeaf::Math
 			);
 		}
 
-		inline ColumnVector GetColumn(const int j) const
+		inline ColumnVector GetColumn(const size_t j) const
 		{
 			BL_ASSERT_INDEX(j, k_NumberOfColumns);
 			return ColumnVector(
@@ -99,6 +97,31 @@ namespace BoulderLeaf::Math
 				1, 0,
 				0, 1
 			);
+		}
+
+		inline Matrix2x2 Transpose() const
+		{
+			return Matrix2x2(
+				m00, m10,
+				m01, m11
+			);
+		}
+
+		inline float Determinant() const
+		{
+			return m00 * m11 - m01 * m10;
+		}
+
+		inline bool HasValidInverse()
+		{
+			return !IsNearZero(Determinant());
+		}
+
+		inline Matrix2x2 Inverse()
+		{
+			return Matrix2x2(
+				m11, m01,
+				m10, m00) * (1 / Determinant());
 		}
 	};
 

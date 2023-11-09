@@ -3,6 +3,7 @@ add_executable(
 	Line.cpp
 	LineSegment.cpp
 	main.cpp
+	Matrix2x2.cpp
 	Matrix2x3.cpp
 	Matrix3x3.cpp
 	Matrix4x4.cpp

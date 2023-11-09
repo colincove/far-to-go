@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <blMath.inl>
+#include "blMath.inl"
 
 namespace BoulderLeaf::Math
 {

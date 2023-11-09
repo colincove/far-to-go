@@ -1,6 +1,6 @@
 #pragma once
 
-#include <blVector3.inl>
+#include "blVector3.inl"
 
 namespace BoulderLeaf::Math
 {

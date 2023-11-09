@@ -1,8 +1,11 @@
 #pragma once
 
-#include <assert.h>;
+#include "..\Test\blAssert.h"
 
-#include "blVector4.inl";
+#include "blVector4.inl"
+#include "blMatrix3x3.inl"
+
+#include <math.h>
 
 namespace BoulderLeaf::Math
 {
@@ -11,6 +14,8 @@ namespace BoulderLeaf::Math
 		static constexpr size_t k_NumberOfRows = 4;
 		static constexpr size_t k_NumberOfColumns = 4;
 		static constexpr size_t k_NumberOfElements = k_NumberOfRows * k_NumberOfColumns;
+
+		static constexpr bool k_isInvertible = k_NumberOfColumns == k_NumberOfRows;
 
 		#define ELEMENT_INDEX(row, column) row * k_NumberOfColumns + column
 
@@ -61,32 +66,32 @@ namespace BoulderLeaf::Math
 
 		const float& operator[](const size_t i) const
 		{
-			assert(i >= 0 && i < k_NumberOfElements);
+			BL_ASSERT_INDEX(i, k_NumberOfElements);
 			return elements[i];
 		}
 
 		float& operator[](const size_t i)
 		{
-			assert(i >= 0 && i < k_NumberOfElements);
+			BL_ASSERT_INDEX(i, k_NumberOfElements);
 			return elements[i];
 		}
 
-		inline float SetElement(const int row, const int column, const float value)
+		inline float SetElement(const size_t row, const size_t column, const float value)
 		{
 			elements[ELEMENT_INDEX(row, column)] = value;
 		}
 
-		inline float GetElement(const int row, const int column) const
+		inline float GetElement(const size_t row, const size_t column) const
 		{
 			return elements[ELEMENT_INDEX(row, column)];
 		}
 
-		inline float& GetElementMutable(const int row, const int column)
+		inline float& GetElementMutable(const size_t row, const size_t column)
 		{
 			return elements[ELEMENT_INDEX(row, column)];
 		}
 
-		inline RowVector GetRow(const int i) const
+		inline RowVector GetRow(const size_t i) const
 		{
 			return RowVector(
 				GetElement(i, 0),
@@ -96,7 +101,7 @@ namespace BoulderLeaf::Math
 			);
 		}
 
-		inline ColumnVector GetColumn(const int j) const
+		inline ColumnVector GetColumn(const size_t j) const
 		{
 			return ColumnVector(
 				GetElement(0, j),
@@ -116,6 +121,33 @@ namespace BoulderLeaf::Math
 			);
 		}
 
+		Matrix3x3 Minor(const size_t row, const size_t column) const
+		{
+			BL_ASSERT_INDEX(row, k_NumberOfRows);
+			BL_ASSERT_INDEX(column, k_NumberOfColumns);
+
+			Matrix3x3 result = Matrix3x3(0, 0, 0, 0, 0,0, 0, 0, 0);
+
+			for (size_t i = 0; i < Matrix3x3::k_NumberOfRows; ++i)
+			{
+				for (size_t j = 0; j < Matrix3x3::k_NumberOfColumns; ++j)
+				{
+					float& element = result.GetElementMutable(i, j);
+					element = GetElement(i >= row ? i + 1 : i, j >= column ? j + 1 : j);
+				}
+			}
+
+			return result;
+		}
+
+		inline float Determinant() const
+		{
+			return m00 * Minor(0,0).Determinant() - 
+				m01 * Minor(0, 1).Determinant() + 
+				m02 * Minor(0, 2).Determinant() - 
+				m03 * Minor(0, 3).Determinant();
+		}
+
 		static inline Matrix4x4 Identity()
 		{
 			return Matrix4x4(
@@ -124,6 +156,34 @@ namespace BoulderLeaf::Math
 				0, 0, 1, 0,
 				0, 0, 0, 1
 			);
+		}
+
+		inline Matrix4x4 Adjoint()
+		{
+			return Matrix4x4(
+				Cofactor(0, 0), Cofactor(0, 1), Cofactor(0, 2), Cofactor(0, 3),
+				Cofactor(1, 0), Cofactor(1, 1), Cofactor(1, 2), Cofactor(1, 3),
+				Cofactor(2, 0), Cofactor(2, 1), Cofactor(2, 2), Cofactor(2, 3),
+				Cofactor(3, 0), Cofactor(3, 1), Cofactor(3, 2), Cofactor(3, 3)
+			).Transpose();
+		}
+
+		inline float Cofactor(const size_t row, const size_t column) const
+		{
+			BL_ASSERT_INDEX(row, k_NumberOfRows);
+			BL_ASSERT_INDEX(column, k_NumberOfColumns);
+
+			return powf(-1, static_cast<float>(row + column + 2)) * Minor(row, column).Determinant();
+		}
+
+		inline bool HasValidInverse()
+		{
+			return !IsNearZero(Determinant());
+		}
+
+		inline Matrix4x4 Inverse()
+		{
+			return Adjoint() / Determinant();
 		}
 	};
 
