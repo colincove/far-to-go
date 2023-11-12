@@ -63,4 +63,15 @@ namespace BoulderLeaf::Math
 	{
 		return IsNearExpected(1, vector.Magnitude());
 	}
+
+	enum class Axis:char
+	{
+		x,
+		y,
+		z,
+		count,
+		i = x,
+		j = y,
+		k = z
+	};
 }

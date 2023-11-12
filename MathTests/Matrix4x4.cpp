@@ -463,15 +463,11 @@ namespace BoulderLeaf::Math::Test
 		Matrix4x4 adjoint(m.Adjoint());
 
 		EXPECT_EQ(Matrix4x4(
-			-3, -21, 6, 9,
-			16, -113, 118, -18,
-			-13, 89, -79, 9,
-			15, -30, 15, 0
-		), adjoint);
-	}
+			-3, 16, -13, 15,
+			-21, -113, 89, -30,
+			6, 118, -79, 15,
+			9, -18, 9, 0), adjoint);
 
-	TEST(Matrix4x4, IsInvertible)
-	{
 		EXPECT_TRUE(Matrix4x4::k_isInvertible);
 	}
 }

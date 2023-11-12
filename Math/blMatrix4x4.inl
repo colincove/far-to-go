@@ -9,6 +9,10 @@
 
 namespace BoulderLeaf::Math
 {
+	//need to forward declare these in order for the Inverse function to link
+	struct Matrix4x4;
+	inline Matrix4x4 operator/(const Matrix4x4& lhs, const float& rhs);
+
 	struct Matrix4x4
 	{
 		static constexpr size_t k_NumberOfRows = 4;
@@ -158,14 +162,19 @@ namespace BoulderLeaf::Math
 			);
 		}
 
-		inline Matrix4x4 Adjoint()
+		inline Matrix4x4 Adjoint() const
+		{
+			return Cofactor().Transpose();
+		}
+
+		inline Matrix4x4 Cofactor() const
 		{
 			return Matrix4x4(
 				Cofactor(0, 0), Cofactor(0, 1), Cofactor(0, 2), Cofactor(0, 3),
 				Cofactor(1, 0), Cofactor(1, 1), Cofactor(1, 2), Cofactor(1, 3),
 				Cofactor(2, 0), Cofactor(2, 1), Cofactor(2, 2), Cofactor(2, 3),
 				Cofactor(3, 0), Cofactor(3, 1), Cofactor(3, 2), Cofactor(3, 3)
-			).Transpose();
+			);
 		}
 
 		inline float Cofactor(const size_t row, const size_t column) const
@@ -176,12 +185,12 @@ namespace BoulderLeaf::Math
 			return powf(-1, static_cast<float>(row + column + 2)) * Minor(row, column).Determinant();
 		}
 
-		inline bool HasValidInverse()
+		inline bool HasValidInverse() const
 		{
 			return !IsNearZero(Determinant());
 		}
 
-		inline Matrix4x4 Inverse()
+		inline Matrix4x4 Inverse() const
 		{
 			return Adjoint() / Determinant();
 		}

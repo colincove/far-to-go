@@ -149,13 +149,18 @@ namespace BoulderLeaf::Math
 			);
 		}
 
-		inline Matrix3x3 Adjoint()
+		inline Matrix3x3 Adjoint() const
+		{
+			return Cofactor().Transpose();
+		}
+
+		inline Matrix3x3 Cofactor() const
 		{
 			return Matrix3x3(
 				Cofactor(0, 0), Cofactor(0, 1), Cofactor(0, 2),
 				Cofactor(1, 0), Cofactor(1, 1), Cofactor(1, 2),
 				Cofactor(2, 0), Cofactor(2, 1), Cofactor(2, 2)
-			).Transpose();
+			);
 		}
 
 		inline float Cofactor(const size_t row, const size_t column) const
@@ -166,12 +171,12 @@ namespace BoulderLeaf::Math
 			return powf(-1, static_cast<float>(row + column + 2)) * Minor(row, column).Determinant();
 		}
 
-		inline bool HasValidInverse()
+		inline bool HasValidInverse() const
 		{
 			return !IsNearZero(Determinant());
 		}
 
-		inline Matrix3x3 Inverse()
+		inline Matrix3x3 Inverse() const
 		{
 			return Adjoint() / Determinant();
 		}

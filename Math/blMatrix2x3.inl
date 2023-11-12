@@ -103,7 +103,7 @@ namespace BoulderLeaf::Math
 			);
 		}
 
-		inline bool HasValidInverse()
+		inline bool HasValidInverse() const
 		{
 			return false;
 		}
