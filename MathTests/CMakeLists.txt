@@ -12,6 +12,7 @@ add_executable(
 	Quaternion.cpp
 	Ray.cpp
 	Rect.cpp
+	Transformations.cpp
 	Vector2.cpp
 	Vector3.cpp
 	)

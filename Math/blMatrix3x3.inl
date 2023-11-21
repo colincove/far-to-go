@@ -12,6 +12,7 @@ namespace BoulderLeaf::Math
 	//need to forward declare these in order for the Inverse function to link
 	struct Matrix3x3;
 	inline Matrix3x3 operator/(const Matrix3x3& lhs, const float& rhs);
+	inline Vector3 operator*(const Vector3& lhs, const Matrix3x3& rhs);
 
 	struct Matrix3x3
 	{
@@ -140,15 +141,6 @@ namespace BoulderLeaf::Math
 				m02 * Minor(0, 2).Determinant();
 		}
 
-		static inline Matrix3x3 Identity()
-		{
-			return Matrix3x3(
-				1, 0, 0,
-				0, 1, 0,
-				0, 0, 1
-			);
-		}
-
 		inline Matrix3x3 Adjoint() const
 		{
 			return Cofactor().Transpose();
@@ -179,6 +171,51 @@ namespace BoulderLeaf::Math
 		inline Matrix3x3 Inverse() const
 		{
 			return Adjoint() / Determinant();
+		}
+
+		static inline Matrix3x3 Identity()
+		{
+			return Matrix3x3(
+				1, 0, 0,
+				0, 1, 0,
+				0, 0, 1
+			);
+		}
+
+		static inline Matrix3x3 ScalingMatrix(const Vector3& scale)
+		{
+			return ScalingMatrix(scale.x, scale.y, scale.z);
+		}
+
+		static inline Matrix3x3 ScalingMatrix(const float& x, const float& y, const float& z)
+		{
+			return Matrix3x3(
+				x, 0, 0,
+				0, y, 0,
+				0, 0, z
+			);
+		}
+
+		static inline Matrix3x3 RotationMatrix(const Vector3& axis, const float r)
+		{
+			return RotationMatrix(axis.x, axis.y, axis.z, r);
+		}
+
+		static inline Matrix3x3 RotationMatrix(const float& x, const float& y, const float& z, const float r)
+		{
+			const float c(cosf(r));
+			const float s(sinf(r));
+
+			return Matrix3x3(
+				c + (1-c) * (x * x), (1 - c) * x * y + s * z, (1 - c) * (x * z) - (s * y),
+				(1 - c) * (x * y) - (s * z), c + (1 - c) * (y * y), (1 - c) * (y * z) + (s * x),
+				(1 - c) * (x * z) + (s * y), (1 - c) * (y * z) - (s * x), c + (1 - c) * (z * z)
+			);
+		}
+
+		static inline Vector3 Transform(const Matrix3x3& matrix, const Vector3& vector)
+		{
+			return vector * matrix;
 		}
 	};
 

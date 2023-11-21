@@ -2,6 +2,8 @@
 
 namespace BoulderLeaf::Math
 {
+	#define PIf 3.14159265f
+
 	static float Epsilon = 0.000001f;
 
 	inline bool IsNearExpected(float expected, float actual)
@@ -74,4 +76,9 @@ namespace BoulderLeaf::Math
 		j = y,
 		k = z
 	};
+
+	inline float ToRadians(const float degrees)
+	{
+		return degrees * PIf / 180;
+	}
 }

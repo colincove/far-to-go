@@ -82,7 +82,7 @@ namespace BoulderLeaf::Math
 			return Dot(other) < 0;
 		}
 
-		inline Vector3 ProjectOnto(const Vector3& other)
+		inline Vector3 ProjectOnto(const Vector3& other) const
 		{
 			return BoulderLeaf::Math::Project<Vector3>(*this, other);
 		}
@@ -195,5 +195,10 @@ namespace BoulderLeaf::Math
 		lhs.x -= rhs.x;
 		lhs.y -= rhs.y;
 		lhs.z -= rhs.z;
+	}
+
+	inline bool NearEqual(const Vector3& a, const Vector3& b)
+	{
+		return IsNearExpected(a.x, b.x) && IsNearExpected(a.y, b.y) && IsNearExpected(a.z, b.z);
 	}
 }
