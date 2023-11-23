@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <blMatrix3x3.inl>
+#include <blMatrix4x4.inl>
 #include <blMath3D.inl>
+#include <blVector4.inl>
 #include <cmath>
 
 namespace BoulderLeaf::Math::Test
@@ -34,5 +36,16 @@ namespace BoulderLeaf::Math::Test
 		const Matrix3x3 rotationMatrix(Matrix3x3::RotationMatrix(axis, radians));
 		const Vector3 transformation(Matrix3x3::Transform(rotationMatrix, origin));
 		EXPECT_TRUE(NearEqual(transformation, Vector3(2.73055795, 1.88665545, 0.99226231)));
+	}
+
+	TEST(Transformations, Translation)
+	{
+		//rotate v about n by angle a
+		const Vector3 translation(2, 2, 2);
+		const Vector4 point(Vector4::Point3D(4, 8, 2));
+
+		const Matrix4x4 translationMatrix(Matrix4x4::TranslationMatrix(translation));
+		const Vector4 transformation(Matrix4x4::Transform(translationMatrix, point));
+		EXPECT_TRUE(NearEqual(transformation, Vector4::Point3D(6, 10, 4)));
 	}
 }

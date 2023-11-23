@@ -11,18 +11,18 @@ namespace BoulderLeaf::Math
 			Vector4(0, 0, 0, 0)
 		{}
 
-		Vector4(float x, float y, float z, float a) :
+		Vector4(float x, float y, float z, float w) :
 			x(x),
 			y(y),
 			z(z), 
-			a(a)
+			w(w)
 		{}
 
 		union
 		{
 			struct
 			{
-				float x, y, z, a;
+				float x, y, z, w;
 			};
 
 			float data[4];
@@ -44,19 +44,19 @@ namespace BoulderLeaf::Math
 				y * other.z - z * other.y,
 				z * other.x - x * other.z,
 				x * other.y - y * other.x,
-				a * other.a - a * other.a
+				w * other.w - w * other.w
 			);
 		}
 
 		inline float Dot(const Vector4& other) const
 		{
-			return x * other.x + y * other.y + z * other.z + a * other.a;
+			return x * other.x + y * other.y + z * other.z + w * other.w;
 		}
 
 		inline Vector4 Normalize() const
 		{
 			const float magnitude = Magnitude();
-			return Vector4(x / magnitude, y / magnitude, z / magnitude, a / magnitude);
+			return Vector4(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
 		}
 
 		inline bool IsNormalized() const
@@ -66,7 +66,7 @@ namespace BoulderLeaf::Math
 
 		inline float Magnitude() const
 		{
-			return sqrtf(x * x + y * y + z * z + a * a);
+			return sqrtf(x * x + y * y + z * z + w * w);
 		}
 
 		inline bool IsOrthoginal(const Vector4& other) const
@@ -88,7 +88,17 @@ namespace BoulderLeaf::Math
 		{
 			return BoulderLeaf::Math::Project<Vector4>(*this, other);
 		}
-	};
+
+		static inline Vector4 Point3D(const float x, const float y, const float z)
+		{
+			return Vector4(x, y, z, 1);
+		}
+
+		static inline Vector4 Vector3D(const float x, const float y, const float z)
+		{
+			return Vector4(x, y, z, 0);
+		}
+ 	};
 
 
 	inline bool operator==(const Vector4& lhs, const Vector4& rhs)
@@ -100,7 +110,7 @@ namespace BoulderLeaf::Math
 
 	inline Vector4 operator*(const Vector4& lhs, const Vector4& rhs)
 	{
-		return Vector4(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.a * rhs.a);
+		return Vector4(lhs.x * rhs.x, lhs.y * rhs.y, lhs.z * rhs.z, lhs.w * rhs.w);
 	}
 
 	inline void operator*=(Vector4& lhs, const Vector4& rhs)
@@ -108,7 +118,7 @@ namespace BoulderLeaf::Math
 		lhs.x *= rhs.x;
 		lhs.y *= rhs.y;
 		lhs.z *= rhs.z;
-		lhs.a *= rhs.a;
+		lhs.w *= rhs.w;
 	}
 
 	inline void operator*=(Vector4& lhs, const float& rhs)
@@ -116,22 +126,22 @@ namespace BoulderLeaf::Math
 		lhs.x *= rhs;
 		lhs.y *= rhs;
 		lhs.z *= rhs;
-		lhs.a *= rhs;
+		lhs.w *= rhs;
 	}
 
 	inline Vector4 operator*(const Vector4& lhs, const float& rhs)
 	{
-		return Vector4(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.a * rhs);
+		return Vector4(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs, lhs.w * rhs);
 	}
 
 	inline Vector4 operator/(const Vector4& lhs, const Vector4& rhs)
 	{
-		return Vector4(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.a / rhs.a);
+		return Vector4(lhs.x / rhs.x, lhs.y / rhs.y, lhs.z / rhs.z, lhs.w / rhs.w);
 	}
 
 	inline Vector4 operator/(const Vector4& lhs, const float& rhs)
 	{
-		return Vector4(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs, lhs.a / rhs);
+		return Vector4(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs, lhs.w / rhs);
 	}
 
 	inline void operator/=(Vector4& lhs, const Vector4& rhs)
@@ -139,24 +149,24 @@ namespace BoulderLeaf::Math
 		lhs.x /= rhs.x;
 		lhs.y /= rhs.y;
 		lhs.z /= rhs.z;
-		lhs.a /= rhs.a;
+		lhs.w /= rhs.w;
 	}
 
 	inline void operator/=(Vector4& lhs, const float& rhs)
 	{
 		lhs.x /= rhs;
 		lhs.y /= rhs;
-		lhs.a /= rhs;
+		lhs.w /= rhs;
 	}
 
 	inline Vector4 operator+(const Vector4& lhs, const Vector4& rhs)
 	{
-		return Vector4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.a * rhs.a);
+		return Vector4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, lhs.w * rhs.w);
 	}
 
 	inline Vector4 operator-(const Vector4& lhs, const Vector4& rhs)
 	{
-		return Vector4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.a - rhs.a);
+		return Vector4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
 	}
 
 	inline void operator+=(Vector4& lhs, const Vector4& rhs)
@@ -164,7 +174,7 @@ namespace BoulderLeaf::Math
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
 		lhs.z += rhs.z;
-		lhs.a += rhs.a;
+		lhs.w += rhs.w;
 	}
 
 	inline void operator+=(Vector4& lhs, const float& rhs)
@@ -172,7 +182,7 @@ namespace BoulderLeaf::Math
 		lhs.x += rhs;
 		lhs.y += rhs;
 		lhs.z += rhs;
-		lhs.a += rhs;
+		lhs.w += rhs;
 	}
 
 	inline void operator-=(Vector4& lhs, const Vector4& rhs)
@@ -180,6 +190,11 @@ namespace BoulderLeaf::Math
 		lhs.x -= rhs.x;
 		lhs.y -= rhs.y;
 		lhs.z -= rhs.z;
-		lhs.a -= rhs.a;
+		lhs.w -= rhs.w;
+	}
+
+	inline bool NearEqual(const Vector4& a, const Vector4& b)
+	{
+		return IsNearExpected(a.x, b.x) && IsNearExpected(a.y, b.y) && IsNearExpected(a.z, b.z) && IsNearExpected(a.w, b.w);
 	}
 }

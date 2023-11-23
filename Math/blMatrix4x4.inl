@@ -12,6 +12,7 @@ namespace BoulderLeaf::Math
 	//need to forward declare these in order for the Inverse function to link
 	struct Matrix4x4;
 	inline Matrix4x4 operator/(const Matrix4x4& lhs, const float& rhs);
+	inline Vector4 operator*(const Vector4& lhs, const Matrix4x4& rhs);
 
 	struct Matrix4x4
 	{
@@ -193,6 +194,72 @@ namespace BoulderLeaf::Math
 		inline Matrix4x4 Inverse() const
 		{
 			return Adjoint() / Determinant();
+		}
+
+		static inline Matrix4x4 ScalingMatrix(const Vector3& scale)
+		{
+			return ScalingMatrix(scale.x, scale.y, scale.z);
+		}
+
+		static inline Matrix4x4 ScalingMatrix(const float& x, const float& y, const float& z)
+		{
+			return Matrix4x4(
+				x, 0, 0, 0,
+				0, y, 0, 0,
+				0, 0, z, 0,
+				0, 0, 0, 1
+			);
+		}
+
+		static inline Matrix4x4 Transform(const Vector3& translation, const Vector3& scale, const Vector3& rotationAxis, const float r)
+		{
+			const float c(cosf(r));
+			const float s(sinf(r));
+
+			return Matrix4x4(
+				c + (1 - c) * (rotationAxis.x * rotationAxis.x), (1 - c) * rotationAxis.x * rotationAxis.y + s * rotationAxis.z, (1 - c) * (rotationAxis.x * rotationAxis.z) - (s * rotationAxis.y), 0,
+				(1 - c) * (rotationAxis.x * rotationAxis.y) - (s * rotationAxis.z), c + (1 - c) * (rotationAxis.y * rotationAxis.y), (1 - c) * (rotationAxis.y * rotationAxis.z) + (s * rotationAxis.x), 0,
+				(1 - c) * (rotationAxis.x * rotationAxis.z) + (s * rotationAxis.y), (1 - c) * (rotationAxis.y * rotationAxis.z) - (s * rotationAxis.x), c + (1 - c) * (rotationAxis.z * rotationAxis.z), 0,
+				translation.x, translation.y, translation.z, 1
+			);
+		}
+
+		static inline Matrix4x4 RotationMatrix(const Vector3& axis, const float r)
+		{
+			return RotationMatrix(axis.x, axis.y, axis.z, r);
+		}
+
+		static inline Matrix4x4 RotationMatrix(const float& x, const float& y, const float& z, const float r)
+		{
+			const float c(cosf(r));
+			const float s(sinf(r));
+
+			return Matrix4x4(
+				c + (1 - c) * (x * x), (1 - c) * x * y + s * z, (1 - c) * (x * z) - (s * y), 0,
+				(1 - c) * (x * y) - (s * z), c + (1 - c) * (y * y), (1 - c) * (y * z) + (s * x), 0,
+				(1 - c) * (x * z) + (s * y), (1 - c) * (y * z) - (s * x), c + (1 - c) * (z * z), 0,
+				0, 0, 0, 1
+			);
+		}
+
+		static inline Matrix4x4 TranslationMatrix(const Vector3& translation)
+		{
+			return TranslationMatrix(translation.x, translation.y, translation.z);
+		}
+
+		static inline Matrix4x4 TranslationMatrix(const float& x, const float& y, const float& z)
+		{
+			return Matrix4x4(
+				1, 0, 0, 0,
+				0, 1, 0, 0, 
+				0, 0, 1, 0,
+				x, y, z, 1
+			);
+		}
+
+		static inline Vector4 Transform(const Matrix4x4& matrix, const Vector4& vector)
+		{
+			return vector * matrix;
 		}
 	};
 
