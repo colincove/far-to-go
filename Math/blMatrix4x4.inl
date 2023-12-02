@@ -4,6 +4,7 @@
 
 #include "blVector4.inl"
 #include "blMatrix3x3.inl"
+#include "blMath3D.inl"
 
 #include <math.h>
 
@@ -254,6 +255,16 @@ namespace BoulderLeaf::Math
 				0, 1, 0, 0, 
 				0, 0, 1, 0,
 				x, y, z, 1
+			);
+		}
+
+		static inline Matrix4x4 TransitionMatrix(const CartesianCoordinates frame, const Vector4 origin)
+		{
+			return Matrix4x4(
+				frame.x.x, frame.x.y, frame.x.z, 0,
+				frame.y.x, frame.y.y, frame.y.z, 0,
+				frame.z.x, frame.z.y, frame.z.z, 0,
+				origin.x, origin.y, origin.z, 1
 			);
 		}
 

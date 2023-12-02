@@ -98,6 +98,8 @@ namespace BoulderLeaf::Math
 		{
 			return Vector4(x, y, z, 0);
 		}
+
+
  	};
 
 
