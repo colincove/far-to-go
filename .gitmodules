@@ -1,6 +1,6 @@
 [submodule "bullet3"]
 	path = Physics/bullet3
 	url = https://github.com/bulletphysics/bullet3
-[submodule "Rendering/DirectX-Headers"]
-	path = Rendering/DirectX-Headers
+[submodule "DX12/DirectX-Headers"]
+	path = DX12/DirectX-Headers
 	url = https://github.com/microsoft/DirectX-Headers.git

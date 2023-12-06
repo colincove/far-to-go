@@ -1,5 +1,3 @@
-//#include "dxstdafxcd ...h"
-
 #include <wsl/winadapter.h>
 
 #include <directx/d3d12.h>

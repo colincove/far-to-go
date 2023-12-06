@@ -36,8 +36,10 @@ add_subdirectory(Math)
 add_subdirectory(Physics)
 add_subdirectory(MathTests)
 add_subdirectory(Scripting)
-add_subdirectory(Rendering)
-add_subdirectory(RenderingTests)
+add_subdirectory(DX12)
+add_subdirectory(DX12Tests)
+add_subdirectory(Graphics)
+add_subdirectory(GraphicsTests)
 add_subdirectory(RapidXML)
 
 target_link_libraries(
@@ -45,7 +47,7 @@ target_link_libraries(
 	PUBLIC Math
 	Physics
 	Scripting
-	Rendering
+	Graphics
 	RapidXML)
 
 target_include_directories(
