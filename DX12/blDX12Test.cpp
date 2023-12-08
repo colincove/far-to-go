@@ -3,7 +3,9 @@
 #include <directx/d3d12video.h>
 #include <directx/dxcore.h>
 #include <directx/d3dx12.h>
+#include <directx/d3d12.h>
 #include "dxguids/dxguids.h"
+#include "directx/d3d12sdklayers.h"
 
 //BoulderLeaf
 #include "blDX12Test.h"
@@ -11,6 +13,7 @@
 //Standard
 #include <iostream>
 #include <atlstr.h>
+#include <assert.h>
 
 namespace BoulderLeaf::Graphics::DX12::Test
 {
@@ -41,6 +44,7 @@ namespace BoulderLeaf::Graphics::DX12::Test
 
 		void LogAdapterOutputs(ComPtr<IDXGIAdapter> adapter);
 		void LogOutputDisplayModes(ComPtr<IDXGIOutput> output, DXGI_FORMAT format);
+		void CreateCommandList();
 	}
 
 	void LogDevices()
@@ -64,18 +68,26 @@ namespace BoulderLeaf::Graphics::DX12::Test
 		}
 	}
 
-	void CreateCommandList()
+	void Initialize()
 	{
-		ComPtr<ID3D12CommandQueue> commandQueue;
-		D3D12_COMMAND_QUEUE_DESC desc;
-		desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-		desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		#ifdef BL_DX12_DEBUG
+		{
+			ComPtr<ID3D12Debug> debugController;
+			assert((ID3D12GetDebugInterface(IID_PPV_ARGS(&debugController)) == S_OK));
+			debugController->EnableDebugLayer();
+		}
+		#endif // BL_DX12_DEBUG
 
-		ComPtr<ID3D12Device> device;
+		ComPtr<IDXGIFactory1> factory = nullptr;
+		HRESULT factoryResult = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+		assert((factoryResult == S_OK));
 
-		//TODO
-		//HRESULT hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device));
-		//device->CreateCommandQueue(&desc, __uuidof(ID3D12CommandQueue), (void**)(&commandQueue));
+		/*ComPtr<IDXGIDevice> device = nullptr;
+		HRESULT deviceResult = D3D12CreateDevice(
+			nullptr, // default adapter
+			D3D_FEATURE_LEVEL_11_0,
+			IID_PPV_ARGS(&device));
+		assert((deviceResult));*/
 	}
 
 	namespace
@@ -115,6 +127,20 @@ namespace BoulderLeaf::Graphics::DX12::Test
 				std::cout << ctabs[2] << "Heght: " << mode.Height << "\n";
 				std::cout << ctabs[2] << "RefreshRate: " << n << "/" << d << "\n";
 			}
+		}
+
+		void CreateCommandList()
+		{
+			ComPtr<ID3D12CommandQueue> commandQueue;
+			D3D12_COMMAND_QUEUE_DESC desc;
+			desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+			desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+
+			ComPtr<ID3D12Device> device;
+
+			//TODO (I do not have code to initialize DX12 and the device)
+			//HRESULT hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device));
+			//device->CreateCommandQueue(&desc, __uuidof(ID3D12CommandQueue), (void**)(&commandQueue));
 		}
 	}
 }

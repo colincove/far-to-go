@@ -6,5 +6,5 @@
 namespace BoulderLeaf::Graphics::DX12::Test
 {
 	void LogDevices();
-	void CreateCommandList();
+	void Initialize();
 }

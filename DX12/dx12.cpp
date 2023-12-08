@@ -8,7 +8,7 @@
 
 int main()
 {
-    IDXCoreAdapter* adapter = nullptr;
+    /*IDXCoreAdapter* adapter = nullptr;
     ID3D12Device* device = nullptr;
     //check_uuid_linkage();
     {
@@ -24,5 +24,5 @@ int main()
             return -1;
     }
 
-    return D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device));
+    return D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device));*/
 }

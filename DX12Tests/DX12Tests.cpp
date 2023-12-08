@@ -10,6 +10,6 @@ namespace BoulderLeaf::Graphics::DX12::Test
 
 	TEST(DX12, CommandQueue)
 	{
-		CreateCommandList();
+		//CreateCommandList();
 	}
 }

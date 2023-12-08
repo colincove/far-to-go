@@ -14,4 +14,10 @@ target_include_directories(DX12
 target_link_libraries(DX12 PRIVATE
 	DirectX-Headers DirectX-Guids ${dxlibs})
 
+target_compile_definitions(
+	Math
+	PUBLIC
+	$<$<CONFIG:Debug>:BL_DX12_DEBUG> #enables debug tools
+)
+
 install(TARGETS DX12 CONFIGURATIONS Debug DESTINATION Debug/lib)
