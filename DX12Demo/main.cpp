@@ -1,10 +1,11 @@
-#include "blDX12Test.h"
+#include "blDX12.h"
+#include <memory>
 
-namespace BoulderLeaf
-{
-	int main()
-	{
-		Graphics::DX12::Test::Initialize();
-		return 1;
-	}
+using namespace BoulderLeaf::Graphics::DX12;
+
+int main()
+{	
+	std::shared_ptr<DX12> dx12(DX12::Get());
+	dx12->Initialize();
+	return 1;
 }

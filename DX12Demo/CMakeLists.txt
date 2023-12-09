@@ -5,7 +5,8 @@ add_executable(
 
 target_link_libraries(
 	DX12Demo 
-	PUBLIC DX12
+	PUBLIC 
+	DX12
 )
 
 install(TARGETS DX12Demo CONFIGURATIONS Debug DESTINATION Debug)

@@ -3,7 +3,6 @@
 #include <directx/d3d12video.h>
 #include <directx/dxcore.h>
 #include <directx/d3dx12.h>
-#include <directx/d3d12.h>
 #include "dxguids/dxguids.h"
 #include "directx/d3d12sdklayers.h"
 
@@ -66,28 +65,6 @@ namespace BoulderLeaf::Graphics::DX12::Test
 			adapterList.push_back(adapter);
 			++i;
 		}
-	}
-
-	void Initialize()
-	{
-		#ifdef BL_DX12_DEBUG
-		{
-			ComPtr<ID3D12Debug> debugController;
-			assert((ID3D12GetDebugInterface(IID_PPV_ARGS(&debugController)) == S_OK));
-			debugController->EnableDebugLayer();
-		}
-		#endif // BL_DX12_DEBUG
-
-		ComPtr<IDXGIFactory1> factory = nullptr;
-		HRESULT factoryResult = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
-		assert((factoryResult == S_OK));
-
-		/*ComPtr<IDXGIDevice> device = nullptr;
-		HRESULT deviceResult = D3D12CreateDevice(
-			nullptr, // default adapter
-			D3D_FEATURE_LEVEL_11_0,
-			IID_PPV_ARGS(&device));
-		assert((deviceResult));*/
 	}
 
 	namespace
