@@ -16,6 +16,7 @@ target_link_libraries(DX12 PRIVATE
 	DirectX-Headers 
 	DirectX-Guids 
 	${dxlibs}
-	d3d12.lib)
+	d3d12.lib
+	dxguid.lib)
 
 install(TARGETS DX12 CONFIGURATIONS Debug DESTINATION Debug/lib)

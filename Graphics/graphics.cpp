@@ -1,4 +1,15 @@
+#include "blHeadless.h"
+
+using namespace BoulderLeaf::Graphics;
+
+int TestInitialize(API* api)
+{
+    api->Initialize();
+    return 1;
+}
+
 int main()
 {
-    return 1;
+    Headless* graphics = new Headless();
+    return TestInitialize(graphics);
 }
