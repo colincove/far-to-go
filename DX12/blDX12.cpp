@@ -22,6 +22,15 @@ namespace BoulderLeaf::Graphics::DX12
 	namespace
 	{
 		UINT GetM4xMsaaQuality(const DXGI_FORMAT backbufferFormat, const ComPtr<ID3D12Device8> device);
+		HRESULT CreateSwapChain(
+			const ComPtr<ID3D12Device8> device,
+			const ComPtr<ID3D12CommandQueue> commandQueue,
+			const ComPtr<IDXGIFactory2> factory,
+			const UINT width,
+			const UINT height,
+			const DXGI_FORMAT backbufferFormat,
+			HWND& mainOutputWindow,
+			ComPtr<IDXGISwapChain1>& swapChainOut);
 	}
 
 	std::weak_ptr<DX12> DX12::Get()
@@ -40,16 +49,23 @@ namespace BoulderLeaf::Graphics::DX12
 		mFactory(nullptr), 
 		mDevice(nullptr),
 		mFence(nullptr),
+		mCommandQueue(nullptr),
+		mDirectCommandListAllocator(nullptr),
+		mCommandList(nullptr),
+		mSwapChain(nullptr),
 		mRvtDescriptorSize(0),
 		mDsvDescriptorSize(0),
-		mCbvSrvDescriptorSize(0)
+		mCbvSrvDescriptorSize(0),
+		mClientWidth(1024),
+		mClientHeight(768),
+		mhMainWnd(nullptr)
 	{
 
 	}
 
 	void DX12::Initialize()
 	{
-
+		mhMainWnd = ::CreateWindowA("STATIC", "dummy", WS_VISIBLE, 0, 0, 100, 100, NULL, NULL, NULL, NULL);
 		DWORD dxgiFactoryFlags = 0;
 #ifdef DEBUG
 		ComPtr<ID3D12Debug> debugController;
@@ -83,6 +99,33 @@ namespace BoulderLeaf::Graphics::DX12
 		mCbvSrvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		assert((GetM4xMsaaQuality(sBackbufferFormat, mDevice) > 0));
+
+		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		HRESULT commandQueueResult = mDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
+		assert((commandQueueResult == S_OK));
+		HRESULT commandAllocatorResult = mDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mDirectCommandListAllocator));
+		assert((commandAllocatorResult == S_OK));
+		HRESULT commandListResult = mDevice->CreateCommandList(
+			0, 
+			D3D12_COMMAND_LIST_TYPE_DIRECT, 
+			mDirectCommandListAllocator.Get(), 
+			nullptr, //initial pipeline state
+			IID_PPV_ARGS(&mCommandList));
+		assert((commandListResult == S_OK));
+
+		HRESULT swapChainResult = CreateSwapChain(
+			mDevice, 
+			mCommandQueue, 
+			mFactory,
+			mClientWidth, 
+			mClientHeight, 
+			sBackbufferFormat, 
+			mhMainWnd,
+			mSwapChain);
+
+		assert((swapChainResult == S_OK));
 	}
 
 	namespace
@@ -104,6 +147,51 @@ namespace BoulderLeaf::Graphics::DX12
 			assert((result == S_OK));
 
 			return msQualityLevels.NumQualityLevels;
+		}
+
+		HRESULT CreateSwapChain(
+			const ComPtr<ID3D12Device8> device,
+			const ComPtr<ID3D12CommandQueue> commandQueue,
+			const ComPtr<IDXGIFactory2> factory,
+			const UINT width,
+			const UINT height,
+			const DXGI_FORMAT backbufferFormat,
+			HWND& mainOutputWindow,
+			ComPtr<IDXGISwapChain1>& swapChainOut)
+		{
+			swapChainOut.Reset();
+
+			DXGI_SWAP_CHAIN_DESC1 desc;
+			const int swapChainBufferCount = 2;
+			
+			desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+			desc.Width = width;
+			desc.Height = height;
+			desc.Stereo = FALSE;
+			desc.Format = backbufferFormat;
+			desc.Scaling = DXGI_SCALING_NONE;
+
+			auto& sampleDesc = desc.SampleDesc;
+			const int m4xMsaaQuality = GetM4xMsaaQuality(backbufferFormat, device);
+			const bool m4xMsaaState = m4xMsaaQuality > 0;
+			//DXGI ERROR: IDXGIFactory::CreateSwapChain: Flip model swapchains (DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL and DXGI_SWAP_EFFECT_FLIP_DISCARD) do not support multisampling. DXGI_SWAP_CHAIN_DESC{ SwapChainType = ..._HWND, BufferDesc = DXGI_MODE_DESC1{Width = 1024, Height = 768, RefreshRate = DXGI_RATIONAL{ Numerator = 60, Denominator = 1 }, Format = R8G8B8A8_UNORM, ScanlineOrdering = ..._UNSPECIFIED, Scaling = (Unknown: 0xcccccccc), Stereo = FALSE }, SampleDesc = DXGI_SAMPLE_DESC{ Count = 4, Quality = 0 }, BufferUsage = 0x20, BufferCount = 2, OutputWindow = 0x0000000000730AFA, Scaling = ..._NONE, Windowed = TRUE, SwapEffect = ..._FLIP_DISCARD, AlphaMode = ..._UNSPECIFIED, Flags = 0x2 } [ MISCELLANEOUS ERROR #102: ]
+			//sampleDesc.Count = m4xMsaaState ? 4 : 1;
+			//sampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;
+			sampleDesc.Count = 1;
+			sampleDesc.Quality = 0;
+
+			desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+			desc.BufferCount = swapChainBufferCount;
+			desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+			desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+			DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullscreenDesc;
+			fullscreenDesc.RefreshRate.Numerator = 60;
+			fullscreenDesc.RefreshRate.Denominator = 1;
+			fullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+			fullscreenDesc.Windowed = true;
+
+			return factory->CreateSwapChainForHwnd(commandQueue.Get(), mainOutputWindow , &desc, &fullscreenDesc, NULL, swapChainOut.GetAddressOf());
 		}
 	}
 }
