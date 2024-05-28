@@ -16,7 +16,9 @@ add_library(
 	blQuad.inl
 	blQuaternion.inl
 	blRay.inl
+	blRotation.inl
 	blRect.inl
+	blTransform.inl
 	blVector2.inl
 	blVector3.inl
 	blVector4.inl

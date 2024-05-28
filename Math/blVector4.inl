@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include "blMath.inl"
+#include "blVector3.inl"
 
 namespace BoulderLeaf::Math
 {
@@ -99,7 +100,15 @@ namespace BoulderLeaf::Math
 			return Vector4(x, y, z, 0);
 		}
 
+		static inline Vector4 Vector3D(const Vector3 vector)
+		{
+			return Vector3D(vector.x, vector.y, vector.z);
+		}
 
+		static inline Vector4 Point3D(const Vector3 vector)
+		{
+			return Point3D(vector.x, vector.y, vector.z);
+		}
  	};
 
 

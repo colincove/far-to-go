@@ -108,6 +108,21 @@ namespace BoulderLeaf::Math
 		{
 			return BoulderLeaf::Math::IsOrthogonalized<Vector3>(start, end);
 		}
+
+		static Vector3 Forward()
+		{
+			return Vector3(1, 0, 0);
+		}
+
+		static Vector3 Up()
+		{
+			return Vector3(0, 1, 0);
+		}
+
+		static Vector3 Left()
+		{
+			return Vector3(0, 0, 1);
+		}
 	};
 
 	

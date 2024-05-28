@@ -20,9 +20,15 @@ namespace BoulderLeaf::Math
 				Vector3 y;
 				Vector3 z;
 			};
+			struct
+			{
+				Vector3 Forward;
+				Vector3 Up;
+				Vector3 Left;
+			};
 		};
 
-		CartesianCoordinates() : CartesianCoordinates(Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)) {}
+		CartesianCoordinates() : CartesianCoordinates(Vector3::Forward(), Vector3::Up(), Vector3::Left()) {}
 		CartesianCoordinates(Vector3 x, Vector3 y, Vector3 z)
 			:x(x), y(y), z(z)
 		{
@@ -45,9 +51,7 @@ namespace BoulderLeaf::Math
 		static CartesianCoordinates FromAxes(Vector3 x, Vector3 y, Vector3 z)
 		{
 			Vector3 a[3](x, y, z);
-
 			Vector3::Orthogonalize(std::begin(a));
-			//CartesianCoordinates result(x.Normalize(), y.Normalize(), z.Normalize());
 			CartesianCoordinates result(a[0], a[1], a[2]);
 			return result;
 		}

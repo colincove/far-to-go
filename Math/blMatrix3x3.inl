@@ -317,4 +317,17 @@ namespace BoulderLeaf::Math
 	{
 		return Vector3(lhs.Dot(rhs.GetColumn(0)), lhs.Dot(rhs.GetColumn(1)), lhs.Dot(rhs.GetColumn(2)));
 	}
+
+	inline bool NearEqual(const Matrix3x3& a, const Matrix3x3& b)
+	{
+		for (int i = 0; i < Matrix3x3::k_NumberOfElements; ++i)
+		{
+			if (!IsNearExpected(a.elements[i], b.elements[i]))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
