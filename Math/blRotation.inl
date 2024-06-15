@@ -10,8 +10,13 @@ namespace BoulderLeaf::Math
 		Quaternion m_quaternion;
 	public:
 
-		Rotation():
-			m_quaternion()
+		Rotation(Quaternion quaternion) :
+			m_quaternion(quaternion)
+		{
+
+		}
+
+		Rotation():Rotation(Quaternion())
 		{
 
 		}
@@ -28,17 +33,17 @@ namespace BoulderLeaf::Math
 
 		Vector3 Forward() const
 		{
-			return Vector3();
+			return m_quaternion.vector;
 		}
 
 		Vector3 Up() const
 		{
-			return Vector3();
+			return Matrix3x3::Transform(Quaternion::RotationMatrix3x3(m_quaternion), Vector3::Up());
 		}
 
 		Vector3 Left() const
 		{
-			return Vector3();
+			return Matrix3x3::Transform(Quaternion::RotationMatrix3x3(m_quaternion), Vector3::Left());
 		}
 
 		Vector3 Backward() const
@@ -58,7 +63,6 @@ namespace BoulderLeaf::Math
 
 		CartesianCoordinates GetFrame() const
 		{
-			//determine from quaternian
 			return CartesianCoordinates(Forward(), Up(), Left());
 		}
 	};

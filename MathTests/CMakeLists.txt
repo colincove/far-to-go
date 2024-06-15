@@ -3,6 +3,7 @@ add_executable(
 	Line.cpp
 	LineSegment.cpp
 	main.cpp
+	Math.cpp
 	Matrix2x2.cpp
 	Matrix2x3.cpp
 	Matrix3x3.cpp
@@ -11,6 +12,7 @@ add_executable(
 	Quad.cpp
 	Quaternion.cpp
 	Ray.cpp
+	Rotation.cpp
 	Rect.cpp
 	Transformations.cpp
 	Vector2.cpp

@@ -23,7 +23,7 @@ namespace BoulderLeaf::Math::Test
 		const float a(45);
 
 		const Vector3 result(RotateAboutAxisDegrees(v, n, a));
-		EXPECT_TRUE(NearEqual(result, Vector3(2.73055795, 1.88665545, 0.99226231)));
+		EXPECT_TRUE(NearEqual(result, Vector3(2.73055795f, 1.88665545f, 0.99226231f)));
 	}
 
 	TEST(Transformations, RotationMatrix)
@@ -67,7 +67,7 @@ namespace BoulderLeaf::Math::Test
 			Vector3(1, 1, 0.75), Vector3(0, 1.2, 0.5), Vector3(-1, 1, 2)));
 
 		const Vector4 origin(Vector4::Point3D(2, 4, 0));
-		const Matrix4x4 transitionMatrix(Matrix4x4::TransitionMatrix(frame, origin));
+		const Matrix4x4 transitionMatrix(TransitionMatrix(frame, origin));
 
 		const Vector4 result(Matrix4x4::Transform(transitionMatrix, v));
 
@@ -84,8 +84,8 @@ namespace BoulderLeaf::Math::Test
 
 		const Vector4 originA(Vector4::Point3D(2, 4, 0));
 		const Vector4 originB(Vector4::Point3D(1, 0, 0.5f));
-		const Matrix4x4 transitionMatrixA(Matrix4x4::TransitionMatrix(frameA, originA));
-		const Matrix4x4 transitionMatrixB(Matrix4x4::TransitionMatrix(frameB, originB));
+		const Matrix4x4 transitionMatrixA(TransitionMatrix(frameA, originA));
+		const Matrix4x4 transitionMatrixB(TransitionMatrix(frameB, originB));
 
 		//combine multiple frame changes into a single matrix
 		const Matrix4x4 transitionMatrix(transitionMatrixA * transitionMatrixB);
@@ -102,7 +102,7 @@ namespace BoulderLeaf::Math::Test
 			Vector3(1, 1, 0.75), Vector3(0, 1.2, 0.5), Vector3(-1, 1, 2)));
 
 		const Vector4 origin(Vector4::Point3D(2, 4, 0));
-		const Matrix4x4 transitionMatrix(Matrix4x4::TransitionMatrix(frame, origin));
+		const Matrix4x4 transitionMatrix(TransitionMatrix(frame, origin));
 		const Matrix4x4 transitionMatrixInverse(transitionMatrix.Inverse());
 
 		const Vector4 transformVector(Matrix4x4::Transform(transitionMatrix, v));

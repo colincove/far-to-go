@@ -322,7 +322,7 @@ namespace BoulderLeaf::Math
 	{
 		for (int i = 0; i < Matrix3x3::k_NumberOfElements; ++i)
 		{
-			if (!IsNearExpected(a.elements[i], b.elements[i]))
+			if (!IsNearEqual(a.elements[i], b.elements[i]))
 			{
 				return false;
 			}

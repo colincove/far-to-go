@@ -6,6 +6,8 @@
 
 #include "blMath.inl"
 #include "blVector3.inl"
+#include "blMatrix4x4.inl"
+#include "blQuaternion.inl"
 
 namespace BoulderLeaf::Math
 {
@@ -90,5 +92,15 @@ namespace BoulderLeaf::Math
 		const Vector3 coordinateOrigin)
 	{
 		return Transition(vector, coordinates) + coordinateOrigin;
+	}
+
+	inline Matrix4x4 TransitionMatrix(const CartesianCoordinates frame, const Vector4 origin)
+	{
+		return Matrix4x4(
+			frame.x.x, frame.x.y, frame.x.z, 0,
+			frame.y.x, frame.y.y, frame.y.z, 0,
+			frame.z.x, frame.z.y, frame.z.z, 0,
+			origin.x, origin.y, origin.z, 1
+		);
 	}
 }

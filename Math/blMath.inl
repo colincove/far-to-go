@@ -6,14 +6,29 @@ namespace BoulderLeaf::Math
 
 	static float Epsilon = 0.000001f;
 
-	inline bool IsNearExpected(float expected, float actual)
+	inline bool IsNearEqual(float expected, float actual)
 	{
 		return fabs(expected - actual) < Epsilon;
 	}
 
+	inline bool IsNearEqual(const float* startA, const float* startB, size_t size)
+	{
+		while (size > 0)
+		{
+			--size;
+
+			if (!IsNearEqual(*(startA + size), *(startB + size)))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	inline bool IsNearZero(float value)
 	{
-		return IsNearExpected(0, value);
+		return IsNearEqual(0, value);
 	}
 
 	template<typename TVector>
@@ -63,7 +78,7 @@ namespace BoulderLeaf::Math
 	template<typename TVector>
 	inline bool IsNormalized(const TVector& vector)
 	{
-		return IsNearExpected(1, vector.Magnitude());
+		return IsNearEqual(1, vector.Magnitude());
 	}
 
 	enum class Axis:char

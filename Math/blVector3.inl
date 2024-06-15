@@ -59,7 +59,7 @@ namespace BoulderLeaf::Math
 
 		inline bool IsNormalized() const
 		{
-			return IsNearExpected(1, Magnitude());
+			return IsNearEqual(1, Magnitude());
 		}
 
 		inline float Magnitude() const
@@ -214,6 +214,6 @@ namespace BoulderLeaf::Math
 
 	inline bool NearEqual(const Vector3& a, const Vector3& b)
 	{
-		return IsNearExpected(a.x, b.x) && IsNearExpected(a.y, b.y) && IsNearExpected(a.z, b.z);
+		return IsNearEqual(a.x, b.x) && IsNearEqual(a.y, b.y) && IsNearEqual(a.z, b.z);
 	}
 }

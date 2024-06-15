@@ -1,17 +1,23 @@
 #pragma once
 #include <algorithm>
+#include <array>
 #include "blVector3.inl"
 #include "blVector4.inl"
 #include "blMatrix4x4.inl"
+#include "blMath.inl"
+#include <cmath>
 
 namespace BoulderLeaf::Math
 {
 	struct Quaternion
 	{
 	public:
+
+		static const size_t k_size = 4;
+
 		union
 		{
-			float data[4];
+			float data[k_size];
 			Vector4 vector4;
 
 			struct
@@ -61,6 +67,27 @@ namespace BoulderLeaf::Math
 			vector4 = vector4.Normalize();
 		}
 
+		inline Vector3 ToEuler() const
+		{
+			// roll (x-axis rotation)
+			const float sinr_cosp = 2 * (t * x + y * z);
+			const float cosr_cosp = 1 - 2 * (x * x + y * y);
+
+			// pitch (y-axis rotation)
+			const float sinp = std::sqrt(1 + 2 * (t * y - x * z));
+			const float cosp = std::sqrt(1 - 2 * (t * y - x * z));
+
+			// yaw (z-axis rotation)
+			const float siny_cosp = 2 * (t * z + x * y);
+			const float cosy_cosp = 1 - 2 * (y * y + z * z);
+
+			return Vector3(
+				std::atan2f(sinr_cosp, cosr_cosp),
+				2 * std::atan2f(sinp, cosp) - PIf / 2,
+				std::atan2f(siny_cosp, cosy_cosp)
+			);
+		}
+
 		static inline Matrix4x4 RotationMatrix4x4(const Quaternion q)
 		{
 			assert(q.IsNormalized());
@@ -78,6 +105,23 @@ namespace BoulderLeaf::Math
 				2.0f * (q.real * q.real + q.x * q.x) - 1, 2.0f * (q.x * q.y - q.real * q.z), 2.0f * (q.x * q.z + q.real * q.y),
 				2.0f * (q.x * q.y + q.real * q.z), 2.0f * (q.real * q.real + q.y * q.y) - 1.0f, 2.0f * (q.y * q.z - q.real * q.x),
 				2.0f * (q.x * q.z - q.real * q.y), 2.0f * (q.y * q.z + q.real * q.x), 2.0f * (q.real * q.real + q.z * q.z) - 1.0f);
+		}
+
+		static inline Quaternion FromEuler(const Vector3 eulerAngles)
+		{
+			const float cr = cosf(eulerAngles.x * 0.5f);
+			const float sr = sinf(eulerAngles.x * 0.5f);
+			const float cp = cosf(eulerAngles.y * 0.5f);
+			const float sp = sinf(eulerAngles.y * 0.5f);
+			const float cy = cosf(eulerAngles.z * 0.5f);
+			const float sy = sinf(eulerAngles.z * 0.5f);
+
+			return Quaternion(
+				cr * cp * cy + sr * sp * sy,
+				sr * cp * cy - cr * sp * sy,
+				cr * sp * cy + sr * cp * sy,
+				cr * cp * sy - sr * sp * cy
+			);
 		}
 	};
 
@@ -117,9 +161,4 @@ namespace BoulderLeaf::Math
 
 		}
 	};
-
-	UnitQuaternion k_unitQuaternions(
-		Quaternion(0.0f, 1.0f, 0.0f, 0.0f), 
-		Quaternion(0.0f, 0.0f, 1.0f, 0.0f),
-		Quaternion(0.0f, 0.0f, 0.0f, 1.0f));
 }

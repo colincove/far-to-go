@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <blQuaternion.inl>
 #include <blVector3.inl>
+#include "blMath.inl"
 
 namespace BoulderLeaf::Math::Test
 {
@@ -37,5 +38,20 @@ namespace BoulderLeaf::Math::Test
 			0.2745098f, 0.9019608f, -0.3333333f, 0,
 			0,0,0,0
 		)));
+	}
+
+	TEST(Quaternion, FromEuler)
+	{
+		const Vector3 eulerAngles(ToRadians(45), ToRadians(10), ToRadians(8));
+		const Quaternion result(Quaternion::FromEuler(eulerAngles));
+		const Quaternion expected(0.920448601f, 0.374681681f, 0.106918328f, 0.0309295245f);
+		EXPECT_TRUE(IsNearEqual(std::begin(result.data), std::begin(expected.data), Quaternion::k_size));
+	}
+
+	TEST(Quaternion, ToEuler)
+	{
+		const Quaternion quaternion(0.920448601f, 0.374681681f, 0.106918328f, 0.0309295245f);
+		const Vector3 result(quaternion.ToEuler());
+		EXPECT_TRUE(NearEqual(result, Vector3(ToRadians(45), ToRadians(10), ToRadians(8))));
 	}
 }

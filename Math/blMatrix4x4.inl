@@ -4,7 +4,6 @@
 
 #include "blVector4.inl"
 #include "blMatrix3x3.inl"
-#include "blMath3D.inl"
 
 #include <math.h>
 
@@ -258,16 +257,6 @@ namespace BoulderLeaf::Math
 			);
 		}
 
-		static inline Matrix4x4 TransitionMatrix(const CartesianCoordinates frame, const Vector4 origin)
-		{
-			return Matrix4x4(
-				frame.x.x, frame.x.y, frame.x.z, 0,
-				frame.y.x, frame.y.y, frame.y.z, 0,
-				frame.z.x, frame.z.y, frame.z.z, 0,
-				origin.x, origin.y, origin.z, 1
-			);
-		}
-
 		static inline Vector4 Transform(const Matrix4x4& matrix, const Vector4& vector)
 		{
 			return vector * matrix;
@@ -378,7 +367,7 @@ namespace BoulderLeaf::Math
 	{
 		for (int i = 0; i < Matrix4x4::k_NumberOfElements; ++i)
 		{
-			if (!IsNearExpected(a.elements[i], b.elements[i]))
+			if (!IsNearEqual(a.elements[i], b.elements[i]))
 			{
 				return false;
 			}

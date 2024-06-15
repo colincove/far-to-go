@@ -18,7 +18,8 @@ add_library(
 	blRay.inl
 	blRotation.inl
 	blRect.inl
-	blTransform.inl
+	blTransform.h
+	blTransform.cpp
 	blVector2.inl
 	blVector3.inl
 	blVector4.inl

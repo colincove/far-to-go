@@ -10,21 +10,16 @@ namespace BoulderLeaf::Math
 		Vector4 position;
 		Rotation rotation;
 
-		Transform():
+		Transform() :
 			position(),
 			rotation()
 		{
 
 		}
 
-		Matrix4x4 GetTransitionMatrix() const
-		{
-			return Matrix4x4::TransitionMatrix(rotation.GetFrame(), position);
-		}
+		Matrix4x4 GetTransitionMatrix() const;
+		void LookAt(const Vector4 point);
 	};
 
-	Transform FromTransitionMatrix(const Matrix4x4 matrix)
-	{
-
-	}
+	Transform FromTransitionMatrix(const Matrix4x4 matrix);
 }
