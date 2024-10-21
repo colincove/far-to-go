@@ -32,6 +32,7 @@ add_executable(
 	FarToGo/main.cpp
 	Test/blAssert.h)
 
+add_subdirectory(DirectX-Headers)
 add_subdirectory(Math)
 add_subdirectory(Physics)
 add_subdirectory(MathTests)

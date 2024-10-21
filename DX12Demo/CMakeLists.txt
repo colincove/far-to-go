@@ -5,7 +5,7 @@ add_executable(
 
 target_link_libraries(
 	DX12Demo 
-	PUBLIC 
+	PUBLIC
 	DX12
 )
 

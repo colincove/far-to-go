@@ -1,13 +1,18 @@
 add_executable(
 	DX12Tests 
 	DX12Tests.cpp
-	main.cpp)
+	main.cpp
+	MockID3D12Device.h
+	MockID3D12GraphicsCommandList.h)
 
 target_link_libraries(
 	DX12Tests
 	PUBLIC DX12
 	GTest::gtest
 	GTest::gtest_main
+	GTest::gmock
+	GTest::gmock_main
+	DirectX-Headers 
 )
 
 install(TARGETS DX12Tests CONFIGURATIONS Debug DESTINATION Debug)

@@ -6,5 +6,4 @@
 namespace BoulderLeaf::Graphics::DX12::Test
 {
 	void LogDevices();
-	void Initialize();
 }

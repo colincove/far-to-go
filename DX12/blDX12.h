@@ -20,7 +20,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 	class DX12 : public API
 	{
-	private:
+	public:
 		ComPtr<IDXGIFactory2> mFactory;
 		ComPtr<ID3D12Device8> mDevice;
 		ComPtr<ID3D12Fence> mFence;
@@ -36,6 +36,7 @@ namespace BoulderLeaf::Graphics::DX12
 		UINT mCbvSrvDescriptorSize;
 		UINT mClientWidth;
 		UINT mClientHeight;
+		bool m_isInitialized;
 		
 		//application
 		HWND mhMainWnd;
@@ -45,6 +46,7 @@ namespace BoulderLeaf::Graphics::DX12
 		static std::weak_ptr<DX12> Get();
 		DX12();
 		void Initialize();
+		bool IsInitialized() const;
 	private:
 		D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
 		D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;

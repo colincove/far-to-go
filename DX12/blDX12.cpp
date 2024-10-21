@@ -66,6 +66,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mCbvSrvDescriptorSize(0),
 		mClientWidth(1024),
 		mClientHeight(768),
+		m_isInitialized(false),
 		mhMainWnd(nullptr),
 		mCurrBackBuffer(0)
 	{
@@ -162,6 +163,9 @@ namespace BoulderLeaf::Graphics::DX12
 		vp.MinDepth = 0;
 		vp.MaxDepth = 1;
 		mCommandList->RSSetViewports(1, &vp);
+
+		//finish
+		m_isInitialized = true;
 	}
 
 	std::vector<ComPtr<ID3D12Resource>> DX12::CreateRenderTargetViewToBackBuffer() const
@@ -186,6 +190,11 @@ namespace BoulderLeaf::Graphics::DX12
 		}
 
 		return swapChainBuffer;
+	}
+
+	bool DX12::IsInitialized() const
+	{
+		return m_isInitialized;
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE DX12::CurrentBackBufferView() const
