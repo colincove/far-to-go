@@ -25,6 +25,30 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12Resource>& uploadBuffer
 	)
 	{
+		return CreateDefaultBuffer(
+			device,
+			commandList,
+			initData,
+			byteSize,
+			uploadBuffer,
+			[](UPDATE_SUBRESOURCES_PARAMETERS) 
+			{
+				return UpdateSubresources<1>(
+					UPDATE_SUBRESOURCES_PARAMETERS_PASSTHROUGH
+				);
+			}
+		);
+	}
+
+	ComPtr<ID3D12Resource> CreateDefaultBuffer(
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		const void* initData,
+		UINT64 byteSize,
+		ComPtr<ID3D12Resource>& uploadBuffer,
+		UpdateSubresourcesFunction updateSubresourcesFunction
+	)
+	{
 		ComPtr<ID3D12Resource> defaultBuffer;
 		const CD3DX12_HEAP_PROPERTIES heapPropertiesDefault(D3D12_HEAP_TYPE_DEFAULT);
 		const CD3DX12_RESOURCE_DESC bufferDesc(CD3DX12_RESOURCE_DESC::Buffer(byteSize));
@@ -70,7 +94,7 @@ namespace BoulderLeaf::Graphics::DX12
 			&resourceBarrierStateOne
 		);
 
-		UpdateSubresources<1>(
+		updateSubresourcesFunction(
 			commandList,
 			defaultBuffer.Get(),
 			uploadBuffer.Get(),

@@ -32,6 +32,10 @@ add_executable(
 	FarToGo/main.cpp
 	Test/blAssert.h)
 
+# fatal error (exceeded object file format limit) and the suggestion to compile with the flag /bigobj
+# started happening in DX12Tests.cpp after I finished adding my Mock classes.
+add_compile_options(/bigobj)
+
 add_subdirectory(DirectX-Headers)
 add_subdirectory(Math)
 add_subdirectory(Physics)

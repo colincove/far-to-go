@@ -233,7 +233,7 @@ namespace BoulderLeaf::Graphics::DX12::Test
         MOCK_METHOD(LUID*, GetAdapterLuid, (LUID* RetVal), (override));
 #endif
 
-        MOCK_METHOD(HRESULT, GetPrivateData, (
+       MOCK_METHOD(HRESULT, GetPrivateData, (
             _In_  REFGUID guid,
             _Inout_  UINT* pDataSize,
             _Out_writes_bytes_opt_(*pDataSize)  void* pData), (override));
@@ -257,6 +257,5 @@ namespace BoulderLeaf::Graphics::DX12::Test
 
         MOCK_METHOD(HRESULT, SetName, (
             _In_z_  LPCWSTR Name), (override));
-
 	};
 }

@@ -5,6 +5,11 @@ add_executable(
 	MockID3D12Device.h
 	MockID3D12GraphicsCommandList.h)
 
+target_include_directories(
+	DX12Tests PRIVATE ../DX12
+	./
+)
+
 target_link_libraries(
 	DX12Tests
 	PUBLIC DX12
