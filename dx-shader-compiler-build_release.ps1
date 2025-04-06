@@ -1,0 +1,1 @@
+cmake --build .\shader-compiler-build

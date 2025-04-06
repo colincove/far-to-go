@@ -19,8 +19,9 @@ namespace BoulderLeaf::Graphics::DX12::Test
 
 	TEST(DX12, Initialize)
 	{
+		HWND mhMainWnd = ::CreateWindowA("STATIC", "DX12 Examples", WS_VISIBLE, 0, 0, 1024, 768, NULL, NULL, NULL, NULL);
 		std::shared_ptr<DX12> dx12(DX12::Get());
-		dx12->Initialize();
+		dx12->Initialize(mhMainWnd);
 		EXPECT_TRUE(dx12->IsInitialized());
 	}
 
@@ -43,10 +44,9 @@ namespace BoulderLeaf::Graphics::DX12::Test
 			3, 4, 6
 		};
 
-		const void* initDataPtr = static_cast<const void*>(&initData);
 		const UINT64 vbByteSize = 8 * sizeof(int);
 
 		ComPtr<ID3D12Resource> uploadBuffer;
-		ComPtr<ID3D12Resource> resource = CreateDefaultBuffer(&device, &commandList, initDataPtr, vbByteSize, uploadBuffer, MockUpdateSubresources);
+		ComPtr<ID3D12Resource> resource = CreateDefaultBuffer(&device, &commandList, static_cast<const void*>(&initData), vbByteSize, uploadBuffer, MockUpdateSubresources);
 	}
 }

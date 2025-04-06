@@ -1,8 +1,19 @@
 #include "blGraphicsAPI.h"
+#include "blHeadless.h"
 
-namespace BoulderLeaf::Graphics::Headless
+namespace BoulderLeaf::Graphics
 {
-	void Initialize()
+	void Headless::Initialize(HWND hMainWnd)
+	{
+
+	}
+
+	void Headless::OnWindowMessage(MSG msg)
+	{
+
+	}
+
+	void Headless::OnResize()
 	{
 
 	}

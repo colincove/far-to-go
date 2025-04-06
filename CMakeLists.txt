@@ -14,6 +14,8 @@ project(
 
 enable_testing()
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/DirectXShaderCompiler/cmake/caches/PredefinedParams.cmake)
+
 #NOTE: We are not fetching GTest here because it conflicts with the libraries imported via bullet3.
 # include(FetchContent)
 # FetchContent_Declare(
@@ -38,6 +40,8 @@ add_compile_options(/bigobj)
 
 add_subdirectory(DirectX-Headers)
 add_subdirectory(Math)
+add_subdirectory(Metrics)
+add_subdirectory(MetricsTests)
 add_subdirectory(Physics)
 add_subdirectory(MathTests)
 add_subdirectory(Scripting)
@@ -47,6 +51,7 @@ add_subdirectory(DX12Tests)
 add_subdirectory(Graphics)
 add_subdirectory(GraphicsTests)
 add_subdirectory(RapidXML)
+add_subdirectory(imgui)
 
 target_link_libraries(
 	FarToGo 

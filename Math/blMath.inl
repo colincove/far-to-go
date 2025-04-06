@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cmath>
 namespace BoulderLeaf::Math
 {
 	#define PIf 3.14159265f

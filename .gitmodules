@@ -4,3 +4,12 @@
 [submodule "DirectX-Headers"]
 	path = DirectX-Headers
 	url = https://github.com/microsoft/DirectX-Headers.git
+[submodule "DirectXShaderCompiler"]
+	path = DirectXShaderCompiler
+	url = https://github.com/microsoft/DirectXShaderCompiler.git
+
+
+
+[submodule "imgui"]
+	path = imgui/source
+	url = https://github.com/ocornut/imgui.git

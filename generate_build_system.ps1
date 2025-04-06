@@ -7,6 +7,4 @@ else
     mkdir build
 }
 
-cd build
-cmake ..\.
-cd ..
+cmake .\ -B .\build

@@ -11,6 +11,7 @@
 //BoulderLeaf
 #include "blDX12Test.h"
 #include "blDX12.h"
+#include "..\Math\blMath.inl"
 
 //Standard
 #include <iostream>
@@ -19,6 +20,15 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
+	XMFLOAT4X4 XMFLOAT4X4_Identity()
+	{
+		return XMFLOAT4X4(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1);
+	}
+
 	namespace
 	{
 		UINT GetM4xMsaaQuality(const DXGI_FORMAT backbufferFormat, const ComPtr<ID3D12Device8> device);
@@ -26,8 +36,6 @@ namespace BoulderLeaf::Graphics::DX12
 			const ComPtr<ID3D12Device8> device,
 			const ComPtr<ID3D12CommandQueue> commandQueue,
 			const ComPtr<IDXGIFactory2> factory,
-			const UINT width,
-			const UINT height,
 			const DXGI_FORMAT backbufferFormat,
 			HWND& mainOutputWindow,
 			ComPtr<IDXGISwapChain1>& swapChainOut);
@@ -52,7 +60,7 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 
 	DX12::DX12() :
-		mFactory(nullptr), 
+		mFactory(nullptr),
 		mDevice(nullptr),
 		mFence(nullptr),
 		mCommandQueue(nullptr),
@@ -61,21 +69,31 @@ namespace BoulderLeaf::Graphics::DX12
 		mSwapChain(nullptr),
 		mRtvHeap(nullptr),
 		mDsvHeap(nullptr),
+		mCbvHeap(nullptr),
 		mRtvDescriptorSize(0),
 		mDsvDescriptorSize(0),
 		mCbvSrvDescriptorSize(0),
-		mClientWidth(1024),
-		mClientHeight(768),
 		m_isInitialized(false),
 		mhMainWnd(nullptr),
-		mCurrBackBuffer(0)
+		mCurrBackBuffer(0),
+		mCurrentFence(0),
+		mViewPort(),
+		mSwapChainBuffer(),
+		mDepthStencilBuffer(nullptr),
+		mProj(XMFLOAT4X4_Identity())
 	{
 
 	}
 
-	void DX12::Initialize()
+	void DX12::Initialize(HWND hMainWnd)
 	{
-		mhMainWnd = ::CreateWindowA("STATIC", "dummy", WS_VISIBLE, 0, 0, 100, 100, NULL, NULL, NULL, NULL);
+		RECT winRect;
+		assert(GetWindowRect(hMainWnd, &winRect));
+		const int width = winRect.right - winRect.left;
+		const int height = winRect.bottom - winRect.top;
+
+		//mhMainWnd = ::CreateWindowA("STATIC", "dummy", WS_VISIBLE, 0, 0, mClientWidth, mClientHeight, NULL, NULL, NULL, NULL);
+		mhMainWnd = hMainWnd;
 		DWORD dxgiFactoryFlags = 0;
 #ifdef DEBUG
 		ComPtr<ID3D12Debug> debugController;
@@ -124,13 +142,15 @@ namespace BoulderLeaf::Graphics::DX12
 			nullptr, //initial pipeline state
 			IID_PPV_ARGS(&mCommandList));
 		assert((commandListResult == S_OK));
+		mCommandList->SetName(L"BL- DX12 Command List");
+
+		m4xMsaaQuality = GetM4xMsaaQuality(sBackbufferFormat, mDevice);
+		m4xMsaaState = m4xMsaaQuality > 0;
 
 		HRESULT swapChainResult = CreateSwapChain(
 			mDevice, 
 			mCommandQueue, 
 			mFactory,
-			mClientWidth, 
-			mClientHeight, 
 			sBackbufferFormat, 
 			mhMainWnd,
 			mSwapChain);
@@ -144,28 +164,53 @@ namespace BoulderLeaf::Graphics::DX12
 			mDsvHeap
 		);
 
+		//this was taken from the BoxExample. A 3rd kind of heap. What is the difference between the 3?
+		BuildDescriptorHeaps();
+
 		assert((descriptorHeapsResult == S_OK));
+
+		PopulateSwapChainBuffers();
 
 		std::vector<ComPtr<ID3D12Resource>> backBufferRenderTargetView = CreateRenderTargetViewToBackBuffer();
 
 		CreateDepthBufferView(
-			mClientWidth,
-			mClientHeight,
+			winRect,
 			mDevice,
 			mDepthBufferView);
 
 		//---------- create viewport -----------//
-		D3D12_VIEWPORT vp;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
-		vp.Width = static_cast<float>(mClientWidth);
-		vp.Height = static_cast<float>(mClientHeight);
-		vp.MinDepth = 0;
-		vp.MaxDepth = 1;
-		mCommandList->RSSetViewports(1, &vp);
+		mViewPort.TopLeftX = 0;
+		mViewPort.TopLeftY = 0;
+		mViewPort.Width = static_cast<float>(width);
+		mViewPort.Height = static_cast<float>(height);
+		mViewPort.MinDepth = 0;
+		mViewPort.MaxDepth = 1;
+		mCommandList->RSSetViewports(1, &mViewPort);
+
+		// The below rect definition would render everything in the top left corner of the screen. 
+		// Use this to cull rendering from a portion of the back buffer. 
+		// mScissorRect = { 0, 0, static_cast<long>(width) / 2, static_cast<long>(height) / 2 };
+
+		// for now, we want the entire screen rendered
+		mScissorRect = { 0, 0, static_cast<long>(width), static_cast<long>(height) };
+		mCommandList->RSSetScissorRects(1, &mScissorRect);
 
 		//finish
 		m_isInitialized = true;
+		OnResize();
+	}
+
+	void DX12::OnWindowMessage(MSG msg)
+	{
+	}
+
+	void DX12::OnResize()
+	{
+		// The window resized, so update the aspect ratio and recompute the
+			// projection matrix.
+		XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * PIf,
+			AspectRatio(), 1.0f, 1000.0f);
+		XMStoreFloat4x4(&mProj, P);
 	}
 
 	std::vector<ComPtr<ID3D12Resource>> DX12::CreateRenderTargetViewToBackBuffer() const
@@ -187,6 +232,7 @@ namespace BoulderLeaf::Graphics::DX12
 				swapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
 			// Next entry in heap.
 			rtvHeapHandle.Offset(1, mRtvDescriptorSize);
+			swapChainBuffer[i]->SetName(L"BL - RenderTargetViewToBackBuffer");
 		}
 
 		return swapChainBuffer;
@@ -206,14 +252,22 @@ namespace BoulderLeaf::Graphics::DX12
 		);
 	}
 
+	D3D12_CPU_DESCRIPTOR_HANDLE DX12::GetBackBufferView(int i) const
+	{
+		return CD3DX12_CPU_DESCRIPTOR_HANDLE(
+			mRtvHeap->GetCPUDescriptorHandleForHeapStart(),
+			i,
+			mRtvDescriptorSize
+		);
+	}
+
 	D3D12_CPU_DESCRIPTOR_HANDLE DX12::DepthStencilView() const
 	{
 		return CD3DX12_CPU_DESCRIPTOR_HANDLE(mDsvHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 
 	void DX12::CreateDepthBufferView(
-		const int width, 
-		const int height,
+		const RECT winRect,
 		const ComPtr<ID3D12Device8> device,
 		ComPtr<ID3D12Resource>& depthBufferViewOut) const
 	{
@@ -221,8 +275,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 		desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		desc.Alignment = 0;
-		desc.Width = width;
-		desc.Height = height;
+		desc.Width = winRect.right - winRect.left;
+		desc.Height = winRect.bottom - winRect.top;
 		desc.DepthOrArraySize = 1;
 		desc.MipLevels = 1;
 		desc.Format = sDepthStencilFormat;
@@ -242,7 +296,7 @@ namespace BoulderLeaf::Graphics::DX12
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&desc,
-			D3D12_RESOURCE_STATE_COMMON,
+			D3D12_RESOURCE_STATE_DEPTH_WRITE,
 			&optClear,
 			IID_PPV_ARGS(depthBufferViewOut.GetAddressOf()));
 
@@ -255,6 +309,8 @@ namespace BoulderLeaf::Graphics::DX12
 			nullptr,
 			DepthStencilView());
 
+		depthBufferViewOut->SetName(L"BL - DepthBuffer");
+
 		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 			depthBufferViewOut.Get(),
 			D3D12_RESOURCE_STATE_COMMON,
@@ -264,8 +320,61 @@ namespace BoulderLeaf::Graphics::DX12
 		mCommandList->ResourceBarrier(
 			1,
 			&barrier);
+	}
 
+	void DX12::FlushCommandQueue()
+	{
+		// Advance the fence value to mark commands up to this fence point.
+		mCurrentFence++;
+		// Add an instruction to the command queue to set a new fence point.
+		// Because we are on the GPU timeline, the new fence point won’t be
+		// set until the GPU finishes processing all the commands prior to
+		// this Signal().
+		mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+		// Wait until the GPU has completed commands up to this fence point.
+		if (mFence->GetCompletedValue() < mCurrentFence)
+		{
+			HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
+			// Fire event when GPU hits current fence.
+			mFence->SetEventOnCompletion(mCurrentFence, eventHandle);
+			// Wait until the GPU hits current fence event is fired.
+			WaitForSingleObject(eventHandle, INFINITE);
+			CloseHandle(eventHandle);
+		}
+	}
 
+	ID3D12Resource* DX12::CurrentBackBuffer() const
+	{
+		return mSwapChainBuffer[mCurrBackBuffer].Get();
+	}
+
+	void DX12::PopulateSwapChainBuffers()
+	{
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(
+			mRtvHeap->GetCPUDescriptorHandleForHeapStart());
+		for (UINT i = 0; i < SwapChainBufferCount; i++)
+		{
+			// Get the ith buffer in the swap chain.
+			mSwapChain->GetBuffer(
+				i, IID_PPV_ARGS(&mSwapChainBuffer[i]));
+			// Create an RTV to it.
+			mDevice->CreateRenderTargetView(mSwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
+			mSwapChainBuffer[i]->SetName(L"SwapChainBuffer");
+			// Next entry in heap.
+			rtvHeapHandle.Offset(1, mRtvDescriptorSize);
+		}
+	}
+
+	void DX12::BuildDescriptorHeaps()
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
+		cbvHeapDesc.NumDescriptors = sSrvHeapSize;
+		cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		cbvHeapDesc.NodeMask = 0;
+
+		auto result = mDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mCbvHeap));
+		assert((result == S_OK));
 	}
 
 	namespace
@@ -293,12 +402,15 @@ namespace BoulderLeaf::Graphics::DX12
 			const ComPtr<ID3D12Device8> device,
 			const ComPtr<ID3D12CommandQueue> commandQueue,
 			const ComPtr<IDXGIFactory2> factory,
-			const UINT width,
-			const UINT height,
 			const DXGI_FORMAT backbufferFormat,
 			HWND& mainOutputWindow,
 			ComPtr<IDXGISwapChain1>& swapChainOut)
 		{
+			RECT winRect;
+			assert(GetWindowRect(mainOutputWindow, &winRect));
+			const int width = winRect.right - winRect.left;
+			const int height = winRect.bottom - winRect.top;
+
 			swapChainOut.Reset();
 
 			DXGI_SWAP_CHAIN_DESC1 desc;
