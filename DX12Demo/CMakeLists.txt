@@ -13,6 +13,8 @@ add_executable(
 	IndexBufferExample.cpp
 	ImguiExample.cpp
 	ImguiExample.h
+	ShapesExample.h
+	ShapesExample.cpp
 	)
 
 target_link_libraries(

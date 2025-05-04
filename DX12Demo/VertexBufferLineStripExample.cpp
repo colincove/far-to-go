@@ -42,7 +42,7 @@ namespace BoulderLeaf::Graphics::DX12
 		dx12->mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 	}
 
-	void VertexBufferLineStripExample::Update()
+	void VertexBufferLineStripExample::Update(const Metrics::blTime& gameTime)
 	{
 		m_dx12->mCommandList->DrawInstanced(4, 2, 0, 0);
 	};

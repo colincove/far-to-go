@@ -21,7 +21,6 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Reset the command list to prep for initialization commands.
 		m_dx12->mCommandList->Reset(m_dx12->mDirectCommandListAllocator.Get(), nullptr);
-		//BuildDescriptorHeaps();
 		BuildConstantBuffers();
 		BuildRootSignature();
 		BuildShadersAndInputLayout();
@@ -49,7 +48,7 @@ namespace BoulderLeaf::Graphics::DX12
 		m_dx12->FlushCommandQueue();
 	}
 
-	void BoxExample::Update()
+	void BoxExample::Update(const Metrics::blTime& gameTime)
 	{
 		mTheta += 0.05f;
 		mPhi += 0.05f;

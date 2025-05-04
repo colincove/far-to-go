@@ -73,7 +73,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 	};
 
-	void IndexBufferExample::Update()
+	void IndexBufferExample::Update(const Metrics::blTime& gameTime)
 	{
 	};
 

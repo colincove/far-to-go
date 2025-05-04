@@ -153,7 +153,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 	}
 
-	void ImguiExample::Update()
+	void ImguiExample::Update(const Metrics::blTime& gameTime)
 	{
 
 	}

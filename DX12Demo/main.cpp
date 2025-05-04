@@ -32,15 +32,19 @@ int main()
 	dx12->Initialize(mhMainWnd);
 	MSG msg = { };
 
-	int currentExampleIndex = -1;
-	int nextExampleIndex = 0;
+	Example currentExampleType = Example::None;
+	Example nextExampleType = Example::ImGui;
+
+	Metrics::blTime gameTime;
 
 	while (true)
 	{
-		if (currentExampleIndex != nextExampleIndex)
+		gameTime = gameTime.NewTick();
+
+		if (currentExampleType != nextExampleType)
 		{
-			currentExample.reset(GetNewExample(dx12, nextExampleIndex));
-			currentExampleIndex = nextExampleIndex;
+			currentExample.reset(GetNewExample(dx12, nextExampleType));
+			currentExampleType = nextExampleType;
 		}
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
@@ -50,7 +54,7 @@ int main()
 			dx12->RecieveWindowMessage(msg);
 		}
 
-		currentExample->Update();
+		currentExample->Update(gameTime);
 		currentExample->Draw();	
 		::Sleep(10);
 	}

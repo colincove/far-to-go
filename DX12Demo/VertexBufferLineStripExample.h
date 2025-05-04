@@ -19,7 +19,7 @@ namespace BoulderLeaf::Graphics::DX12
 	public:
 		VertexBufferLineStripExample(std::shared_ptr<DX12> dx12);
 	public:
-		void Update() override;
+		void Update(const Metrics::blTime& gameTime) override;
 		void Draw() override;
 	};
 }

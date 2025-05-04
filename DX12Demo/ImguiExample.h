@@ -11,7 +11,7 @@ namespace BoulderLeaf::Graphics::DX12
 		ImguiExample(std::shared_ptr<DX12> dx12);
 		~ImguiExample();
 	public:
-		void Update() override;
+		void Update(const Metrics::blTime& gameTime) override;
 		void Draw() override;
 		virtual LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	private:

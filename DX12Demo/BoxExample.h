@@ -22,7 +22,6 @@ namespace BoulderLeaf::Graphics::DX12
 		void OnMouseUp(WPARAM btnState, int x, int y);
 		void OnMouseMove(WPARAM btnState, int x, int y);
 
-		void BuildDescriptorHeaps();
 		void BuildConstantBuffers();
 		void BuildRootSignature();
 		void BuildShadersAndInputLayout();
@@ -47,7 +46,7 @@ namespace BoulderLeaf::Graphics::DX12
 		BoxExample(std::shared_ptr<DX12> dx12);
 		~BoxExample();
 	public:
-		void Update() override;
+		void Update(const Metrics::blTime& gameTime) override;
 		void Draw() override;
 	};
 }

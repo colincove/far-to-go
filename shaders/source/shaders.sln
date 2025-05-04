@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hlsl", "hlsl", "{9BC3F847-2
 		hlsl\box_example_vs.hlsl = hlsl\box_example_vs.hlsl
 		hlsl\example_ps.hlsl = hlsl\example_ps.hlsl
 		hlsl\example_vs.hlsl = hlsl\example_vs.hlsl
+		shapes_example_ps.hlsl = shapes_example_ps.hlsl
+		shapes_example_vs.hlsl = shapes_example_vs.hlsl
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{B1EEEED6-3504-4D52-9CC4-C75FB49243F0}"
