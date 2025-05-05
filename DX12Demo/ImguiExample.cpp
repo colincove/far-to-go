@@ -53,7 +53,7 @@ namespace
 			D3D12_DESCRIPTOR_HEAP_DESC desc = heap->GetDesc();
 			HeapType = desc.Type;
 			HeapStartCpu = Heap->GetCPUDescriptorHandleForHeapStart();
-			//HeapStartGpu = Heap->GetGPUDescriptorHandleForHeapStart();
+			HeapStartGpu = Heap->GetGPUDescriptorHandleForHeapStart();
 			HeapHandleIncrement = device->GetDescriptorHandleIncrementSize(HeapType);
 			FreeIndices.reserve((int)desc.NumDescriptors);
 			for (int n = desc.NumDescriptors; n > 0; n--)
@@ -90,7 +90,6 @@ namespace
 	static HANDLE                       g_fenceEvent = nullptr;
 	static UINT64                       g_fenceLastSignaledValue = 0;
 	static bool                         g_SwapChainOccluded = false;
-	static HANDLE                       g_hSwapChainWaitableObject = nullptr;
 	//static ID3D12Resource* g_mainRenderTargetResource[APP_NUM_BACK_BUFFERS] = {};
 
 	// Forward declarations of helper functions
@@ -104,8 +103,18 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	ImguiExample::ImguiExample(std::shared_ptr<DX12> dx12) : AbstractExample(dx12),
 		mSwapChainOccluded(false),
-		showDemoWindow(false)
+		showDemoWindow(true)
 	{
+		//ERORR
+		//D3D12 ERROR: ID3D12CommandQueue::ExecuteCommandLists: Using ResourceBarrier on Command List (0x00000223173319F0:'Unnamed ID3D12GraphicsCommandList Object'): Before state (0x0: D3D12_RESOURCE_STATE_[COMMON|PRESENT]) of resource (0x00000223173AEDE0:'BL - DepthBuffer') (subresource: 0) specified by transition barrier does not match with the state (0x10: D3D12_RESOURCE_STATE_DEPTH_WRITE) specified in the previous call to ResourceBarrier [ RESOURCE_MANIPULATION ERROR #527: RESOURCE_BARRIER_BEFORE_AFTER_MISMATCH]
+		// NO idea why this happens. But if I do these commands below, it all works as expected
+		m_dx12->mCommandList->Close();
+		m_dx12->mCommandList->Reset(m_dx12->mDirectCommandListAllocator.Get(), nullptr);
+		ID3D12CommandList* cmdsLists[] = { m_dx12->mCommandList.Get() };
+		m_dx12->mCommandList->Close();
+		m_dx12->mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+		//END
+
 		for (UINT i = 0; i < APP_NUM_FRAMES_IN_FLIGHT; i++)
 		{
 			//WHAT ARE THESE ALLOCATORS. WHy do I need more than 1? My Box example only has 1. 
@@ -117,7 +126,6 @@ namespace BoulderLeaf::Graphics::DX12
 
 		g_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		assert(g_fenceEvent != nullptr);
-			
 
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
@@ -212,7 +220,7 @@ namespace BoulderLeaf::Graphics::DX12
 		ID3D12DescriptorHeap* descriptorHeaps[] = { m_dx12->mCbvHeap.Get() };
 		dx12.mCommandList->SetDescriptorHeaps(1, descriptorHeaps);
 
-		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dx12.mCommandList.Get());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dx12.mCommandList.Get());
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 		dx12.mCommandList->ResourceBarrier(1, &barrier);
@@ -246,8 +254,9 @@ namespace BoulderLeaf::Graphics::DX12
 				WaitForLastSubmittedFrame(dx12);
 				HRESULT result = dx12.mSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
 				assert(SUCCEEDED(result) && "Failed to resize swapchain.");
+				return 0;
 			}
-			return 0;
+			return 1;
 		case WM_SYSCOMMAND:
 			if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
 				return 0;
@@ -284,7 +293,7 @@ namespace
 		UINT nextFrameIndex = g_frameIndex + 1;
 		g_frameIndex = nextFrameIndex;
 
-		HANDLE waitableObjects[] = { g_hSwapChainWaitableObject, nullptr };
+		HANDLE waitableObjects[] = { dx12.mSwapChainWaitableObject, nullptr };
 		DWORD numWaitableObjects = 1;
 
 		FrameContext* frameCtx = &g_frameContext[nextFrameIndex % APP_NUM_FRAMES_IN_FLIGHT];

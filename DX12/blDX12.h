@@ -6,7 +6,7 @@
 #include "../Graphics/blGraphicsAPI.h"
 #include <dxgi.h>
 #include <d3d12.h>
-#include <dxgi1_2.h>
+#include <dxgi1_3.h>
 #include <DirectXMath.h>
 
 #include <memory>
@@ -35,7 +35,8 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12CommandQueue> mCommandQueue;
 		ComPtr<ID3D12CommandAllocator> mDirectCommandListAllocator;
 		ComPtr<ID3D12GraphicsCommandList> mCommandList;
-		ComPtr<IDXGISwapChain1> mSwapChain;
+		ComPtr<IDXGISwapChain2> mSwapChain;
+		HANDLE mSwapChainWaitableObject;
 		ComPtr<ID3D12DescriptorHeap> mRtvHeap;
 		ComPtr<ID3D12DescriptorHeap> mDsvHeap;
 		ComPtr<ID3D12DescriptorHeap> mCbvHeap;

@@ -38,7 +38,7 @@ namespace BoulderLeaf::Graphics::DX12
 			const ComPtr<IDXGIFactory2> factory,
 			const DXGI_FORMAT backbufferFormat,
 			HWND& mainOutputWindow,
-			ComPtr<IDXGISwapChain1>& swapChainOut);
+			ComPtr<IDXGISwapChain2>& swapChainOut);
 
 		HRESULT CreateRtvAndDsvDescriptorHeaps(
 			const ComPtr<ID3D12Device8> device,
@@ -67,6 +67,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mDirectCommandListAllocator(nullptr),
 		mCommandList(nullptr),
 		mSwapChain(nullptr),
+		mSwapChainWaitableObject(nullptr),
 		mRtvHeap(nullptr),
 		mDsvHeap(nullptr),
 		mCbvHeap(nullptr),
@@ -156,6 +157,7 @@ namespace BoulderLeaf::Graphics::DX12
 			mSwapChain);
 
 		assert((swapChainResult == S_OK));
+		mSwapChainWaitableObject = mSwapChain->GetFrameLatencyWaitableObject();
 
 		HRESULT descriptorHeapsResult = CreateRtvAndDsvDescriptorHeaps(
 			mDevice,
@@ -404,7 +406,7 @@ namespace BoulderLeaf::Graphics::DX12
 			const ComPtr<IDXGIFactory2> factory,
 			const DXGI_FORMAT backbufferFormat,
 			HWND& mainOutputWindow,
-			ComPtr<IDXGISwapChain1>& swapChainOut)
+			ComPtr<IDXGISwapChain2>& swapChainOut)
 		{
 			RECT winRect;
 			assert(GetWindowRect(mainOutputWindow, &winRect));
@@ -435,7 +437,10 @@ namespace BoulderLeaf::Graphics::DX12
 			desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			desc.BufferCount = swapChainBufferCount;
 			desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-			desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+			//DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT was added so that 
+			//GetFrameLatencyWaitableObject would actually return something
+			desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
 
 			DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullscreenDesc;
 			fullscreenDesc.RefreshRate.Numerator = 60;
@@ -443,7 +448,15 @@ namespace BoulderLeaf::Graphics::DX12
 			fullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 			fullscreenDesc.Windowed = true;
 
-			return factory->CreateSwapChainForHwnd(commandQueue.Get(), mainOutputWindow , &desc, &fullscreenDesc, NULL, swapChainOut.GetAddressOf());
+			IDXGISwapChain1* swapChain1 = nullptr;
+			factory->CreateSwapChainForHwnd(commandQueue.Get(), mainOutputWindow, &desc, &fullscreenDesc, NULL, &swapChain1);
+			if (swapChain1->QueryInterface(IID_PPV_ARGS(&swapChainOut)) != S_OK)
+			{
+				return 0;
+			}
+				
+			swapChain1->Release();
+			return S_OK;
 		}
 
 		HRESULT CreateRtvAndDsvDescriptorHeaps(
