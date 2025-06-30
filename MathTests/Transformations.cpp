@@ -35,7 +35,7 @@ namespace BoulderLeaf::Math::Test
 
 		const Matrix3x3 rotationMatrix(Matrix3x3::RotationMatrix(axis, radians));
 		const Vector3 transformation(Matrix3x3::Transform(rotationMatrix, origin));
-		EXPECT_TRUE(NearEqual(transformation, Vector3(2.73055795, 1.88665545, 0.99226231)));
+		EXPECT_TRUE(NearEqual(transformation, Vector3(2.73055795f, 1.88665545f, 0.99226231f)));
 	}
 
 	TEST(Transformations, Translation)
@@ -53,7 +53,7 @@ namespace BoulderLeaf::Math::Test
 	{
 		const Vector3 v(0.15f, 0.15f, 0.15f);
 		const CartesianCoordinates frame(CartesianCoordinates::FromAxes(
-			Vector3(1, 1, 0.75), Vector3(0, 1.2, 0.5), Vector3(-1, 1, 2)));
+			Vector3(1, 1, 0.75f), Vector3(0, 1.2f, 0.5f), Vector3(-1, 1, 2)));
 
 		const Vector3 result(Transition(v, frame));
 
@@ -64,7 +64,7 @@ namespace BoulderLeaf::Math::Test
 	{
 		const Vector4 v(Vector4::Vector3D(0.15f, 0.15f, 0.15f));
 		const CartesianCoordinates frame(CartesianCoordinates::FromAxes(
-			Vector3(1, 1, 0.75), Vector3(0, 1.2, 0.5), Vector3(-1, 1, 2)));
+			Vector3(1, 1, 0.75f), Vector3(0, 1.2f, 0.5f), Vector3(-1, 1, 2)));
 
 		const Vector4 origin(Vector4::Point3D(2, 4, 0));
 		const Matrix4x4 transitionMatrix(TransitionMatrix(frame, origin));
@@ -78,7 +78,7 @@ namespace BoulderLeaf::Math::Test
 	{
 		const Vector4 v(Vector4::Vector3D(0.15f, 0.15f, 0.15f));
 		const CartesianCoordinates frameA(CartesianCoordinates::FromAxes(
-			Vector3(1, 1, 0.75), Vector3(0, 1.2, 0.5), Vector3(-1, 1, 2)));
+			Vector3(1, 1, 0.75f), Vector3(0, 1.2f, 0.5), Vector3(-1, 1, 2)));
 		const CartesianCoordinates frameB(CartesianCoordinates::FromAxes(
 			Vector3(1.4f, 0.3f, 0.15f), Vector3(0, 2, 2), Vector3(-1, 1, 2)));
 
@@ -99,7 +99,7 @@ namespace BoulderLeaf::Math::Test
 	{
 		const Vector4 v(Vector4::Vector3D(0.15f, 0.15f, 0.15f));
 		const CartesianCoordinates frame(CartesianCoordinates::FromAxes(
-			Vector3(1, 1, 0.75), Vector3(0, 1.2, 0.5), Vector3(-1, 1, 2)));
+			Vector3(1, 1, 0.75f), Vector3(0, 1.2f, 0.5f), Vector3(-1, 1, 2)));
 
 		const Vector4 origin(Vector4::Point3D(2, 4, 0));
 		const Matrix4x4 transitionMatrix(TransitionMatrix(frame, origin));

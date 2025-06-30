@@ -271,7 +271,6 @@ namespace BoulderLeaf::Graphics::DX12
 
 namespace
 {
-
 	void WaitForLastSubmittedFrame(DX12& dx12)
 	{
 		FrameContext* frameCtx = &g_frameContext[g_frameIndex % APP_NUM_FRAMES_IN_FLIGHT];

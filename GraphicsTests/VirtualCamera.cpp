@@ -5,18 +5,38 @@ namespace BoulderLeaf::Graphics
 {
 	TEST(VirtualCamera, Initialize)
 	{
-		VirtualCamera camera(5, 15, 0.8f, 0.66f);
+		const float nearPlane = 5;
+		const float farPlane = 15;
+		const float viewAngle = 0.3f;
+		const float aspectRatio = 0.66f;
+
+		const VirtualCamera camera(
+			nearPlane,
+			farPlane,
+			viewAngle,
+			aspectRatio);
+
 		VirtualCamera cameraDefault;
 
-		EXPECT_FLOAT_EQ(camera.GetNearPlane(), 5);
-		EXPECT_FLOAT_EQ(camera.GetFarPlane(), 15);
-		EXPECT_FLOAT_EQ(camera.GetViewAngle(), 0.8f);
-		EXPECT_FLOAT_EQ(camera.GetAspectRatio(), 0.66f);
+		EXPECT_FLOAT_EQ(camera.GetNearPlane(), nearPlane);
+		EXPECT_FLOAT_EQ(camera.GetFarPlane(), farPlane);
+		EXPECT_FLOAT_EQ(camera.GetViewAngle(), viewAngle);
+		EXPECT_FLOAT_EQ(camera.GetAspectRatio(), aspectRatio);
 	}
 
 	TEST(VirtualCamera, Project)
 	{
-		const VirtualCamera camera(5, 15, 0.3f, 0.66f);
+		const float nearPlane = 5;
+		const float farPlane = 15;
+		const float viewAngle = 0.3f;
+		const float aspectRatio = 0.66f;
+
+		const VirtualCamera camera(
+			nearPlane, 
+			farPlane, 
+			viewAngle, 
+			aspectRatio);
+
 		const Matrix4x4 projectionMatrix(camera.GetProjectionMatrix());
 
 		Vector4 vertice(Vector4::Point3D(0.5f, 1, 10));

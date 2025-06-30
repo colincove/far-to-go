@@ -1,8 +1,8 @@
 #pragma once
 
-#include "..\Test\blAssert.h"
+#include "../Test/blAssert.h"
 
-#include "blVector2.inl"
+#include <blVector2.inl>
 
 namespace BoulderLeaf::Math
 {
@@ -36,13 +36,13 @@ namespace BoulderLeaf::Math
 			};
 		};
 
-		Matrix2x2(float m00, float m01, 
+		constexpr Matrix2x2(float m00, float m01,
 			float m10, float m11) : m00(m00), m01(m01), m10(m10), m11(m11)		
 		{
 
 		}
 
-		Matrix2x2() : Matrix2x2(0, 0, 0, 0)
+		constexpr Matrix2x2() : Matrix2x2(0, 0, 0, 0)
 		{
 
 		}

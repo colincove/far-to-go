@@ -9,6 +9,8 @@
 #include <DirectXColors.h>
 #include <memory>
 #include <string>
+#include <blMesh.h>
+#include <blMeshLibrary.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -209,6 +211,9 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 	void BoxExample::BuildBoxGeometry() 
 	{
+		const StandardMesh& standardCube = Cube();
+		const Mesh cubeMesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(standardCube.GetStorage()));
+
 		std::array<Vertex, 8> vertices =
 		{
 			Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::White), XMFLOAT2() }),
@@ -245,6 +250,11 @@ namespace BoulderLeaf::Graphics::DX12
 			4, 3, 7
 		};
 
+
+
+		//auto fromVertexFunction = [](StandardMesh::Vertex v) { return From<StandardMesh::Vertex, Mesh::Vertex>(v); };
+		//Mesh dx12Mesh = CastMeshFrom<StandardMesh, Mesh, StandardMesh::Vertex, Mesh::Vertex>(mesh, From<StandardMesh::Vertex, Mesh::Vertex>);
+		//vertices[0] = From<StandardMesh::Vertex, Vertex>(mesh.mVertices[0]);
 		const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 		const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 		mBoxGeo = std::make_unique<MeshGeometry>();

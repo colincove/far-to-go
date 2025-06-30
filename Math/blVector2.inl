@@ -7,11 +7,11 @@ namespace BoulderLeaf::Math
 {
 	struct Vector2
 	{
-		Vector2() : 
+		constexpr Vector2() :
 			Vector2(0, 0)
 		{}
 
-		Vector2(float x, float y):
+		constexpr Vector2(float x, float y):
 			x(x),
 			y(y)
 		{}

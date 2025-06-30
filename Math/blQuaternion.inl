@@ -36,7 +36,7 @@ namespace BoulderLeaf::Math
 		};
 		
 	public:
-		Quaternion(float t, float x, float y, float z) :
+		constexpr Quaternion(float t, float x, float y, float z) :
 			t(t),
 			x(x),
 			y(y),
@@ -45,14 +45,14 @@ namespace BoulderLeaf::Math
 
 		}
 
-		Quaternion(float real, Vector3 vector) :
+		constexpr Quaternion(float real, Vector3 vector) :
 			real(real),
 			vector(vector)
 		{
 
 		}
 
-		Quaternion():Quaternion(0, 0, 0, 0)
+		constexpr Quaternion():Quaternion(0, 0, 0, 0)
 		{
 
 		}

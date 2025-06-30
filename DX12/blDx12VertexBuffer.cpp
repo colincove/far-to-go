@@ -1,8 +1,8 @@
 #include <directx/d3dx12_core.h>
 #include <directx/D3dx12.h>
-#include "blDx12VertexBuffer.h"
+#include <blDx12VertexBuffer.h>
 #include <directx/d3d12.h>
-#include<cassert>
+#include <cassert>
 
 namespace BoulderLeaf::Graphics::DX12
 {

@@ -33,7 +33,7 @@ int main()
 	MSG msg = { };
 
 	Example currentExampleType = Example::None;
-	Example nextExampleType = Example::ImGui;
+	Example nextExampleType = Example::Box;
 
 	Metrics::blTime gameTime;
 

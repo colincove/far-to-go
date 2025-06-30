@@ -2,8 +2,8 @@
 
 #include "..\Test\blAssert.h"
 
-#include "blVector4.inl"
-#include "blMatrix3x3.inl"
+#include <blVector4.inl>
+#include <blMatrix3x3.inl>
 
 #include <math.h>
 
@@ -52,7 +52,7 @@ namespace BoulderLeaf::Math
 			};
 		};
 
-		Matrix4x4(float m00, float m01, float m02, float m03,
+		constexpr Matrix4x4(float m00, float m01, float m02, float m03,
 			float m10, float m11, float m12, float m13,
 			float m20, float m21, float m22, float m23,
 			float m30, float m31, float m32, float m33)
@@ -64,7 +64,7 @@ namespace BoulderLeaf::Math
 
 		}
 
-		Matrix4x4() : Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+		constexpr Matrix4x4() : Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 		{
 
 		}

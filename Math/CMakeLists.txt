@@ -31,6 +31,7 @@ set_target_properties(Math PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(Math
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+		PRIVATE ./
         )
 
 target_compile_definitions(

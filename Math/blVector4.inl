@@ -8,11 +8,11 @@ namespace BoulderLeaf::Math
 {
 	struct Vector4
 	{
-		Vector4() :
+		constexpr Vector4() :
 			Vector4(0, 0, 0, 0)
 		{}
 
-		Vector4(float x, float y, float z, float w) :
+		constexpr Vector4(float x, float y, float z, float w) :
 			x(x),
 			y(y),
 			z(z), 

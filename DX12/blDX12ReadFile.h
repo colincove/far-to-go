@@ -1,6 +1,6 @@
 #pragma once
 
-#include "blDX12Core.h"
+#include <blDX12Core.h>
 #include <D3Dcommon.h>
 #include <string>
 

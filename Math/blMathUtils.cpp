@@ -1,4 +1,4 @@
-#include "blQuaternion.inl"
+#include <blQuaternion.inl>
 
 namespace BoulderLeaf::Math
 {

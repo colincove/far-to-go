@@ -1,6 +1,6 @@
 #pragma once
-#include "..\Math\blTransform.h"
-#include "..\Math\blVector4.inl"
+#include <blTransform.h>
+#include <blVector4.inl>
 
 namespace BoulderLeaf::Graphics
 {

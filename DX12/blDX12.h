@@ -2,8 +2,8 @@
 
 //BoulderLeaf
 #include <assert.h>
-#include "blDX12Core.h"
-#include "../Graphics/blGraphicsAPI.h"
+#include <blDX12Core.h>
+#include <blGraphicsAPI.h>
 #include <dxgi.h>
 #include <d3d12.h>
 #include <dxgi1_3.h>

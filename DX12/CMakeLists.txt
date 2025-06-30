@@ -12,11 +12,17 @@ add_library(
 	blDx12VertexBuffer.h
 	blDx12VertexBuffer.cpp
 	blDx12VertexData.h
+	blDx12VertexData.cpp
 	blDX12UploadBuffer.h
 	)
 
 target_include_directories(DX12
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+		PRIVATE 
+		../Core
+		../Math
+		../Graphics
+		./
         )
 
 target_link_libraries(DX12 PRIVATE

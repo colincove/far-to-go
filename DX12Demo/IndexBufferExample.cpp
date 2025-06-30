@@ -55,7 +55,7 @@ namespace BoulderLeaf::Graphics::DX12
 		);
 
 		mBufferView.BufferLocation = mVertexBufferGPU->GetGPUVirtualAddress();
-		mBufferView.SizeInBytes = vbByteSize;
+		mBufferView.SizeInBytes = static_cast<UINT>(vbByteSize);
 		mBufferView.StrideInBytes = sizeof(Vertex);
 
 		mBufferViews[1] = { mBufferView };

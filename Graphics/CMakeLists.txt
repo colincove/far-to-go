@@ -1,20 +1,31 @@
 add_library(
 	Graphics 
+	blColour.h
 	graphics.cpp
 	blGraphicsAPI.h
 	blGraphicsAPI.cpp
 	blHeadless.h
 	blHeadless.cpp
+	blMesh.h
+	blMesh.cpp
+	blMeshLibrary.h
 	blVirtualCamera.h
 	blVirtualCamera.cpp)
 
 target_include_directories(Graphics
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+		${CMAKE_CURRENT_SOURCE_DIR}/../Core
+		${CMAKE_CURRENT_SOURCE_DIR}/../Math
+		PRIVATE ./
+		../Math
+		../Core
         )
 
 target_link_libraries(
 	Graphics
-	PUBLIC DX12
+	PUBLIC Math
+	DX12
+	Core
 )
 
 #after adding the include #include <windef.h> I started to get this compile error

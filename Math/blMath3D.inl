@@ -4,10 +4,10 @@
 #include <cmath>
 #include <array>
 
-#include "blMath.inl"
-#include "blVector3.inl"
-#include "blMatrix4x4.inl"
-#include "blQuaternion.inl"
+#include <blMath.inl>
+#include <blVector3.inl>
+#include <blMatrix4x4.inl>
+#include <blQuaternion.inl>
 
 namespace BoulderLeaf::Math
 {

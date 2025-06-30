@@ -1,7 +1,7 @@
 #pragma once
 
-#include "blDX12Core.h"
-#include "blDX12Math.inl"
+#include <blDX12Core.h>
+#include <blDX12Math.inl>
 #include <d3d12.h>
 #include "../DirectX-Headers/include/directx/d3dx12.h"
 

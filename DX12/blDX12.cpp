@@ -9,9 +9,9 @@
 #include <dxgidebug.h>
 
 //BoulderLeaf
-#include "blDX12Test.h"
-#include "blDX12.h"
-#include "..\Math\blMath.inl"
+#include <blDX12Test.h>
+#include <blDX12.h>
+#include <blMath.inl>
 
 //Standard
 #include <iostream>
@@ -448,6 +448,9 @@ namespace BoulderLeaf::Graphics::DX12
 			fullscreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 			fullscreenDesc.Windowed = true;
 
+			//What is this nonsense? I searched high and low, and no factory interface can straight up create a IDXGISwapChain2 class. 
+			//You need to do this goofy looking QueryInterface thing. It is very odd. WHy?
+			//(code taken from imgui dx12 backend examples)
 			IDXGISwapChain1* swapChain1 = nullptr;
 			factory->CreateSwapChainForHwnd(commandQueue.Get(), mainOutputWindow, &desc, &fullscreenDesc, NULL, &swapChain1);
 			if (swapChain1->QueryInterface(IID_PPV_ARGS(&swapChainOut)) != S_OK)

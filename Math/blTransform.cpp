@@ -1,6 +1,6 @@
 #pragma once
-#include "blMatrix4x4.inl"
-#include "blTransform.h"
+#include <blMatrix4x4.inl>
+#include <blTransform.h>
 
 namespace BoulderLeaf::Math
 {

@@ -52,6 +52,7 @@ add_subdirectory(Graphics)
 add_subdirectory(GraphicsTests)
 add_subdirectory(RapidXML)
 add_subdirectory(imgui)
+add_subdirectory(Core)
 
 target_link_libraries(
 	FarToGo 

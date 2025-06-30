@@ -3,6 +3,8 @@
 #include "blDX12Core.h"
 #include "blDX12UploadBuffer.h"
 #include <assert.h>
+#include <ctime>
+#include <chrono>
 
 namespace
 {
@@ -11,7 +13,17 @@ namespace
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	ShapesExample::ShapesExample(std::shared_ptr<DX12> dx12) : AbstractExample(dx12)
+	ShapesExample::ShapesExample(std::shared_ptr<DX12> dx12) : AbstractExample(dx12),
+		mFrameResources(),
+		mCurrFrameResource(nullptr),
+		mCurrFrameResourceIndex(0),
+		mMainPassCB(),
+		mAllRitems(),
+		mOpaqueRitems(),
+		mTransparentRitems(),
+		mWorld(Math::Identity4x4()),
+		mView(Math::Identity4x4()),
+		mProj(Math::Identity4x4())
 	{
 		BuildFrameResources();
 	}
@@ -23,6 +35,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void ShapesExample::Update(const Metrics::blTime& gameTime)
 	{
+		UpdateMainPassCB(gameTime);
+
 		// Cycle through the circular frame resource array.
 		mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) %
 			s_numFrameResources;
@@ -107,34 +121,40 @@ namespace BoulderLeaf::Graphics::DX12
 		}*/
 	}
 
-	void ShapesExample::UpdateMainPassCB()
+	void ShapesExample::UpdateMainPassCB(const Metrics::blTime& gameTime)
 	{
-		/*RECT winRect;
+		RECT winRect;
 		assert(GetWindowRect(m_dx12->mhMainWnd, &winRect));
 		const int width = winRect.right - winRect.left;
 		const int height = winRect.bottom - winRect.top;
 
-		XMMATRIX view = XMLoadFloat4x4(&mView);
-		XMMATRIX proj = XMLoadFloat4x4(&mProj);
-		XMMATRIX viewProj = XMMatrixMultiply(view, proj);
-		XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
-		XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(proj), proj);
-		XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
+		const XMMATRIX view = XMLoadFloat4x4(&mView);
+		const XMMATRIX proj = XMLoadFloat4x4(&mProj);
+		const XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+
+		XMVECTOR viewDet = XMMatrixDeterminant(view);
+		XMVECTOR projDet = XMMatrixDeterminant(proj);
+		XMVECTOR viewProjDet = XMMatrixDeterminant(viewProj);
+
+		const XMMATRIX invView = XMMatrixInverse(&viewDet, view);
+		const XMMATRIX invProj = XMMatrixInverse(&projDet, proj);
+		const XMMATRIX invViewProj = XMMatrixInverse(&viewProjDet, viewProj);
+
 		XMStoreFloat4x4(&mMainPassCB.View, XMMatrixTranspose(view));
 		XMStoreFloat4x4(&mMainPassCB.InvView, XMMatrixTranspose(invView));
 		XMStoreFloat4x4(&mMainPassCB.Proj, XMMatrixTranspose(proj));
 		XMStoreFloat4x4(&mMainPassCB.InvProj, XMMatrixTranspose(invProj));
 		XMStoreFloat4x4(&mMainPassCB.ViewProj, XMMatrixTranspose(viewProj));
 		XMStoreFloat4x4(&mMainPassCB.InvViewProj, XMMatrixTranspose(invViewProj));
-		mMainPassCB.EyePosW = mEyePos;
+		//mMainPassCB.EyePosW = mEyePos; cannot find this deifned anywhere in class or book pages
 		mMainPassCB.RenderTargetSize = XMFLOAT2((float) width, (float)height);
 		mMainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / width, 1.0f
 			/ height);
 		mMainPassCB.NearZ = 1.0f;
 		mMainPassCB.FarZ = 1000.0f;
-		mMainPassCB.TotalTime = gt.TotalTime();
-		mMainPassCB.DeltaTime = gt.DeltaTime();
-		auto currPassCB = mCurrFrameResource->PassCB.get();
-		currPassCB->CopyData(0, mMainPassCB);*/
+		mMainPassCB.TotalTime = gameTime.TotalSeconds();
+		mMainPassCB.DeltaTime = gameTime.DeltaSeconds();
+		//auto currPassCB = mCurrFrameResource->PassCB.get();
+		//currPassCB->CopyData(0, mMainPassCB);
 	}
 }

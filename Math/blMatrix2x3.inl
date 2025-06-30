@@ -2,10 +2,10 @@
 
 #include "..\Test\blAssert.h"
 
-#include "blVector3.inl"
-#include "blVector2.inl"
-#include "blMatrix3x3.inl"
-#include "blMatrix2x2.inl"
+#include <blVector3.inl>
+#include <blVector2.inl>
+#include <blMatrix3x3.inl>
+#include <blMatrix2x2.inl>
 
 namespace BoulderLeaf::Math
 {
@@ -37,7 +37,7 @@ namespace BoulderLeaf::Math
 			};
 		};
 
-		Matrix2x3(float m00, float m01, float m02,
+		constexpr Matrix2x3(float m00, float m01, float m02,
 			float m10, float m11, float m12)
 			: m00(m00), m01(m01), m02(m02),
 			m10(m10), m11(m11), m12(m12)
@@ -45,7 +45,7 @@ namespace BoulderLeaf::Math
 
 		}
 
-		Matrix2x3() : Matrix2x3(0, 0, 0, 0, 0, 0)
+		constexpr Matrix2x3() : Matrix2x3(0, 0, 0, 0, 0, 0)
 		{
 
 		}

@@ -1,5 +1,5 @@
-#include "blGraphicsAPI.h"
-#include "blHeadless.h"
+#include <blGraphicsAPI.h>
+#include <blHeadless.h>
 
 namespace BoulderLeaf::Graphics
 {

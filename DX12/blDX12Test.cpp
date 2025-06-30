@@ -24,7 +24,7 @@ namespace BoulderLeaf::Graphics::DX12::Test
 		{
 			CString result;
 
-			for (int i = 0; i < indentation; ++i)
+			for (unsigned int i = 0; i < indentation; ++i)
 			{
 				result += ctab;
 			}

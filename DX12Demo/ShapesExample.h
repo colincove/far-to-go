@@ -5,6 +5,7 @@
 #include "blDX12UploadBuffer.h"
 #include <blDX12MeshGeometry.h>
 #include <blDx12Math.inl>
+#include <blTIme.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -15,7 +16,19 @@ namespace BoulderLeaf::Graphics::DX12
 
 		struct PassConstants
 		{
+			XMFLOAT4X4 View;
+			XMFLOAT4X4 InvView;
+			XMFLOAT4X4 Proj;
+			XMFLOAT4X4 InvProj;
+			XMFLOAT4X4 ViewProj;
+			XMFLOAT4X4 InvViewProj;
 
+			XMFLOAT2 RenderTargetSize;
+			XMFLOAT2 InvRenderTargetSize;
+			float NearZ;
+			float FarZ;
+			float TotalTime;
+			float DeltaTime;
 		};
 
 		struct ObjectConstants
@@ -84,8 +97,10 @@ namespace BoulderLeaf::Graphics::DX12
 		void Draw() override;
 	private:
 		std::vector<std::unique_ptr<FrameResource>> mFrameResources;
-		FrameResource* mCurrFrameResource = nullptr;
-		int mCurrFrameResourceIndex = 0;
+		FrameResource* mCurrFrameResource;
+		int mCurrFrameResourceIndex;
+
+		PassConstants mMainPassCB;
 
 		// List of all the render items.
 		std::vector<std::unique_ptr<RenderItem>> mAllRitems;
@@ -93,8 +108,12 @@ namespace BoulderLeaf::Graphics::DX12
 		std::vector<RenderItem*> mOpaqueRitems;
 		std::vector<RenderItem*> mTransparentRitems;
 
+		XMFLOAT4X4 mWorld = Math::Identity4x4();
+		XMFLOAT4X4 mView;
+		XMFLOAT4X4 mProj;
+
 		void BuildFrameResources();
 		void UpdateObjectCBs();
-		void UpdateMainPassCB();
+		void UpdateMainPassCB(const Metrics::blTime& gameTime);
 	};
 }

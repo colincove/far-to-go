@@ -5,6 +5,7 @@
 #include <directxcollision.h>
 #include <string>
 #include <unordered_map>
+#include <blMesh.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -24,8 +25,11 @@ namespace BoulderLeaf::Graphics::DX12
 	};
 	struct MeshGeometry
 	{
+		using Mesh = blMesh<StandardVertex>;
+
 		// Give it a name so we can look it up by name.
 		std::string Name;
+		Mesh* mMesh;
 		// System memory copies. Use Blobs because the vertex/index format can
 		// be generic.
 		// It is up to the client to cast appropriately.
