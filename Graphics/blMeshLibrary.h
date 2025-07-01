@@ -23,7 +23,7 @@ namespace BoulderLeaf::Graphics
 		})
 		};
 
-		static std::array<std::size_t, 36> indices =
+		static std::array<blMeshStorage::index, 36> indices =
 		{
 			// front face
 			0, 1, 2,

@@ -213,6 +213,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		const StandardMesh& standardCube = Cube();
 		const Mesh cubeMesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(standardCube.GetStorage()));
+		const blMeshStorage::Header& header = cubeMesh.GetStorage().GetHeader();
 
 		std::array<Vertex, 8> vertices =
 		{
@@ -227,42 +228,13 @@ namespace BoulderLeaf::Graphics::DX12
 		})
 		};
 
-		std::array<std::uint16_t, 36> indices =
-		{
-			// front face
-
-			0, 1, 2,
-			0, 2, 3,
-			// back face
-			4, 6, 5,
-			4, 7, 6,
-			// left face
-			4, 5, 1,
-			4, 1, 0,
-			// right face
-			3, 2, 6,
-			3, 6, 7,
-			// top face
-			1, 5, 6,
-			1, 6, 2,
-			// bottom face
-			4, 0, 3,
-			4, 3, 7
-		};
-
-
-
-		//auto fromVertexFunction = [](StandardMesh::Vertex v) { return From<StandardMesh::Vertex, Mesh::Vertex>(v); };
-		//Mesh dx12Mesh = CastMeshFrom<StandardMesh, Mesh, StandardMesh::Vertex, Mesh::Vertex>(mesh, From<StandardMesh::Vertex, Mesh::Vertex>);
-		//vertices[0] = From<StandardMesh::Vertex, Vertex>(mesh.mVertices[0]);
 		const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-		const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 		mBoxGeo = std::make_unique<MeshGeometry>();
 		mBoxGeo->Name = "boxGeo";
 		D3DCreateBlob(vbByteSize, &mBoxGeo->VertexBufferCPU);
 		CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-		D3DCreateBlob(ibByteSize, &mBoxGeo->IndexBufferCPU);
-		CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+		D3DCreateBlob(header.GetVertexBufferSize(), &mBoxGeo->IndexBufferCPU);
+		CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), cubeMesh.GetStorage().IndexBegin(), header.GetVertexBufferSize());
 
 		mBoxGeo->VertexBufferGPU = CreateDefaultBuffer(
 			m_dx12->mDevice.Get(),
@@ -274,16 +246,16 @@ namespace BoulderLeaf::Graphics::DX12
 		mBoxGeo->IndexBufferGPU = CreateDefaultBuffer(
 			m_dx12->mDevice.Get(),
 			m_dx12->mCommandList.Get(),
-			indices.data(),
-			ibByteSize,
+			cubeMesh.GetStorage().IndexBegin(),
+			header.GetVertexBufferSize(),
 			mBoxGeo->IndexBufferUploader);
 
 		mBoxGeo->VertexByteStride = sizeof(Vertex);
 		mBoxGeo->VertexBufferByteSize = vbByteSize;
 		mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-		mBoxGeo->IndexBufferByteSize = ibByteSize;
+		mBoxGeo->IndexBufferByteSize = (UINT) header.GetVertexBufferSize();
 		SubmeshGeometry submesh;
-		submesh.IndexCount = (UINT)indices.size();
+		submesh.IndexCount = (UINT) cubeMesh.GetIndexCount();
 
 		submesh.StartIndexLocation = 0;
 		submesh.BaseVertexLocation = 0;
