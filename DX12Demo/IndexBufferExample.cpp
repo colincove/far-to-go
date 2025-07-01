@@ -9,13 +9,13 @@ namespace BoulderLeaf::Graphics::DX12
 		:AbstractExample(dx12),
 		mVertices(
 			{
-				Vertex(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 0), XMFLOAT2(0, 0)),
-				{ XMFLOAT3(2, 1, 1), XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 0), XMFLOAT2(0, 0) },
-				{ XMFLOAT3(2, 1, 1), XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 0), XMFLOAT2(0, 0) },
-				{ XMFLOAT3(2, 2, 2), XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 1, 0), XMFLOAT2(0, 0) },
-				{ XMFLOAT3(3, 2, 2), XMFLOAT3(0, 0, 0), XMFLOAT4(1, 1, 0, 0), XMFLOAT2(0, 0) },
-				{ XMFLOAT3(3, 3, 2), XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 1, 0), XMFLOAT2(0, 0) },
-				{ XMFLOAT3(4, 3, 3), XMFLOAT3(0, 0, 0), XMFLOAT4(1, 1, 1, 0), XMFLOAT2(0, 0) }
+				Vertex(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(0, 0, 0, 0), XMFLOAT2(0, 0)),
+				{ XMFLOAT3(2, 1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(1, 0, 0, 0), XMFLOAT2(0, 0) },
+				{ XMFLOAT3(2, 1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(0, 1, 0, 0), XMFLOAT2(0, 0) },
+				{ XMFLOAT3(2, 2, 2), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(0, 0, 1, 0), XMFLOAT2(0, 0) },
+				{ XMFLOAT3(3, 2, 2), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(1, 1, 0, 0), XMFLOAT2(0, 0) },
+				{ XMFLOAT3(3, 3, 2), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(0, 1, 1, 0), XMFLOAT2(0, 0) },
+				{ XMFLOAT3(4, 3, 3), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(1, 1, 1, 0), XMFLOAT2(0, 0) }
 			}),
 		mVertexBufferGPU(nullptr),
 		mVertexBufferUpload(nullptr),

@@ -2,7 +2,6 @@
 
 #include <array>
 #include <blDX12.h>
-#include <blDx12VertexData.h>
 #include "AbstractExample.h"
 #include <blDX12MeshGeometry.h>
 #include <memory>
@@ -12,9 +11,30 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	class BoxExample : public AbstractExample
 	{
+	public:
 		struct ObjectConstants
 		{
-			XMFLOAT4X4 WorldViewProj = XMFLOAT4X4_Identity();
+			XMFLOAT4X4 WorldViewProj = Math::Identity4x4();
+		};
+
+		struct Vertex
+		{
+		public:
+			XMFLOAT3 Pos;
+			XMFLOAT3 Norm;
+			XMFLOAT4 Color;
+			XMFLOAT2 UV;
+		};
+
+		using Mesh = Graphics::blMesh<Vertex>;
+		using BoxMeshGeometry = MeshGeometry<Mesh>;
+
+		const std::vector<D3D12_INPUT_ELEMENT_DESC> VertexDesc =
+		{
+			{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"Color", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
 	private:
@@ -30,7 +50,7 @@ namespace BoulderLeaf::Graphics::DX12
 	private:
 		ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 		std::unique_ptr<UploadBuffer<ObjectConstants>> mObjectCB = nullptr;
-		std::unique_ptr<MeshGeometry> mBoxGeo = nullptr;
+		std::unique_ptr<BoxMeshGeometry> mBoxGeo = nullptr;
 		ComPtr<ID3DBlob> mvsByteCode = nullptr;
 		ComPtr<ID3DBlob> mpsByteCode = nullptr;
 		std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
@@ -49,4 +69,9 @@ namespace BoulderLeaf::Graphics::DX12
 		void Update(const Metrics::blTime& gameTime) override;
 		void Draw() override;
 	};
+
+	inline bool operator==(const BoxExample::Vertex& lhs, const BoxExample::Vertex& rhs)
+	{
+		return memcmp(&lhs, &rhs, sizeof(BoxExample::Vertex));
+	}
 }

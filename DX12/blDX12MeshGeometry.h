@@ -23,10 +23,10 @@ namespace BoulderLeaf::Graphics::DX12
 		// This is used in later chapters of the book.
 		DirectX::BoundingBox Bounds;
 	};
+
+	template<typename Mesh>
 	struct MeshGeometry
 	{
-		using Mesh = blMesh<StandardVertex>;
-
 		// Give it a name so we can look it up by name.
 		std::string Name;
 		Mesh* mMesh;

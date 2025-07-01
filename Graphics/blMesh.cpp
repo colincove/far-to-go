@@ -2,9 +2,9 @@
 
 namespace BoulderLeaf::Graphics
 {
-	size_t blMeshStorage::GetBufferSize(const Header& header)
+	size_t blMeshStorage::GetBufferSize(const VertexHeader& header)
 	{
-		return sizeof(Header) +
+		return sizeof(VertexHeader) +
 			header.mVertexCount * header.mVertexSize +
 			header.mIndexCount * sizeof(blMeshStorage::index);
 	}
@@ -22,10 +22,10 @@ namespace BoulderLeaf::Graphics
 		size_t indexCount,
 		size_t vertexSize) : blMeshStorage()
 	{
-		const Header header = Header(vertexCount, vertexSize, indexCount);
+		const VertexHeader header = VertexHeader(vertexCount, indexCount, vertexSize);
 		const size_t bufferSize = GetBufferSize(header);
 		mBuffer = std::make_unique<byte[]>(bufferSize);
-		GetHeaderMutable() = header;
+		GetVertexHeaderMutable() = header;
 		InitializeIndexingPointers();
 	}
 
@@ -60,7 +60,7 @@ namespace BoulderLeaf::Graphics
 
 	blMeshStorage::blMeshStorage(const blMeshStorage& other)
 	{
-		const size_t bufferSize = GetBufferSize(other.GetHeader());
+		const size_t bufferSize = GetBufferSize(other.GetVertexHeader());
 		mBuffer = std::make_unique<byte[]>(bufferSize);
 		memcpy(static_cast<void*>(mBuffer.get()), other.begin(), bufferSize);
 		InitializeIndexingPointers();
@@ -68,9 +68,8 @@ namespace BoulderLeaf::Graphics
 
 	void blMeshStorage::InitializeIndexingPointers()
 	{
-		const Header& header = GetHeader();
-		mIndexDataStart = reinterpret_cast<blMeshStorage::index*>(mBuffer.get() + sizeof(Header));
-		mVertexDataStart = reinterpret_cast<byte*>(mIndexDataStart + header.mIndexCount);
+		mIndexDataStart = reinterpret_cast<blMeshStorage::index*>(mBuffer.get() + sizeof(VertexHeader));
+		mVertexDataStart = reinterpret_cast<byte*>(mIndexDataStart + GetIndexCount());
 	}
 
 	const blMeshStorage::Header& blMeshStorage::GetHeader() const
@@ -83,6 +82,16 @@ namespace BoulderLeaf::Graphics
 		return *reinterpret_cast<blMeshStorage::Header*>(mBuffer.get());
 	}
 
+	const blMeshStorage::VertexHeader& blMeshStorage::GetVertexHeader() const
+	{
+		return *reinterpret_cast<const blMeshStorage::VertexHeader*>(mBuffer.get());
+	}
+
+	blMeshStorage::VertexHeader& blMeshStorage::GetVertexHeaderMutable()
+	{
+		return *reinterpret_cast<blMeshStorage::VertexHeader*>(mBuffer.get());
+	}
+
 	const size_t& blMeshStorage::GetVertexCount() const
 	{
 		return GetHeader().mVertexCount;
@@ -90,7 +99,7 @@ namespace BoulderLeaf::Graphics
 
 	const size_t& blMeshStorage::GetVertexSize() const
 	{
-		return GetHeader().mVertexSize;
+		return GetVertexHeader().mVertexSize;
 	}
 
 	const size_t& blMeshStorage::GetIndexCount() const
@@ -100,12 +109,12 @@ namespace BoulderLeaf::Graphics
 
 	const void* blMeshStorage::GetVertex(size_t index) const
 	{
-		return mVertexDataStart + index * GetHeader().mVertexSize;
+		return mVertexDataStart + index * GetVertexHeader().mVertexSize;
 	}
 
 	void* blMeshStorage::GetVertexMutable(size_t index)
 	{
-		return mVertexDataStart + index * GetHeader().mVertexSize;
+		return mVertexDataStart + index * GetVertexHeader().mVertexSize;
 	}
 
 	const blMeshStorage::index& blMeshStorage::GetIndex(size_t index) const
@@ -125,7 +134,7 @@ namespace BoulderLeaf::Graphics
 
 	const byte* blMeshStorage::end() const
 	{
-		return begin() + sizeof(byte) * GetBufferSize(GetHeader());
+		return begin() + sizeof(byte) * GetBufferSize(GetVertexHeader());
 	}
 
 	bool blMeshStorage::IsValid() const { return mBuffer != nullptr; }

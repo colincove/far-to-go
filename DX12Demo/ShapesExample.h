@@ -12,6 +12,7 @@ namespace BoulderLeaf::Graphics::DX12
 	class ShapesExample : public AbstractExample
 	{
 	public:
+		using ShapesMeshGeometry = MeshGeometry<StandardMesh>;
 		static constexpr int s_numFrameResources = 3;
 
 		struct PassConstants
@@ -80,7 +81,7 @@ namespace BoulderLeaf::Graphics::DX12
 			UINT ObjCBIndex = -1;
 			// Geometry associated with this render-item. Note that multiple
 			// render-items can share the same geometry.
-			MeshGeometry* Geo = nullptr;
+			ShapesMeshGeometry* Geo = nullptr;
 			// Primitive topology.
 			D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 			// DrawIndexedInstanced parameters.

@@ -22,28 +22,19 @@ namespace BoulderLeaf::Graphics
 	public:
 		using index = std::uint16_t;
 
-
 		struct Header
 		{
 			Header(
 				size_t vertexCount,
-				size_t vertexSize,
 				size_t indexCount)
 				: mVertexCount(vertexCount),
-				mVertexSize(vertexSize),
 				mIndexCount(indexCount)
 			{
 
 			}
 
 			size_t mVertexCount;
-			size_t mVertexSize;
 			size_t mIndexCount;
-
-			size_t GetVertexBufferSize() const
-			{
-				return mVertexCount * mVertexSize;
-			}
 
 			size_t GetIndexBufferSize() const
 			{
@@ -51,7 +42,33 @@ namespace BoulderLeaf::Graphics
 			}
 		};
 
+		struct VertexHeader : public Header
+		{
+			VertexHeader(
+				size_t vertexCount,
+				size_t indexCount,
+				size_t vertexSize)
+				: Header(vertexCount, indexCount), 
+				mVertexSize(vertexSize)
+			{
+
+			}
+
+			size_t mVertexSize;
+
+			size_t GetVertexBufferSize() const
+			{
+				return mVertexCount * mVertexSize;
+			}
+		};
+
 		friend bool operator==(const Header& lhs, const Header& rhs)
+		{
+			return lhs.mVertexCount == rhs.mVertexCount &&
+				lhs.mIndexCount == rhs.mIndexCount;
+		};
+
+		friend bool operator==(const VertexHeader& lhs, const VertexHeader& rhs)
 		{
 			return lhs.mVertexCount == rhs.mVertexCount &&
 				lhs.mVertexSize == rhs.mVertexSize &&
@@ -84,14 +101,14 @@ namespace BoulderLeaf::Graphics
 		byte* mVertexDataStart;
 		index* mIndexDataStart;
 	private:
-		static size_t GetBufferSize(const Header& header);
+		static size_t GetBufferSize(const VertexHeader& header);
 	public:
 		template<typename TVertexFrom, typename TVertexTo>
 		static blMeshStorage To(const blMeshStorage& from)
 		{
 			blMeshStorage result(from.GetVertexCount(), from.GetIndexCount(), sizeof(TVertexTo));
-			memcpy(static_cast<void*>(result.mBuffer.get()), static_cast<const void*>(from.mBuffer.get()), sizeof(Header) + from.GetIndexCount() * sizeof(index));
-
+			memcpy(static_cast<void*>(result.mIndexDataStart), static_cast<const void*>(from.mIndexDataStart), from.GetIndexCount() * sizeof(index));
+			
 			for (int i = 0; i < from.GetVertexCount(); ++i)
 			{
 				TVertexTo& vertex = *reinterpret_cast<TVertexTo*>(result.GetVertexMutable(i));
@@ -102,9 +119,11 @@ namespace BoulderLeaf::Graphics
 		};
 	private:
 		Header& GetHeaderMutable();
+		VertexHeader& GetVertexHeaderMutable();
 		void InitializeIndexingPointers();
 	public:
 		const Header& GetHeader() const;
+		const VertexHeader& GetVertexHeader() const;
 		const size_t& GetVertexCount() const;
 		const size_t& GetVertexSize() const;
 		const size_t& GetIndexCount() const;
@@ -134,11 +153,25 @@ namespace BoulderLeaf::Graphics
 	template<typename TVertex>
 	class blMesh
 	{
+	public:
+		struct Prototype
+		{
+			std::vector<TVertex> vertices;
+			std::vector<blMeshStorage::index> indices;
+		};
+
+		static Prototype& GetPrototype()
+		{
+			static Prototype prototype;
+			prototype.indices.clear();
+			prototype.vertices.clear();
+			return prototype;
+		}
 	private:
 		blMeshStorage mStorage;
 	public:
 		blMesh() : mStorage() {}
-		blMesh(blMeshStorage storage) : mStorage(storage){}
+		blMesh(const blMeshStorage& storage) : mStorage(storage){}
 		blMesh(size_t vertexCount) : blMesh<TVertex>::blMesh(vertexCount, 0) {}
 		blMesh(size_t vertexCount, size_t indexCount)
 			:mStorage(
@@ -156,6 +189,15 @@ namespace BoulderLeaf::Graphics
 			const size_t vertexCount,
 			const blMeshStorage::index* indices,
 			const size_t indexCount) : mStorage(reinterpret_cast<const byte*>(vertices), vertexCount, indices, indexCount, sizeof(TVertex))
+		{
+
+		}
+
+		blMesh(const Prototype& prototype) : blMesh(
+			prototype.vertices.data(), 
+			prototype.vertices.size(),
+			prototype.indices.data(),
+			prototype.indices.size())
 		{
 
 		}
@@ -183,6 +225,7 @@ namespace BoulderLeaf::Graphics
 	{
 		Math::Vector3 Position;
 		Math::Vector3 Normal;
+		Math::Vector3 Tangent;
 		Math::Vector4 Colour;
 		Math::Vector2 UV;
 	};

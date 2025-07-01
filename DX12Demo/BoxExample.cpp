@@ -2,7 +2,6 @@
 #include <blDX12.h>
 #include <blDX12Math.inl>
 #include <blDx12VertexBuffer.h>
-#include <blDx12VertexData.h>
 #include <blDx12UploadBuffer.h>
 #include <blDX12ReadFile.h>
 #include "BoxExample.h"
@@ -11,6 +10,23 @@
 #include <string>
 #include <blMesh.h>
 #include <blMeshLibrary.h>
+
+#include <thread>
+#include <chrono>
+
+namespace BoulderLeaf::Graphics
+{
+	template<>
+	DX12::BoxExample::Vertex Graphics::From<StandardVertex, DX12::BoxExample::Vertex>(const StandardVertex& from)
+	{
+		return DX12::BoxExample::Vertex(
+			XMFLOAT3(from.Position.x, from.Position.y, from.Position.z),
+			XMFLOAT3(from.Normal.x, from.Normal.y, from.Normal.z),
+			XMFLOAT4(from.Colour.x, from.Colour.y, from.Colour.z, from.Colour.w),
+			XMFLOAT2(from.UV.x, from.UV.y)
+		);
+	}
+}
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -209,13 +225,13 @@ namespace BoulderLeaf::Graphics::DX12
 		
 		mInputLayout = std::vector<D3D12_INPUT_ELEMENT_DESC>(VertexDesc);
 	}
-	void BoxExample::BuildBoxGeometry() 
+	void BoxExample::BuildBoxGeometry()
 	{
 		const Mesh mesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(Cube().GetStorage()));
 		const blMeshStorage& storage = mesh.GetStorage();
-		const blMeshStorage::Header& header = storage.GetHeader();
+		const blMeshStorage::VertexHeader& header = storage.GetVertexHeader();
 
-		mBoxGeo = std::make_unique<MeshGeometry>();
+		mBoxGeo = std::make_unique<BoxMeshGeometry>();
 		mBoxGeo->Name = "boxGeo";
 		D3DCreateBlob(header.GetVertexBufferSize(), &mBoxGeo->VertexBufferCPU);
 		CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), storage.VertexBegin(), header.GetVertexBufferSize());
