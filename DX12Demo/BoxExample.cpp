@@ -211,51 +211,37 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 	void BoxExample::BuildBoxGeometry() 
 	{
-		const StandardMesh& standardCube = Cube();
-		const Mesh cubeMesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(standardCube.GetStorage()));
-		const blMeshStorage::Header& header = cubeMesh.GetStorage().GetHeader();
+		const Mesh mesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(Cube().GetStorage()));
+		const blMeshStorage& storage = mesh.GetStorage();
+		const blMeshStorage::Header& header = storage.GetHeader();
 
-		std::array<Vertex, 8> vertices =
-		{
-			Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::White), XMFLOAT2() }),
-			Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::Black), XMFLOAT2()}),
-			Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::Red), XMFLOAT2() }),
-			Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::Green), XMFLOAT2() }),
-			Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::Blue), XMFLOAT2() }),
-			Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::Yellow), XMFLOAT2() }),
-			Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::Cyan), XMFLOAT2() }),
-			Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT3(), XMFLOAT4(DirectX::Colors::Magenta), XMFLOAT2()
-		})
-		};
-
-		const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 		mBoxGeo = std::make_unique<MeshGeometry>();
 		mBoxGeo->Name = "boxGeo";
-		D3DCreateBlob(vbByteSize, &mBoxGeo->VertexBufferCPU);
-		CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+		D3DCreateBlob(header.GetVertexBufferSize(), &mBoxGeo->VertexBufferCPU);
+		CopyMemory(mBoxGeo->VertexBufferCPU->GetBufferPointer(), storage.VertexBegin(), header.GetVertexBufferSize());
 		D3DCreateBlob(header.GetVertexBufferSize(), &mBoxGeo->IndexBufferCPU);
-		CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), cubeMesh.GetStorage().IndexBegin(), header.GetVertexBufferSize());
+		CopyMemory(mBoxGeo->IndexBufferCPU->GetBufferPointer(), storage.IndexBegin(), header.GetVertexBufferSize());
 
 		mBoxGeo->VertexBufferGPU = CreateDefaultBuffer(
 			m_dx12->mDevice.Get(),
 			m_dx12->mCommandList.Get(),
-			vertices.data(),
-			vbByteSize,
+			storage.VertexBegin(),
+			header.GetVertexBufferSize(),
 			mBoxGeo->VertexBufferUploader);
 
 		mBoxGeo->IndexBufferGPU = CreateDefaultBuffer(
 			m_dx12->mDevice.Get(),
 			m_dx12->mCommandList.Get(),
-			cubeMesh.GetStorage().IndexBegin(),
+			storage.IndexBegin(),
 			header.GetVertexBufferSize(),
 			mBoxGeo->IndexBufferUploader);
 
-		mBoxGeo->VertexByteStride = sizeof(Vertex);
-		mBoxGeo->VertexBufferByteSize = vbByteSize;
+		mBoxGeo->VertexByteStride = (UINT) header.mVertexSize;
+		mBoxGeo->VertexBufferByteSize = (UINT) header.GetVertexBufferSize();
 		mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
 		mBoxGeo->IndexBufferByteSize = (UINT) header.GetVertexBufferSize();
 		SubmeshGeometry submesh;
-		submesh.IndexCount = (UINT) cubeMesh.GetIndexCount();
+		submesh.IndexCount = (UINT) storage.GetIndexCount();
 
 		submesh.StartIndexLocation = 0;
 		submesh.BaseVertexLocation = 0;
