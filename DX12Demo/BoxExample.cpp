@@ -229,8 +229,8 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		const Mesh mesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(Cube().GetStorage()));
 		const blMeshStorage& storage = mesh.GetStorage();
-		const blMeshStorage::VertexHeader& header = storage.GetVertexHeader();
-
+		const blMeshStorage::Header& header = storage.GetHeader();
+		
 		mBoxGeo = std::make_unique<BoxMeshGeometry>();
 		mBoxGeo->Name = "boxGeo";
 		D3DCreateBlob(header.GetVertexBufferSize(), &mBoxGeo->VertexBufferCPU);

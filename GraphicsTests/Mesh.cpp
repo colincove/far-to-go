@@ -43,7 +43,7 @@ namespace BoulderLeaf::Graphics
 		StandardMesh mesh(GetTestMesh());
 
 		const blMeshStorage::Header& header = mesh.GetStorage().GetHeader();
-		const blMeshStorage::VertexHeader& vertexHeader = mesh.GetStorage().GetVertexHeader();
+		const blMeshStorage::Header& vertexHeader = mesh.GetStorage().GetHeader();
 
 		EXPECT_EQ(header.mIndexCount, vertexHeader.mIndexCount);
 		EXPECT_EQ(header.mVertexCount, vertexHeader.mVertexCount);

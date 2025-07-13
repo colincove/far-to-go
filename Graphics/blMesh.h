@@ -26,35 +26,23 @@ namespace BoulderLeaf::Graphics
 		{
 			Header(
 				size_t vertexCount,
-				size_t indexCount)
+				size_t indexCount,
+				size_t vertexSize)
 				: mVertexCount(vertexCount),
-				mIndexCount(indexCount)
+				mIndexCount(indexCount),
+				mVertexSize(vertexSize)
 			{
 
 			}
 
 			size_t mVertexCount;
+			size_t mVertexSize;
 			size_t mIndexCount;
 
 			size_t GetIndexBufferSize() const
 			{
 				return mIndexCount * sizeof(index);
 			}
-		};
-
-		struct VertexHeader : public Header
-		{
-			VertexHeader(
-				size_t vertexCount,
-				size_t indexCount,
-				size_t vertexSize)
-				: Header(vertexCount, indexCount), 
-				mVertexSize(vertexSize)
-			{
-
-			}
-
-			size_t mVertexSize;
 
 			size_t GetVertexBufferSize() const
 			{
@@ -65,14 +53,8 @@ namespace BoulderLeaf::Graphics
 		friend bool operator==(const Header& lhs, const Header& rhs)
 		{
 			return lhs.mVertexCount == rhs.mVertexCount &&
-				lhs.mIndexCount == rhs.mIndexCount;
-		};
-
-		friend bool operator==(const VertexHeader& lhs, const VertexHeader& rhs)
-		{
-			return lhs.mVertexCount == rhs.mVertexCount &&
-				lhs.mVertexSize == rhs.mVertexSize &&
-				lhs.mIndexCount == rhs.mIndexCount;
+				lhs.mIndexCount == rhs.mIndexCount &&
+				lhs.mVertexSize == rhs.mVertexSize;
 		};
 
 	public:
@@ -101,7 +83,10 @@ namespace BoulderLeaf::Graphics
 		byte* mVertexDataStart;
 		index* mIndexDataStart;
 	private:
-		static size_t GetBufferSize(const VertexHeader& header);
+		static size_t GetBufferSize(const Header& header);
+	public:
+		static std::unique_ptr<byte[]> CreateVertexBuffer(std::vector<const blMeshStorage*> storageArray);
+		static std::unique_ptr<index[]> CreateIndexBuffer(std::vector<const blMeshStorage*> storageArray);
 	public:
 		template<typename TVertexFrom, typename TVertexTo>
 		static blMeshStorage To(const blMeshStorage& from)
@@ -119,11 +104,9 @@ namespace BoulderLeaf::Graphics
 		};
 	private:
 		Header& GetHeaderMutable();
-		VertexHeader& GetVertexHeaderMutable();
 		void InitializeIndexingPointers();
 	public:
 		const Header& GetHeader() const;
-		const VertexHeader& GetVertexHeader() const;
 		const size_t& GetVertexCount() const;
 		const size_t& GetVertexSize() const;
 		const size_t& GetIndexCount() const;

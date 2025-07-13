@@ -4,15 +4,17 @@
 #include "blDX12Core.h"
 #include "blDX12UploadBuffer.h"
 #include <blDX12MeshGeometry.h>
+#include <blDx12VertexData.h>
 #include <blDx12Math.inl>
 #include <blTIme.h>
+#include <blMeshIndexedCatalogue.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
 	class ShapesExample : public AbstractExample
 	{
 	public:
-		using ShapesMeshGeometry = MeshGeometry<StandardMesh>;
+		using ShapesMeshGeometry = MeshGeometry<blMeshStorage>;
 		static constexpr int s_numFrameResources = 3;
 
 		struct PassConstants
@@ -90,6 +92,33 @@ namespace BoulderLeaf::Graphics::DX12
 			int BaseVertexLocation = 0;
 		};
 
+		struct GeometryDataEntry
+		{
+			blMeshIndexedCatalogue::index idx;
+			std::unique_ptr<Mesh> geometry;
+			SubmeshGeometry submesh;
+		};
+
+		class GeometryData
+		{
+		public:
+			using index = size_t;
+		private:
+			blMeshIndexedCatalogue mMeshIndexedCatalogue;
+			std::vector<GeometryDataEntry> mEntries;
+			size_t mTotalVertices;
+			size_t mVertexBufferSize;
+			size_t mIndexBufferSize;
+		public:
+			GeometryData();
+		public:
+			index AddEntry(const Mesh& mesh);
+			GeometryDataEntry& GetEntry(index idx);
+			size_t GetTotalNumberOfVertices() const { return mTotalVertices; }
+			size_t GetVertexBufferSize() const { return mVertexBufferSize; }
+			size_t GetIndexBufferSize() const { return mIndexBufferSize; }
+		};
+
 	public:
 		ShapesExample(std::shared_ptr<DX12> dx12);
 		~ShapesExample();
@@ -112,9 +141,23 @@ namespace BoulderLeaf::Graphics::DX12
 		XMFLOAT4X4 mWorld = Math::Identity4x4();
 		XMFLOAT4X4 mView;
 		XMFLOAT4X4 mProj;
+		UINT mPassCbvOffset;
+
+		GeometryData mGeometryData;
+		GeometryData::index mBoxGeomIdx;
+		GeometryData::index mSphereGeomIdx;
+		GeometryData::index mConeGeomIdx;
+		bool mIsWireframe;
+
+		std::unique_ptr<ShapesMeshGeometry> mMeshGeometry;
 
 		void BuildFrameResources();
 		void UpdateObjectCBs();
 		void UpdateMainPassCB(const Metrics::blTime& gameTime);
+		void BuildGeometryData();
+		void BuildRenderItems();
+		void BuildDescriptorHeaps();
+		void BuildConstantBufferViews();
+		void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
 	};
 }

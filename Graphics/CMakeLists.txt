@@ -8,9 +8,22 @@ add_library(
 	blHeadless.cpp
 	blMesh.h
 	blMesh.cpp
+	blMeshIndexedCatalogue.h
+	blMeshIndexedCatalogue.cpp
 	blMeshLibrary.h
+	blMeshLibrary.cpp
+	blRenderData.h
+	blRenderData.cpp
+	blRenderDataTypes.h
+	blRenderScene.h
+	blRenderScene.cpp
+	blRenderItem.h
+	blRenderItem.cpp
 	blVirtualCamera.h
-	blVirtualCamera.cpp)
+	blVirtualCamera.cpp
+	blWindow.h
+	blWindow.cpp
+	RenderItemTypes/blRenderItemStandardMesh.h)
 
 target_include_directories(Graphics
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
