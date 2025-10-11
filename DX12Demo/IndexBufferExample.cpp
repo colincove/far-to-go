@@ -1,11 +1,11 @@
-#include <blDX12.h>
+#include <blDX12_LegacyV1.h>
 #include <blDx12VertexBuffer.h>
 #include "IndexBufferExample.h"
 #include <memory>
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	IndexBufferExample::IndexBufferExample(std::shared_ptr<DX12> dx12)
+	IndexBufferExample::IndexBufferExample(std::shared_ptr<DX12_LegacyV1> dx12)
 		:AbstractExample(dx12),
 		mVertices(
 			{

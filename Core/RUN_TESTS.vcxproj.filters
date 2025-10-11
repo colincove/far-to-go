@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\colin\Documents\far-to-go\CMakeFiles\ed34d1439702b754386acf26b070f689\RUN_TESTS_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{20FE4E8B-06FC-3A5D-B3B7-127C6A2CA957}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

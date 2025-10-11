@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <blDX12.h>
+#include <blDX12_LegacyV1.h>
 #include "AbstractExample.h"
 #include <blDX12MeshGeometry.h>
 #include <memory>
@@ -63,7 +63,7 @@ namespace BoulderLeaf::Graphics::DX12
 		POINT mLastMousePos;
 		ComPtr<ID3D12Resource> mUploadCBuffer;
 	public:
-		BoxExample(std::shared_ptr<DX12> dx12);
+		BoxExample(std::shared_ptr<DX12_LegacyV1> dx12);
 		~BoxExample();
 	public:
 		void Update(const Metrics::blTime& gameTime) override;

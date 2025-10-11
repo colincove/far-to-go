@@ -1,5 +1,5 @@
 #include "../Math/blMath.inl"
-#include <blDX12.h>
+#include <blDX12_LegacyV1.h>
 #include <blDX12Math.inl>
 #include <blDx12VertexBuffer.h>
 #include <blDx12UploadBuffer.h>
@@ -30,7 +30,7 @@ namespace BoulderLeaf::Graphics
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	BoxExample::BoxExample(std::shared_ptr<DX12> dx12)
+	BoxExample::BoxExample(std::shared_ptr<DX12_LegacyV1> dx12)
 		:AbstractExample(dx12)
 	{
 		//When should I do this? it was not in the example

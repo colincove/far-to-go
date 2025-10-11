@@ -1,0 +1,387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5CD74DA5-F2C6-318F-975D-FE4E91B04D12}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>DX12Demo</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DX12Demo.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DX12Demo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">DX12Demo.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">DX12Demo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">DX12Demo.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">DX12Demo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">DX12Demo.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">DX12Demo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;GTEST_LANG_CXX11=1;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;GTEST_LANG_CXX11=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\lib\Debug\DX12_Debug.lib;..\lib\Debug\Metrics.lib;..\lib\Debug\Graphics_Debug.lib;..\lib\Debug\Imgui_Debug.lib;..\lib\Debug\DX12_Debug.lib;..\lib\Debug\DirectX-Guids.lib;..\lib\Debug\DirectX-Headers.lib;d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;..\lib\Debug\Math.lib;..\lib\Debug\Core_Debug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/colin/Documents/far-to-go/DX12Demo/Debug/DX12Demo.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/colin/Documents/far-to-go/DX12Demo/Debug/DX12Demo.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LANG_CXX11=1;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LANG_CXX11=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\lib\Release\DX12.lib;..\lib\Release\Metrics.lib;..\lib\Release\Graphics.lib;..\lib\Release\Imgui.lib;..\lib\Release\DX12.lib;..\lib\Release\DirectX-Guids.lib;..\lib\Release\DirectX-Headers.lib;d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;..\lib\Release\Math.lib;..\lib\Release\Core.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/colin/Documents/far-to-go/DX12Demo/Release/DX12Demo.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/colin/Documents/far-to-go/DX12Demo/Release/DX12Demo.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LANG_CXX11=1;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LANG_CXX11=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\lib\MinSizeRel\DX12_MinsizeRel.lib;..\lib\MinSizeRel\Metrics.lib;..\lib\MinSizeRel\Graphics_MinsizeRel.lib;..\lib\MinSizeRel\Imgui_MinsizeRel.lib;..\lib\MinSizeRel\DX12_MinsizeRel.lib;..\lib\MinSizeRel\DirectX-Guids.lib;..\lib\MinSizeRel\DirectX-Headers.lib;d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;..\lib\MinSizeRel\Math.lib;..\lib\MinSizeRel\Core_MinsizeRel.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/colin/Documents/far-to-go/DX12Demo/MinSizeRel/DX12Demo.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/colin/Documents/far-to-go/DX12Demo/MinSizeRel/DX12Demo.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LANG_CXX11=1;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LANG_CXX11=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\colin\Documents\far-to-go\DX12;C:\Users\colin\Documents\far-to-go\Metrics;C:\Users\colin\Documents\far-to-go\Graphics;C:\Users\colin\Documents\far-to-go\Graphics\..\Core;C:\Users\colin\Documents\far-to-go\Graphics\..\Math;C:\Users\colin\Documents\far-to-go\Math;C:\Users\colin\Documents\far-to-go\Core;C:\Users\colin\Documents\far-to-go\imgui;C:\Users\colin\Documents\far-to-go\imgui\source;C:\Users\colin\Documents\far-to-go\imgui\source\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\lib\RelWithDebInfo\DX12_RelWithDebugInfo.lib;..\lib\RelWithDebInfo\Metrics.lib;..\lib\RelWithDebInfo\Graphics_RelWithDebugInfo.lib;..\lib\RelWithDebInfo\Imgui_RelWithDebugInfo.lib;..\lib\RelWithDebInfo\DX12_RelWithDebugInfo.lib;..\lib\RelWithDebInfo\DirectX-Guids.lib;..\lib\RelWithDebInfo\DirectX-Headers.lib;d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;..\lib\RelWithDebInfo\Math.lib;..\lib\RelWithDebInfo\Core_RelWithDebugInfo.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/colin/Documents/far-to-go/DX12Demo/RelWithDebInfo/DX12Demo.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/colin/Documents/far-to-go/DX12Demo/RelWithDebInfo/DX12Demo.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\colin\Documents\far-to-go\DX12Demo\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/colin/Documents/far-to-go -BC:/Users/colin/Documents/far-to-go --check-stamp-file C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/colin/Documents/far-to-go -BC:/Users/colin/Documents/far-to-go --check-stamp-file C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/colin/Documents/far-to-go -BC:/Users/colin/Documents/far-to-go --check-stamp-file C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/colin/Documents/far-to-go -BC:/Users/colin/Documents/far-to-go --check-stamp-file C:/Users/colin/Documents/far-to-go/DX12Demo/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\colin\Documents\far-to-go\DX12Demo\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\main.cpp" />
+    <ClInclude Include="C:\Users\colin\Documents\far-to-go\DX12Demo\AbstractExample.h" />
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\AbstractExample.cpp" />
+    <ClInclude Include="C:\Users\colin\Documents\far-to-go\DX12Demo\BoxExample.h" />
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\BoxExample.cpp" />
+    <ClInclude Include="C:\Users\colin\Documents\far-to-go\DX12Demo\Examples.h" />
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\Examples.cpp" />
+    <ClInclude Include="C:\Users\colin\Documents\far-to-go\DX12Demo\VertexBufferLineStripExample.h" />
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\VertexBufferLineStripExample.cpp" />
+    <ClInclude Include="C:\Users\colin\Documents\far-to-go\DX12Demo\IndexBufferExample.h" />
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\IndexBufferExample.cpp" />
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\ImguiExample.cpp" />
+    <ClInclude Include="C:\Users\colin\Documents\far-to-go\DX12Demo\ImguiExample.h" />
+    <ClInclude Include="C:\Users\colin\Documents\far-to-go\DX12Demo\ShapesExample.h" />
+    <ClCompile Include="C:\Users\colin\Documents\far-to-go\DX12Demo\ShapesExample.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\ZERO_CHECK.vcxproj">
+      <Project>{2AED2150-94B4-3084-8BAF-55543F420121}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\Core\Core.vcxproj">
+      <Project>{0646AD54-E6E2-334E-B335-2B888ABDB54F}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\DX12\DX12.vcxproj">
+      <Project>{52E9377A-D2AA-39CE-8EA2-FBFAB1A8801D}</Project>
+      <Name>DX12</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\DirectX-Headers\DirectX-Guids.vcxproj">
+      <Project>{6E8FB615-23D2-3199-B96A-AE7EB7B399C2}</Project>
+      <Name>DirectX-Guids</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\DirectX-Headers\DirectX-Headers.vcxproj">
+      <Project>{EAEF1CE3-5C96-3DD9-A92E-F9D78B90F86F}</Project>
+      <Name>DirectX-Headers</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\Graphics\Graphics.vcxproj">
+      <Project>{892489DF-F1FF-3CF4-999B-2B4707900E19}</Project>
+      <Name>Graphics</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\imgui\Imgui.vcxproj">
+      <Project>{7E448418-ADB4-3E9B-9055-0FE4CFD59646}</Project>
+      <Name>Imgui</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\Math\Math.vcxproj">
+      <Project>{41376A66-7E37-39D6-946C-4445C632646E}</Project>
+      <Name>Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\colin\Documents\far-to-go\Metrics\Metrics.vcxproj">
+      <Project>{6B2D374D-E820-3D0C-BF3F-EB6C743C0AF5}</Project>
+      <Name>Metrics</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

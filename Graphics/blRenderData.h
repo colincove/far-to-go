@@ -2,25 +2,42 @@
 #include <blTypes.h>
 #include <blRenderScene.h>
 #include <blRenderDataTypes.h>
+#include <blMesh.h>
+#include <blMatrix4x4.inl>
+#include <blFlags.h>
 
 namespace BoulderLeaf::Graphics
 {
 	namespace
 	{
+
 		template<typename TData, RenderDataType type>
-		void WriteRenderData(blRenderScene& scene, const TData& data)
+		class blRenderDataInterface
 		{
-			scene.WriteRenderData<TData, type>(data);
-			// This function would write the data to the render item buffer in the scene.
-			// The actual implementation would depend on how the render item buffer is structured.
-			// For now, we will just leave it empty as a placeholder.
-		}
+		public:
+			static void Write(blRenderScene& scene, const TData& data)
+			{
+				scene.WriteRenderData<TData, type>(data);
+			}
+		};
 	}
 
-	struct MeshRenderData
+	struct StandardMeshRenderData
 	{
+	public:
+		using Interface = blRenderDataInterface<StandardMeshRenderData, RenderDataType::Mesh>;
 
+		enum class OptionBits : char
+		{
+			None = 0,
+			Instance = 1 << 0,
+		};
+
+		using OptionFlags = blFlagsOf<OptionBits>;
+
+	public:
+		std::weak_ptr<StandardMesh> mesh;
+		Math::Matrix4x4 transform;
+		OptionFlags flags;
 	};
-
-	using WriteMeshRenderData = WriteRenderData<MeshRenderData, RenderDataType::Mesh>
 }

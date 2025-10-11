@@ -1,4 +1,4 @@
-#include <blDX12.h>
+#include <blDX12_LegacyV1.h>
 #include <gtest/gtest.h>
 #include "..\Graphics\blMesh.h"
 #include <blDx12VertexData.h>

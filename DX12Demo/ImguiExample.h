@@ -8,7 +8,7 @@ namespace BoulderLeaf::Graphics::DX12
 	class ImguiExample : public AbstractExample
 	{
 	public:
-		ImguiExample(std::shared_ptr<DX12> dx12);
+		ImguiExample(std::shared_ptr<DX12_LegacyV1> dx12);
 		~ImguiExample();
 	public:
 		void Update(const Metrics::blTime& gameTime) override;

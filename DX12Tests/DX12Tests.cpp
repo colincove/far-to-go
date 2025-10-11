@@ -1,4 +1,4 @@
-#include <blDX12.h>
+#include <blDX12_LegacyV1.h>
 #include <blDX12Test.h>
 #include <blDx12VertexBuffer.h>
 #include <directx/d3dx12_core.h>
@@ -20,7 +20,7 @@ namespace BoulderLeaf::Graphics::DX12::Test
 	TEST(DX12, Initialize)
 	{
 		HWND mhMainWnd = ::CreateWindowA("STATIC", "DX12 Examples", WS_VISIBLE, 0, 0, 1024, 768, NULL, NULL, NULL, NULL);
-		std::shared_ptr<DX12> dx12(DX12::Get());
+		std::shared_ptr<DX12_LegacyV1> dx12(DX12_LegacyV1::Get());
 		dx12->Initialize(mhMainWnd);
 		EXPECT_TRUE(dx12->IsInitialized());
 	}

@@ -15,7 +15,7 @@ namespace
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	ShapesExample::ShapesExample(std::shared_ptr<DX12> dx12) : AbstractExample(dx12),
+	ShapesExample::ShapesExample(std::shared_ptr<DX12_LegacyV1> dx12) : AbstractExample(dx12),
 		mFrameResources(),
 		mCurrFrameResource(nullptr),
 		mCurrFrameResourceIndex(0),
@@ -163,7 +163,7 @@ namespace BoulderLeaf::Graphics::DX12
 		}
 	}
 
-	ShapesExample::FrameResource::FrameResource(std::shared_ptr<DX12> dx12, UINT passCount, UINT objectCount)
+	ShapesExample::FrameResource::FrameResource(std::shared_ptr<DX12_LegacyV1> dx12, UINT passCount, UINT objectCount)
 		:mDx12(dx12),
 		mPassCount(passCount),
 		mObjectCount(objectCount),

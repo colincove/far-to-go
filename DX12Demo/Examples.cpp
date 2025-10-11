@@ -15,19 +15,19 @@ namespace
 
 	struct ExampleDef
 	{
-		std::function<AbstractExample*(std::shared_ptr <DX12> dx12)> Construct;
-		AbstractExample* operator()(std::shared_ptr <DX12> dx12) const
+		std::function<AbstractExample*(std::shared_ptr<DX12_LegacyV1> dx12)> Construct;
+		AbstractExample* operator()(std::shared_ptr<DX12_LegacyV1> dx12) const
 		{
 			return Construct(dx12);
 		}
 	};
 
 	const ExampleDef k_exampleDefinitions[] = {
-		{ [](std::shared_ptr <DX12> dx12) { return new BoxExample(dx12); }},
-		{ [](std::shared_ptr <DX12> dx12) { return new VertexBufferLineStripExample(dx12); } },
-		{ [](std::shared_ptr <DX12> dx12) { return new IndexBufferExample(dx12); } },
-		{ [](std::shared_ptr <DX12> dx12) { return new ImguiExample(dx12); } },
-		{ [](std::shared_ptr <DX12> dx12) { return new ShapesExample(dx12); } }
+		{ [](std::shared_ptr<DX12_LegacyV1> dx12) { return new BoxExample(dx12); }},
+		{ [](std::shared_ptr<DX12_LegacyV1> dx12) { return new VertexBufferLineStripExample(dx12); } },
+		{ [](std::shared_ptr<DX12_LegacyV1> dx12) { return new IndexBufferExample(dx12); } },
+		{ [](std::shared_ptr<DX12_LegacyV1> dx12) { return new ImguiExample(dx12); } },
+		{ [](std::shared_ptr<DX12_LegacyV1> dx12) { return new ShapesExample(dx12); } }
 	};
 	
 	constexpr size_t k_numberOfExamples = Count(k_exampleDefinitions);
@@ -36,7 +36,7 @@ namespace
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	AbstractExample* GetNewExample(std::shared_ptr <DX12> dx12, const Example example)
+	AbstractExample* GetNewExample(std::shared_ptr<DX12_LegacyV1> dx12, const Example example)
 	{
 		const size_t index = static_cast<size_t>(example);
 		assert(index < k_numberOfExamples);

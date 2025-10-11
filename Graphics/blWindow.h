@@ -12,13 +12,16 @@ namespace BoulderLeaf::Graphics
 	protected:
 		static const char* WindowClassName;
 	public:
+		using Callback = std::function<LRESULT WINAPI(HWND, UINT, WPARAM, LPARAM)>;
+
 		blWindow(std::string windowName);
 		~blWindow();
 	private:
 		HWND mWindowHandle;
-		std::function<LRESULT WINAPI(HWND, UINT, WPARAM, LPARAM)> mCallback;
+		Callback mCallback;
 	public:
 		HWND& GetWindowHandle() { return mWindowHandle; }
+		void SetCallback(Callback callback) { mCallback = callback; }
 		LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	};
 }

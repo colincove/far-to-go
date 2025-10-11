@@ -3,11 +3,6 @@
 
 namespace BoulderLeaf::Graphics
 {
-	void Headless::Initialize(HWND hMainWnd)
-	{
-
-	}
-
 	void Headless::OnWindowMessage(MSG msg)
 	{
 

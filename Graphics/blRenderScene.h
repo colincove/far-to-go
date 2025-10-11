@@ -29,11 +29,18 @@ namespace BoulderLeaf::Graphics
 			{
 				throw std::runtime_error("Render item buffer overflow");
 			}
+
 			// Write data to the render item buffer
 			std::memcpy(mRenderItemBuffer + mStreamPosition, &data, sizeof(TData));
-			mRenderItemPositions[static_cast<size_t>(type)].push_back(mStreamPosition);
+			GetRenderItemPositions(type).push_back(mStreamPosition);
 			mStreamPosition += sizeof(TData);
 		}
+
+		const std::vector<size_t>& GetRenderItemPositions(RenderDataType type) const
+		{
+			return mRenderItemPositions[static_cast<size_t>(type)];
+		}
+
 	private:
 		blRenderSceneData mData;
 		byte mRenderItemBuffer[RENDER_DATA_BUFFER_SIZE];

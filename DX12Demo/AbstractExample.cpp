@@ -1,10 +1,10 @@
 #include <assert.h>
 #include "AbstractExample.h"
-#include <blDx12.h>
+#include <blDX12_LegacyV1.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	AbstractExample::AbstractExample(std::shared_ptr<DX12> dx12) : m_dx12(dx12)
+	AbstractExample::AbstractExample(std::shared_ptr<DX12_LegacyV1> dx12) : m_dx12(dx12)
 	{
 	}
 

@@ -1,0 +1,19 @@
+# CMake generation dependency list for this directory.
+C:/Users/colin/Documents/far-to-go/MathTests/CMakeLists.txt
+C:/Users/colin/Documents/far-to-go/MathTests/Line.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/LineSegment.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Math.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Matrix2x2.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Matrix2x3.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Matrix3x3.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Matrix4x4.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Point3.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Quad.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Quaternion.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Ray.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Rect.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Rotation.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Transformations.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Vector2.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/Vector3.cpp
+C:/Users/colin/Documents/far-to-go/MathTests/main.cpp

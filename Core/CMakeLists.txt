@@ -2,6 +2,7 @@ add_library(
 	Core
 	blCore.h
 	blCore.cpp
+	blFlags.h
 	blTypes.h)
 
 set_target_properties(Core PROPERTIES LINKER_LANGUAGE CXX)

@@ -1,4 +1,4 @@
-#include <blDX12.h>
+#include <blDX12_LegacyV1.h>
 #include "AbstractExample.h"
 #include <memory>
 #include "blDX12Core.h"
@@ -42,10 +42,10 @@ namespace BoulderLeaf::Graphics::DX12
 		struct FrameResource
 		{
 		public:
-			FrameResource(std::shared_ptr<DX12> dx12, UINT passCount, UINT objectCount);
+			FrameResource(std::shared_ptr<DX12_LegacyV1> dx12, UINT passCount, UINT objectCount);
 			FrameResource(const FrameResource& rhs) = delete;
 
-			std::shared_ptr<DX12> mDx12;
+			std::shared_ptr<DX12_LegacyV1> mDx12;
 			UINT mPassCount;
 			UINT mObjectCount;
 
@@ -120,7 +120,7 @@ namespace BoulderLeaf::Graphics::DX12
 		};
 
 	public:
-		ShapesExample(std::shared_ptr<DX12> dx12);
+		ShapesExample(std::shared_ptr<DX12_LegacyV1> dx12);
 		~ShapesExample();
 	public:
 		void Update(const Metrics::blTime& gameTime) override;

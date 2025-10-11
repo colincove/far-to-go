@@ -18,8 +18,8 @@ namespace BoulderLeaf::Graphics
 	{
 		WNDCLASSEX wc = { sizeof(wc), CS_CLASSDC, ::WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, WindowClassName, nullptr };
 		::RegisterClassEx(&wc);
-		HWND mhMainWnd = ::CreateWindowEx(WS_EX_APPWINDOW, wc.lpszClassName, windowName.c_str(), WS_VISIBLE | WS_THICKFRAME | WS_OVERLAPPEDWINDOW, 0, 0, 1024, 768, NULL, NULL, NULL, NULL);
-		windowMap.emplace(mhMainWnd, this);
+		mWindowHandle = ::CreateWindowEx(WS_EX_APPWINDOW, wc.lpszClassName, windowName.c_str(), WS_VISIBLE | WS_THICKFRAME | WS_OVERLAPPEDWINDOW, 0, 0, 1024, 768, NULL, NULL, NULL, NULL);
+		windowMap.emplace(mWindowHandle, this);
 	}
 
 	blWindow::~blWindow()

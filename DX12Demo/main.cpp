@@ -1,14 +1,12 @@
 #include<array>
-#include "blDX12.h"
+#include "blDX12_LegacyV1.h"
+#include "blWindow.h"
 #include "Examples.h"
 #include <functional>
 #include <memory>
 #include <windows.h> 
 #include <windef.h>
 #include "..\Metrics\blPIX.h"
-#include "imgui.h"
-#include "imgui_impl_dx12.h"
-#include "imgui_impl_win32.h"
 
 using namespace BoulderLeaf::Graphics::DX12;
 using namespace BoulderLeaf;
@@ -23,17 +21,17 @@ int main()
 {	
 	Metrics::LoadPIX();
 
-	WNDCLASSEX wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, "DX12 Demo", nullptr };
-	::RegisterClassEx(&wc);
-	HWND mhMainWnd = ::CreateWindowEx(WS_EX_APPWINDOW, wc.lpszClassName, "DX12 Demo", WS_VISIBLE | WS_THICKFRAME | WS_OVERLAPPEDWINDOW, 0, 0, 1024, 768, NULL, NULL, NULL, NULL);
+	BoulderLeaf::Graphics::blWindow window("DX12 Demo");
+	window.SetCallback(WndProc);
 	
-	std::shared_ptr<DX12> dx12(DX12::Get());
-	DX12& dx12Ref = *dx12;
-	dx12->Initialize(mhMainWnd);
+	std::shared_ptr<DX12_LegacyV1> dx12(DX12_LegacyV1::Get());
+	DX12_LegacyV1& dx12Ref = *dx12;
+	dx12->Initialize(window.GetWindowHandle());
+
 	MSG msg = { };
 
 	Example currentExampleType = Example::None;
-	Example nextExampleType = Example::Box;
+	Example nextExampleType = Example::ImGui;
 
 	Metrics::blTime gameTime;
 

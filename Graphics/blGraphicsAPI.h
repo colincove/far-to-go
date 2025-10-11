@@ -12,13 +12,18 @@
 #answer
 #include <windows.h> */
 #include <windows.h>
+#include <blWindow.h>
+#include <memory>
 
 namespace BoulderLeaf::Graphics
 {
 	class API
 	{
+	private:
+		std::shared_ptr<blWindow> mWindow;
 	public:
-		virtual void Initialize(HWND hMainWnd) = 0;
+		API() = default;
+		API(std::shared_ptr<blWindow> window);
 	public:
 		void RecieveWindowMessage(MSG msg);
 	protected:

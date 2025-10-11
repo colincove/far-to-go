@@ -4,6 +4,8 @@ add_library(
 	graphics.cpp
 	blGraphicsAPI.h
 	blGraphicsAPI.cpp
+	blGraphicsAPI_LegacyV1.h
+	blGraphicsAPI_LegacyV1.cpp
 	blHeadless.h
 	blHeadless.cpp
 	blMesh.h
@@ -23,13 +25,21 @@ add_library(
 	blVirtualCamera.cpp
 	blWindow.h
 	blWindow.cpp
-	RenderItemTypes/blRenderItemStandardMesh.h)
+	RenderItemTypes/blRenderItemStandardMesh.h
+	Resources/blResourcesCommon.h
+	Resources/blResourceManager.cpp
+	Resources/blResourceManager.h
+	Resources/blResource.cpp
+	Resources/blResource.h
+	Resources/blMeshResource.cpp
+	Resources/blMeshResource.h)
 
 target_include_directories(Graphics
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_SOURCE_DIR}/../Core
 		${CMAKE_CURRENT_SOURCE_DIR}/../Math
 		PRIVATE ./
+		./Resources
 		../Math
 		../Core
         )

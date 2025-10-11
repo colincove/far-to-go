@@ -93,15 +93,15 @@ namespace
 	//static ID3D12Resource* g_mainRenderTargetResource[APP_NUM_BACK_BUFFERS] = {};
 
 	// Forward declarations of helper functions
-	void WaitForLastSubmittedFrame(DX12& dx12);
-	FrameContext* WaitForNextFrameResources(DX12& dx12);
+	void WaitForLastSubmittedFrame(DX12_LegacyV1& dx12);
+	FrameContext* WaitForNextFrameResources(DX12_LegacyV1& dx12);
 	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	ImguiExample::ImguiExample(std::shared_ptr<DX12> dx12) : AbstractExample(dx12),
+	ImguiExample::ImguiExample(std::shared_ptr<DX12_LegacyV1> dx12) : AbstractExample(dx12),
 		mSwapChainOccluded(false),
 		showDemoWindow(true)
 	{
@@ -168,7 +168,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void ImguiExample::Draw()
 	{
-		DX12& dx12 = *m_dx12.get();
+		DX12_LegacyV1& dx12 = *m_dx12.get();
 
 		// Handle window screen locked
 		if (mSwapChainOccluded && dx12.mSwapChain->Present(0, DXGI_PRESENT_TEST) == DXGI_STATUS_OCCLUDED)
@@ -244,7 +244,7 @@ namespace BoulderLeaf::Graphics::DX12
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 			return true;
 
-		DX12& dx12 = *m_dx12;
+		DX12_LegacyV1& dx12 = *m_dx12;
 
 		switch (msg)
 		{
@@ -271,7 +271,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 namespace
 {
-	void WaitForLastSubmittedFrame(DX12& dx12)
+	void WaitForLastSubmittedFrame(DX12_LegacyV1& dx12)
 	{
 		FrameContext* frameCtx = &g_frameContext[g_frameIndex % APP_NUM_FRAMES_IN_FLIGHT];
 
@@ -287,7 +287,7 @@ namespace
 		WaitForSingleObject(g_fenceEvent, INFINITE);
 	}
 
-	FrameContext* WaitForNextFrameResources(DX12& dx12)
+	FrameContext* WaitForNextFrameResources(DX12_LegacyV1& dx12)
 	{
 		UINT nextFrameIndex = g_frameIndex + 1;
 		g_frameIndex = nextFrameIndex;

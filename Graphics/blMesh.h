@@ -9,6 +9,7 @@
 #include <blTypes.h>
 #include <assert.h>
 #include <blCore.h>
+#include <Resources/blResource.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -151,7 +152,7 @@ namespace BoulderLeaf::Graphics
 			return prototype;
 		}
 	private:
-		blMeshStorage mStorage;
+		blResource<blMeshStorage> mStorage;
 	public:
 		blMesh() : mStorage() {}
 		blMesh(const blMeshStorage& storage) : mStorage(storage){}
@@ -188,17 +189,17 @@ namespace BoulderLeaf::Graphics
 		blMesh(const blMesh<TVertex>& other):mStorage(other.mStorage){}
 		blMesh(blMesh<TVertex>&& other) noexcept :mStorage(std::move(other.mStorage)) {}
 	public:
-		const size_t& GetVertexCount() const { return mStorage.GetVertexCount(); }
-		const size_t& GetVertexSize() const { return mStorage.GetVertexSize(); }
-		const size_t& GetIndexCount() const { return mStorage.GetIndexCount(); }
+		const size_t& GetVertexCount() const { return mStorage.Get().GetVertexCount(); }
+		const size_t& GetVertexSize() const { return mStorage.Get().GetVertexSize(); }
+		const size_t& GetIndexCount() const { return mStorage.Get().GetIndexCount(); }
 
-		const TVertex& GetVertex(size_t index) const { return *reinterpret_cast<const TVertex*>(mStorage.GetVertex(index)); }
-		TVertex& GetVertexMutable(size_t index) { return *reinterpret_cast<TVertex*>(mStorage.GetVertexMutable(index)); }
+		const TVertex& GetVertex(size_t index) const { return *reinterpret_cast<const TVertex*>(mStorage.Get().GetVertex(index)); }
+		TVertex& GetVertexMutable(size_t index) { return *reinterpret_cast<TVertex*>(mStorage.GetMutable().GetVertexMutable(index)); }
 
-		const blMeshStorage::index& GetIndex(size_t index) const { return mStorage.GetIndex(index); }
-		blMeshStorage::index& GetIndexMutable(size_t index) { return mStorage.GetIndexMutable(index); }
+		const blMeshStorage::index& GetIndex(size_t index) const { return mStorage.Get().GetIndex(index); }
+		blMeshStorage::index& GetIndexMutable(size_t index) { return mStorage.GetMutable().GetIndexMutable(index); }
 
-		bool IsValid() const { return mStorage.IsValid(); }
+		bool IsValid() const { return mStorage.Get().IsValid(); }
 
 		const blMeshStorage& GetStorage() const { return mStorage; }
 		blMeshStorage& GetStorageMutable() { return mStorage; }

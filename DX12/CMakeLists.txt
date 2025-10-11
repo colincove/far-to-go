@@ -1,19 +1,39 @@
 add_library(
 	DX12 
+	blCommandList.cpp
+	blCommandList.h
+	blCommandListAllocator.h
+	blCommandListAllocator.cpp
+	blCommandQueue.h
+	blCommandQueue.cpp
 	blDX12Core.h
 	blDX12.h
 	blDX12.cpp
+	blDX12_LegacyV1.h
+	blDX12_LegacyV1.cpp
+	blDevice.cpp
+	blDevice.h
+	blDescriptorHeap.h
+	blDescriptorHeap.cpp
 	blDX12Math.inl
 	blDX12MeshGeometry.h
 	blDX12ReadFile.h
 	blDX12ReadFile.cpp
 	blDX12Test.h
 	blDX12Test.cpp
+	blFactory.cpp
+	blFactory.h
+	blFence.h
+	blFence.cpp
 	blDx12VertexBuffer.h
 	blDx12VertexBuffer.cpp
 	blDx12VertexData.h
 	blDx12VertexData.cpp
 	blDX12UploadBuffer.h
+	blRenderContext.h
+	blRenderContext.cpp
+	blSwapChain.h
+	blSwapChain.cpp
 	)
 
 target_include_directories(DX12

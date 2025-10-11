@@ -2,6 +2,11 @@
 
 namespace BoulderLeaf::Graphics
 {
+	API::API(std::shared_ptr<blWindow> window) : mWindow(window)
+	{
+
+	}
+
 	void API::RecieveWindowMessage(MSG msg)
 	{
 		switch (msg.message)

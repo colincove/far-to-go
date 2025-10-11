@@ -1,11 +1,11 @@
-#include <blDX12.h>
+#include <blDX12_LegacyV1.h>
 #include <blDx12VertexBuffer.h>
 #include <memory>
 #include "VertexBufferLineStripExample.h"
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	VertexBufferLineStripExample::VertexBufferLineStripExample(std::shared_ptr<DX12> dx12)
+	VertexBufferLineStripExample::VertexBufferLineStripExample(std::shared_ptr<DX12_LegacyV1> dx12)
 		:mVertices(
 			{
 				Vertex(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(), XMFLOAT4(0, 0, 0, 0), XMFLOAT2(0, 0)),
