@@ -2,7 +2,7 @@
 
 namespace BoulderLeaf::Graphics
 {
-	API::API(std::shared_ptr<blWindow> window) : mWindow(window)
+	API::API(std::shared_ptr<Core::blWindow> window) : mWindow(window)
 	{
 
 	}

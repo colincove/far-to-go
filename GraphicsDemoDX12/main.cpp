@@ -12,7 +12,7 @@ using namespace BoulderLeaf::Graphics;
 int main()
 {	
 	Metrics::LoadPIX();
-	std::shared_ptr<blWindow> window(std::make_shared<blWindow>("Graphics Demo"));
+	std::shared_ptr<Core::blWindow> window(std::make_shared<Core::blWindow>("Graphics Demo"));
 	std::shared_ptr<Graphics::API> api(std::make_shared<DX12::blDX12>(window));
 	return 1;
 }

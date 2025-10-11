@@ -20,7 +20,7 @@ namespace BoulderLeaf::Graphics::DX12
 	const int blDX12::SwapChainBufferCount = 2;
 	const int blDX12::sSrvHeapSize = 64;
 
-	blDX12::blDX12(std::shared_ptr<blWindow> window) :
+	blDX12::blDX12(std::shared_ptr<Core::blWindow> window) :
 		API(window),
 		mWindow(window),
 		mDevice(nullptr)
@@ -41,9 +41,15 @@ namespace BoulderLeaf::Graphics::DX12
 #endif // DEBUG
 
 		mDevice = std::make_shared<blDevice>();
-		mCommandQueue =  mDevice->CreateCommandQueue();
-		mFactory = std::make_shared<blFactory>(); //TODO: construct factory
-		//DX12_API_CALL(CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&mFactory)));
+		mCommandListAllocator = std::make_shared<blCommandListAllocator>(mDevice);
+		mCommandQueue = std::make_shared<blCommandQueue>(mDevice);
+		mFactory = std::make_shared<blFactory>();
+
+		mSwapChain = std::make_shared<blSwapChain>(
+			mDevice,
+			mCommandQueue,
+			mFactory,
+			mWindow);
 	}
 
 	void blDX12::OnWindowMessage(MSG msg)
@@ -55,33 +61,29 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 
 	}
-
-	std::weak_ptr<blDevice> blDX12::GetDevice()
+	
+	std::shared_ptr<blDevice> blDX12::GetDevice()
 	{
 		return mDevice;
 	}
 
-	std::weak_ptr<blCommandQueue> blDX12::GetCommandQueue()
+	std::shared_ptr<blCommandQueue> blDX12::GetCommandQueue()
 	{
 		return mCommandQueue;
 	}
 
-	std::weak_ptr<blFactory> blDX12::GetFactory()
+	std::shared_ptr<blFactory> blDX12::GetFactory()
 	{
 		return mFactory;
 	}
 
-	std::shared_ptr<blSwapChain> CreateSwapChain(
-		const std::shared_ptr<blDevice> device,
-		const std::shared_ptr<blCommandQueue> commandQueue,
-		const std::shared_ptr<blFactory> factory,
-		const std::shared_ptr<blWindow> window)
+	std::shared_ptr<blCommandListAllocator> blDX12::GetCommandListAllocator()
 	{
-		return std::make_shared<blSwapChain>(
-			device->GetDX12Device(),
-			commandQueue->GetDX12CommandQueue(),
-			factory->GetDX12Factory(),
-			blDX12::sBackbufferFormat,
-			window->GetWindowHandle());
+		return mCommandListAllocator;
+	}
+
+	std::shared_ptr<blSwapChain> blDX12::GetSwapChain()
+	{
+		return mSwapChain;
 	}
 }

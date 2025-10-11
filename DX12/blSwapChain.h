@@ -4,6 +4,10 @@
 #include <d3d12.h>
 #include "dxgi1_2.h"
 #include <memory>
+#include <blWindow.h>
+#include <blDevice.h>
+#include <blCommandQueue.h>
+#include <blFactory.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -13,10 +17,9 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12Fence> mSwapChain;
 	public:
 		blSwapChain(
-			const ComPtr<ID3D12Device8> device,
-			const ComPtr<ID3D12CommandQueue> commandQueue,
-			const ComPtr<IDXGIFactory2> factory,
-			const DXGI_FORMAT backbufferFormat,
-			HWND& mainOutputWindow);
+			const std::shared_ptr<blDevice> device,
+			const std::shared_ptr<blCommandQueue> commandQueue,
+			const std::shared_ptr<blFactory> factory,
+			const std::shared_ptr<Core::blWindow> window);
 	};
 }

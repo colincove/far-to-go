@@ -46,6 +46,7 @@ target_include_directories(DX12
         )
 
 target_link_libraries(DX12 PRIVATE
+	CoreApplication
 	DirectX-Headers 
 	DirectX-Guids 
 	${dxlibs}

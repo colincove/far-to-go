@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-namespace BoulderLeaf::Graphics
+namespace BoulderLeaf::Core
 {
 	class blWindow
 	{

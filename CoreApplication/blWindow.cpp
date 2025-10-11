@@ -1,15 +1,16 @@
-#include <blWindow.h>
+#include "blWindow.h"
 #include <string>
 #include <map>
 
 namespace
 {
-	using namespace BoulderLeaf::Graphics;
+	using namespace BoulderLeaf::Core;
+
 	std::map<HWND, blWindow*> windowMap;
 	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 }
 
-namespace BoulderLeaf::Graphics
+namespace BoulderLeaf::Core
 {
 	const char* blWindow::WindowClassName = "BoulderLeaf";
 

@@ -6,23 +6,27 @@
 #include <memory>
 #include <windows.h> 
 #include <windef.h>
+#include <blGameLoop.h>
 #include "..\Metrics\blPIX.h"
 
 using namespace BoulderLeaf::Graphics::DX12;
 using namespace BoulderLeaf;
 
-namespace
-{
-	std::shared_ptr<AbstractExample> currentExample;
-	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-}
-
 int main()
 {	
 	Metrics::LoadPIX();
+	std::shared_ptr<AbstractExample> currentExample;
 
-	BoulderLeaf::Graphics::blWindow window("DX12 Demo");
-	window.SetCallback(WndProc);
+	BoulderLeaf::Core::blWindow window("DX12 Demo");
+	window.SetCallback([&](HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
+		{
+			if (currentExample.get() != nullptr)
+			{
+				return currentExample->WndProc(hWnd, msg, wParam, lParam);
+			}
+
+			return true;
+		});
 	
 	std::shared_ptr<DX12_LegacyV1> dx12(DX12_LegacyV1::Get());
 	DX12_LegacyV1& dx12Ref = *dx12;
@@ -31,44 +35,45 @@ int main()
 	MSG msg = { };
 
 	Example currentExampleType = Example::None;
-	Example nextExampleType = Example::ImGui;
+	Example nextExampleType = Example::Box;
 
-	Metrics::blTime gameTime;
-
-	while (true)
+	Core::blGameLoop gameLoop;
+	Core::blGameLoop::Callbacks callbacks =
 	{
-		gameTime = gameTime.NewTick();
-
-		if (currentExampleType != nextExampleType)
+		.MessageRecieved = [&msg, &dx12](MSG& msgRecieved) -> void
 		{
-			currentExample.reset(GetNewExample(dx12, nextExampleType));
-			currentExampleType = nextExampleType;
-		}
-
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			msg = msgRecieved;
 			dx12->RecieveWindowMessage(msg);
-		}
-
-		currentExample->Update(gameTime);
-		currentExample->Draw();	
-		::Sleep(10);
-	}
-	
-	return 1;
-}
-
-namespace
-{
-	LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		if (currentExample.get() != nullptr)
+		},
+		.PreUpdate = [&currentExample, &currentExampleType, &nextExampleType, &dx12](Metrics::blTime& gameTime) -> void
 		{
-			return currentExample->WndProc(hWnd, msg, wParam, lParam);
-		}
+			if (currentExampleType != nextExampleType)
+			{
+				currentExample.reset(GetNewExample(dx12, nextExampleType));
+				currentExampleType = nextExampleType;
+			}
+		},
+		.Update = [&currentExample](Metrics::blTime& gameTime) -> void
+		{
+			if (currentExample.get() != nullptr)
+			{
+				currentExample->Update(gameTime);
+			}
+		},
+		.Draw = [&currentExample](Metrics::blTime& gameTime) -> void
+		{
+			if (currentExample.get() != nullptr)
+			{
+				currentExample->Draw();
+			}
+		},
+		.ShouldContinue = [&msg]() -> bool
+		{
+			return msg.message != WM_QUIT;
+		},
+	};
 
-		return true;
-	}
+	gameLoop.Run(callbacks);
+
+	return 1;
 }

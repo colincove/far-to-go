@@ -4,6 +4,8 @@
 #include <memory>
 #include <blDevice.h>
 #include <blFactory.h>
+#include <blCommandQueue.h>
+#include <blCommandListAllocator.h>
 #include <dxgiformat.h>
 #include <blWindow.h>
 #include <blSwapChain.h>
@@ -14,13 +16,17 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	private:
 		std::shared_ptr<blDevice> mDevice;
+		std::shared_ptr<blCommandListAllocator> mCommandListAllocator;
 		std::shared_ptr<blCommandQueue> mCommandQueue;
 		std::shared_ptr<blFactory> mFactory;
-		std::shared_ptr<blWindow> mWindow;
+		std::shared_ptr<Core::blWindow> mWindow;
+		std::shared_ptr<blSwapChain> mSwapChain;
 	public:
-		std::weak_ptr<blDevice> GetDevice();
-		std::weak_ptr<blCommandQueue> GetCommandQueue();
-		std::weak_ptr<blFactory> GetFactory();
+		std::shared_ptr<blDevice> GetDevice();
+		std::shared_ptr<blCommandQueue> GetCommandQueue();
+		std::shared_ptr<blFactory> GetFactory();
+		std::shared_ptr<blCommandListAllocator> GetCommandListAllocator();
+		std::shared_ptr<blSwapChain> GetSwapChain();
 	public:
 		//NOTE: This format was randomly chosen. Verify correct value later
 		const static DXGI_FORMAT sBackbufferFormat;
@@ -30,15 +36,9 @@ namespace BoulderLeaf::Graphics::DX12
 		const static int sSrvHeapSize;
 
 	public:
-		blDX12(std::shared_ptr<blWindow> window);
+		blDX12(std::shared_ptr<Core::blWindow> window);
 	protected:
 		void OnWindowMessage(MSG msg) override;
 		void OnResize() override;
 	};
-
-	std::shared_ptr<blSwapChain> CreateSwapChain(
-		const std::shared_ptr<blDevice> device,
-		const std::shared_ptr<blCommandQueue> commandQueue,
-		const std::shared_ptr<blFactory> factory,
-		const std::shared_ptr<blWindow> window);
 }

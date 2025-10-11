@@ -20,10 +20,10 @@ namespace BoulderLeaf::Graphics
 	class API
 	{
 	private:
-		std::shared_ptr<blWindow> mWindow;
+		std::shared_ptr<Core::blWindow> mWindow;
 	public:
 		API() = default;
-		API(std::shared_ptr<blWindow> window);
+		API(std::shared_ptr<Core::blWindow> window);
 	public:
 		void RecieveWindowMessage(MSG msg);
 	protected:

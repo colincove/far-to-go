@@ -23,8 +23,6 @@ add_library(
 	blRenderItem.cpp
 	blVirtualCamera.h
 	blVirtualCamera.cpp
-	blWindow.h
-	blWindow.cpp
 	RenderItemTypes/blRenderItemStandardMesh.h
 	Resources/blResourcesCommon.h
 	Resources/blResourceManager.cpp
@@ -49,6 +47,7 @@ target_link_libraries(
 	PUBLIC Math
 	DX12
 	Core
+	CoreApplication
 )
 
 #after adding the include #include <windef.h> I started to get this compile error

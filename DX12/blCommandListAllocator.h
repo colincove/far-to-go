@@ -2,6 +2,7 @@
 
 #include <blDX12Core.h>
 #include <d3d12.h>
+#include <blDevice.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -9,12 +10,18 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	private:
 		ComPtr<ID3D12CommandAllocator> mCommandListAllocator;
+		std::shared_ptr<blDevice> mDevice;
 	public:
-		blCommandListAllocator(ComPtr<ID3D12Device8> device);
+		blCommandListAllocator(std::shared_ptr<blDevice> device);
 
 		const ComPtr<ID3D12CommandAllocator> GetAllocatorPtr() const
 		{
 			return mCommandListAllocator;
+		}
+
+		std::shared_ptr<blDevice> GetDevice()
+		{
+			return mDevice;
 		}
 	};
 }
