@@ -6,6 +6,10 @@
 #include <wrl.h>
 #include <assert.h>
 #include <atldef.h>
+#include <dxgiformat.h>
+#include <blImageFormat.h>
+#include <blGraphicsCore.h>
+#include <d3d12.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -23,4 +27,16 @@ namespace BoulderLeaf::Graphics::DX12
 #else
 	#define DX12_API_CALL_SUCCEEDED(a) (a)
 #endif // DEBUG
+
+	DXGI_FORMAT ConvertImageFormatToDXGIFormat(eImageFormat format);
+	D3D12_INPUT_CLASSIFICATION ConvertInputCassificationToD3D12InputClassification(eInputClassification format);
+	D3D12_INPUT_ELEMENT_DESC ConvertInputElementDescToD3D12InputElementDesc(const InputElementDesc& desc);
+
+	struct Constants
+	{
+		const static DXGI_FORMAT BackbufferFormat;
+		const static DXGI_FORMAT DepthStencilFormat;
+		const static int SwapChainBufferCount;
+		const static int SrvHeapSize;
+	};
 }

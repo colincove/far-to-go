@@ -11,7 +11,7 @@ namespace BoulderLeaf::Graphics
 	{
 		friend class blResourceManager;
 	public:
-		blResourceId() : mId(0) {}
+		blResourceId() : mId(0), mInitialized(false) {}
 
 		bool operator<(const blResourceId& other) const
 		{
@@ -34,72 +34,140 @@ namespace BoulderLeaf::Graphics
 		}
 
 	private:
-		blResourceId(size_t id) : mId(id) {}
+		blResourceId(size_t id) : mId(id), mInitialized(true) {}
 	private:
 		size_t mId;
-	};
-
-	class blResourceCollar
-	{
-		friend class blResourceManager;
-	private:
-		blResourceId mId;
-		std::shared_ptr<blResourceManager> mOwner;
+		bool mInitialized;
 	public:
-		blResourceCollar(blResourceId id, std::shared_ptr<blResourceManager> owner);
-		blResourceCollar();
-		~blResourceCollar();
+		size_t GetRaw() const { return mId; }
+		bool IsValid() const { return mInitialized; }
 	};
 
-	template<typename TData>
+	enum class eResourceType
+	{
+		Scene,
+		Mesh,
+		Shader,
+		Material,
+		DataBuffer
+	};
+
+	template<typename TData, eResourceType TType>
 	class blResource
 	{
 		friend class blResourceManager;
 	private:
 		TData mData;
+		blResourceId mId;
 	public:
-		blResource() = default;
+		using DataType = TData;
+		constexpr static eResourceType ResourceType = TType;
+		blResource() = delete;
 
 		template<class... Types>
-		blResource(Types... args) : mData(std::forward<Types>(args)...)
+		blResource(blResourceId id, Types... args) : mData(std::forward<Types>(args)...),
+			mId(id)
 		{
 		}
 
-		blResource(const TData& data) : mData(data) {}
-		blResource(TData&& data) : mData(std::move(data)) {}
+		blResource(blResourceId id, const TData& data) : mData(data), mId(id){}
+		blResource(blResourceId id, TData&& data) : mData(std::move(data)), mId(id) {}
 	public:
 		const TData& GetData() const
 		{
 			return mData;
 		}
+
 		TData& GetDataMutable()
 		{
 			return mData;
 		}
 
-		operator TData& () { return mData; }
-		operator const TData& () const { return mData; }
-
-		TData& GetMutable()
-		{
-			return mData;
-		}
-
-		const TData& Get() const
-		{
-			return mData;
-		}
-
-	private:
-		std::optional<blResourceCollar> mCollar;
-		std::optional<blResourceCollar>& GetCollarMutable() const
-		{
-			return *mCollar;
-		}
 	public:
-		const std::optional<blResourceCollar>& GetCollar() const
+		const blResourceId& GetId() const
 		{
-			return *mCollar;
+			return mId;
 		}
 	};
+
+	template<typename TResource>
+	using blResourcePtr = std::shared_ptr<TResource>;
+
+	template<typename TResource>
+	using blResourceWeakPtr = std::weak_ptr<TResource>;
+
+	template<typename TResource>
+	using blResourceUniquePtr = std::unique_ptr<TResource>;
 }
+
+#include <functional>
+
+#define BL_RESOURCE_NAMESPACE() BoulderLeaf::Graphics
+
+#define BL_RESOURCE_TYPE_NAME(TData) \
+TData##Resource
+
+#define BL_RESOURCE_TYPE_NAME_QUALIFIED(TData) \
+BL_RESOURCE_NAMESPACE()##::##TData##Resource
+
+#define BL_RESOURCE_PTR_TYPE_NAME(TData) \
+TData##ResourcePtr
+
+#define BL_RESOURCE_PTR_TYPE_NAME_QUALIFIED(TData) \
+BL_RESOURCE_NAMESPACE()##::##TData##ResourcePtr
+
+#define BL_RESOURCE_WEAK_PTR_TYPE_NAME(TData) \
+TData##ResourceWeakPtr
+
+#define BL_RESOURCE_UNIQUE_PTR_TYPE_NAME(TData) \
+TData##ResourceUniquePtr
+
+#define BL_RESOURCE_WEAK_PTR_TYPE_NAME_QUALIFIED(TData) \
+BL_RESOURCE_NAMESPACE()##::##TData##ResourceWeakPtr
+
+#define BL_RESOURCE_LESS_THAN_DECL(TData)\
+namespace std { \
+	bool operator<(const BL_RESOURCE_TYPE_NAME_QUALIFIED(TData)& a, const BL_RESOURCE_TYPE_NAME_QUALIFIED(TData)& b) noexcept; \
+}
+
+#define BL_RESOURCE_LESS_THAN_IMPL(TData)\
+namespace std { \
+	bool operator<(const BL_RESOURCE_TYPE_NAME_QUALIFIED(TData)& a, const BL_RESOURCE_TYPE_NAME_QUALIFIED(TData)& b) noexcept { \
+		return a.GetId().GetRaw() < b.GetId().GetRaw(); \
+	} \
+}
+
+#define BL_RESOURCE_HASH(TData)\
+namespace std { \
+	template<> \
+	struct hash<BL_RESOURCE_TYPE_NAME_QUALIFIED(TData)> { \
+		size_t operator()(const BL_RESOURCE_TYPE_NAME_QUALIFIED(TData)& resource) const noexcept { \
+			return resource.GetId().GetRaw(); \
+		} \
+	}; \
+}
+
+#define BL_RESOURCE_POINTERS(TData, TResourceType, Name) \
+using BL_RESOURCE_PTR_TYPE_NAME(Name) = blResourcePtr<BL_RESOURCE_TYPE_NAME(Name)>; \
+using BL_RESOURCE_WEAK_PTR_TYPE_NAME(Name) = blResourceWeakPtr<BL_RESOURCE_TYPE_NAME(Name)>; \
+using BL_RESOURCE_UNIQUE_PTR_TYPE_NAME(Name) = blResourceUniquePtr<BL_RESOURCE_TYPE_NAME(Name)>;\
+using TData##WeakPtr = std::weak_ptr<TData>;\
+using TData##Ptr = std::shared_ptr<TData>;\
+using TData##UniquePtr = std::unique_ptr<TData>;
+
+#define BL_RESOURCE_WITH_NAME(TData, TResourceType, Name) \
+namespace BL_RESOURCE_NAMESPACE() { \
+using BL_RESOURCE_TYPE_NAME(Name) = blResource<TData, TResourceType>; \
+BL_RESOURCE_POINTERS(TData, TResourceType, Name) \
+} \
+BL_RESOURCE_HASH(Name) \
+BL_RESOURCE_LESS_THAN_DECL(Name)
+
+#define BL_RESOURCE_IMPL(TData) \
+BL_RESOURCE_LESS_THAN_IMPL(TData)
+
+#define BL_RESOURCE(TData, TResourceType) \
+BL_RESOURCE_WITH_NAME(TData, TResourceType, TData)
+
+#define BL_DERIVED_RESOURCE(TData, TResourceType) \
+BL_RESOURCE_POINTERS(TData, TResourceType, TData)

@@ -6,7 +6,7 @@
 
 namespace BoulderLeaf::Graphics
 {
-	class blMeshResource : public blResource<blMeshStorage>
+	class blMeshResource : public blResource<StandardMesh>
 	{
 	public:
 		blMeshResource() = default;

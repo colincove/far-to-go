@@ -14,20 +14,43 @@
 #include <windows.h>
 #include <blWindow.h>
 #include <memory>
+#include <blRenderScene.h>
+#include <RenderItems/blRenderItemBuffer.h>
+#include <blShader.h>
+#include <Resources/blResourceManager.h>
+#include <blRenderGroup.h>
 
 namespace BoulderLeaf::Graphics
 {
 	class API
 	{
+		struct RenderGroupData
+		{
+			bool initialized = false;
+		};
+
 	private:
 		std::shared_ptr<Core::blWindow> mWindow;
+		RenderGroupData renderGroupData[blRenderGroups::MaxValue];
 	public:
 		API() = default;
 		API(std::shared_ptr<Core::blWindow> window);
 	public:
 		void RecieveWindowMessage(MSG msg);
+		virtual void DrawScene(const RenderItemBuffer& renderItems, const blSceneResourcePtr& scene);
+		virtual void StartFrame() {};
+		virtual void EndFrame() {};
 	protected:
-		virtual void OnWindowMessage(MSG msg) = 0;
-		virtual void OnResize() = 0;
+		virtual void OnWindowMessage(MSG msg);
+		virtual void OnResize();
+		virtual void DrawMesh(const RenderMeshData& renderData, const blSceneResourcePtr scene) = 0;
+		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) = 0;
+		virtual void InitializeGroup(const blRenderGroupId& group) {};
+		virtual void PreDrawRenderItem(const RenderData& renderItem, const blSceneResourcePtr& scene) {};
+	protected:
+		bool IsGroupInitialized(const blRenderGroupId& group) const { return renderGroupData[group].initialized; }
+	private:
+		void InitializeGroupInternal(const blRenderGroupId& group);
+		void PreDrawRenderItemInternal(const RenderData& renderItem, const blSceneResourcePtr& scene);
 	};
 }

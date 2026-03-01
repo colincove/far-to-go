@@ -10,16 +10,36 @@
 #include <assert.h>
 #include <blCore.h>
 #include <Resources/blResource.h>
+#include <string>
+#include <blBuffer.h>
 
 namespace BoulderLeaf::Graphics
 {
 	template<typename tFrom, typename tTo>
 	tTo From(const tFrom& from);
+	using VertexElementType = BufferElementType;
+	using VertexElementDescription = BufferElementDescription;
+
+	template<typename TVertex>
+	struct VertexDefinition : public BufferDefinition<TVertex>
+	{
+		using VertexType = TVertex;
+	};
+
+	struct StandardVertex
+	{
+		Math::Vector3 Position;
+		Math::Vector3 Normal;
+		Math::Vector3 Tangent;
+		Math::Vector4 Colour;
+		Math::Vector2 UV;
+	};
 
 	class blMeshStorage
 	{
 		template<typename TVertex>
 		friend class blMesh;
+		friend class blMeshBase;
 	public:
 		using index = std::uint16_t;
 
@@ -132,17 +152,81 @@ namespace BoulderLeaf::Graphics
 		}
 
 		bool IsValid() const;
+
+		inline void operator=(blMeshStorage&& rhs)
+		{
+			mBuffer = std::move(rhs.mBuffer);
+			rhs.mIndexDataStart = nullptr;
+			rhs.mVertexDataStart = nullptr;
+			InitializeIndexingPointers();
+		}
 	};
 
-	template<typename TVertex>
-	class blMesh
+	class blMeshBase
+	{
+	protected:
+		blMeshStorage mStorage;
+	public:
+		blMeshBase() : mStorage() {}
+		blMeshBase(const blMeshStorage& storage) : mStorage(storage) {}
+		blMeshBase(blMeshStorage&& storage) : mStorage(std::move(storage)) {}
+		blMeshBase(size_t vertexCount, size_t indexCount, const size_t vertexSize)
+			:mStorage(
+				vertexCount,
+				indexCount,
+				vertexSize) {
+		}
+
+		blMeshBase(
+			byte vertices[],
+			const size_t vertexSize) : mStorage(vertices, vertexSize)
+		{
+		}
+
+		blMeshBase(
+			const byte* vertices,
+			const size_t vertexCount,
+			const blMeshStorage::index* indices,
+			const size_t indexCount,
+			const size_t vertexSize) : mStorage(vertices, vertexCount, indices, indexCount, vertexSize)
+		{
+
+		}
+
+		blMeshBase(const blMeshBase& other) :mStorage(other.mStorage) {}
+		blMeshBase(blMeshBase&& other) noexcept :mStorage(std::move(other.mStorage)) {}
+
+		virtual const std::vector<VertexElementDescription>& GetVertexElementDescriptions() const 
+		{
+			static std::vector<VertexElementDescription> defaultDescriptions;
+			//dumb. no need for this. just nonsense complexity with resources
+			return defaultDescriptions;
+		};
+	public:
+		bool IsValid() const { return mStorage.IsValid(); }
+		const blMeshStorage& GetStorage() const { return mStorage; }
+		blMeshStorage& GetStorageMutable() { return mStorage; }
+	public:
+		const size_t& GetVertexCount() const { return mStorage.GetVertexCount(); }
+		const size_t& GetVertexSize() const { return mStorage.GetVertexSize(); }
+		const size_t& GetIndexCount() const { return mStorage.GetIndexCount(); }
+
+		const blMeshStorage::index& GetIndex(size_t index) const { return mStorage.GetIndex(index); }
+		blMeshStorage::index& GetIndexMutable(size_t index) { return mStorage.GetIndexMutable(index); }
+	};
+
+	template<typename TVertexDefinition>
+	class blMesh : public blMeshBase
 	{
 	public:
+		using TVertex = TVertexDefinition::VertexType;
 		struct Prototype
 		{
 			std::vector<TVertex> vertices;
 			std::vector<blMeshStorage::index> indices;
 		};
+
+		using TPrototype = Prototype;
 
 		static Prototype& GetPrototype()
 		{
@@ -151,20 +235,18 @@ namespace BoulderLeaf::Graphics
 			prototype.vertices.clear();
 			return prototype;
 		}
-	private:
-		blResource<blMeshStorage> mStorage;
 	public:
-		blMesh() : mStorage() {}
-		blMesh(const blMeshStorage& storage) : mStorage(storage){}
-		blMesh(size_t vertexCount) : blMesh<TVertex>::blMesh(vertexCount, 0) {}
+		blMesh() : blMeshBase() {}
+		blMesh(const blMeshStorage& storage) : blMeshBase(storage){}
+		blMesh(size_t vertexCount) : blMesh<TVertexDefinition>::blMesh(vertexCount, 0) {}
 		blMesh(size_t vertexCount, size_t indexCount)
-			:mStorage(
+			:blMeshBase(
 				vertexCount,
 				indexCount,
 				sizeof(TVertex)){}
 
 		blMesh(
-			TVertex vertices[]) : mStorage(static_cast<byte[]>(vertices), sizeof(TVertex))
+			TVertex vertices[]) : blMeshBase(static_cast<byte[]>(vertices), sizeof(TVertex))
 		{
 		}
 
@@ -172,7 +254,7 @@ namespace BoulderLeaf::Graphics
 			const TVertex* vertices,
 			const size_t vertexCount,
 			const blMeshStorage::index* indices,
-			const size_t indexCount) : mStorage(reinterpret_cast<const byte*>(vertices), vertexCount, indices, indexCount, sizeof(TVertex))
+			const size_t indexCount) : blMeshBase(reinterpret_cast<const byte*>(vertices), vertexCount, indices, indexCount, sizeof(TVertex))
 		{
 
 		}
@@ -186,33 +268,20 @@ namespace BoulderLeaf::Graphics
 
 		}
 
-		blMesh(const blMesh<TVertex>& other):mStorage(other.mStorage){}
-		blMesh(blMesh<TVertex>&& other) noexcept :mStorage(std::move(other.mStorage)) {}
+		blMesh(const blMesh<TVertexDefinition>& other):blMeshBase(other.mStorage){}
+		blMesh(blMesh<TVertexDefinition>&& other) noexcept :blMeshBase(std::move(other.mStorage)) {}
+
+		virtual const std::vector<VertexElementDescription>& GetVertexElementDescriptions() const override
+		{
+			return TVertexDefinition::Description;
+		}
+
 	public:
-		const size_t& GetVertexCount() const { return mStorage.Get().GetVertexCount(); }
-		const size_t& GetVertexSize() const { return mStorage.Get().GetVertexSize(); }
-		const size_t& GetIndexCount() const { return mStorage.Get().GetIndexCount(); }
-
-		const TVertex& GetVertex(size_t index) const { return *reinterpret_cast<const TVertex*>(mStorage.Get().GetVertex(index)); }
-		TVertex& GetVertexMutable(size_t index) { return *reinterpret_cast<TVertex*>(mStorage.GetMutable().GetVertexMutable(index)); }
-
-		const blMeshStorage::index& GetIndex(size_t index) const { return mStorage.Get().GetIndex(index); }
-		blMeshStorage::index& GetIndexMutable(size_t index) { return mStorage.GetMutable().GetIndexMutable(index); }
-
-		bool IsValid() const { return mStorage.Get().IsValid(); }
-
-		const blMeshStorage& GetStorage() const { return mStorage; }
-		blMeshStorage& GetStorageMutable() { return mStorage; }
+		const TVertex& GetVertex(size_t index) const { return *reinterpret_cast<const TVertex*>(mStorage.GetVertex(index)); }
+		TVertex& GetVertexMutable(size_t index) { return *reinterpret_cast<TVertex*>(mStorage.GetVertexMutable(index)); }
 	};
 
-	struct StandardVertex
-	{
-		Math::Vector3 Position;
-		Math::Vector3 Normal;
-		Math::Vector3 Tangent;
-		Math::Vector4 Colour;
-		Math::Vector2 UV;
-	};
+	using StandardVertexDefinition = VertexDefinition<StandardVertex>;
 
 	inline bool operator==(const StandardVertex& lhs, const StandardVertex& rhs)
 	{
@@ -221,5 +290,10 @@ namespace BoulderLeaf::Graphics
 
 	inline bool operator!=(const StandardVertex& lhs, const StandardVertex& rhs) { return !(lhs == rhs); }
 
-	using StandardMesh = blMesh<StandardVertex>;
+	using StandardMesh = blMesh<StandardVertexDefinition>;
+	using blMeshBaseUniquePtr = std::unique_ptr<::BoulderLeaf::Graphics::blMeshBase>;
+	using StandardMeshUniquePtr = std::unique_ptr<::BoulderLeaf::Graphics::StandardMesh>;
 }
+
+BL_RESOURCE(blMeshBase, eResourceType::Mesh);
+BL_RESOURCE(StandardMesh, eResourceType::Mesh);

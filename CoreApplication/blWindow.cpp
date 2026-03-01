@@ -1,6 +1,7 @@
 #include "blWindow.h"
 #include <string>
 #include <map>
+#include <assert.h>
 
 namespace
 {
@@ -43,6 +44,20 @@ namespace BoulderLeaf::Core
 		}
 
 		return true;
+	}
+
+	int blWindow::GetWidth() const
+	{
+		RECT winRect;
+		assert(GetWindowRect(mWindowHandle, &winRect));
+		return winRect.right - winRect.left;
+	}
+
+	int blWindow::GetHeight() const
+	{
+		RECT winRect;
+		assert(GetWindowRect(mWindowHandle, &winRect));
+		return winRect.bottom - winRect.top;
 	}
 }
 

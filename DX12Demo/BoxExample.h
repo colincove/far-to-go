@@ -26,7 +26,8 @@ namespace BoulderLeaf::Graphics::DX12
 			XMFLOAT2 UV;
 		};
 
-		using Mesh = Graphics::blMesh<Vertex>;
+		using MeshVertexDefinition = VertexDefinition<Vertex>;
+		using Mesh = Graphics::blMesh<MeshVertexDefinition>;
 		using BoxMeshGeometry = MeshGeometry<Mesh>;
 
 		const std::vector<D3D12_INPUT_ELEMENT_DESC> VertexDesc =

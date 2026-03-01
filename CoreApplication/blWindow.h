@@ -23,5 +23,7 @@ namespace BoulderLeaf::Core
 		HWND& GetWindowHandle() { return mWindowHandle; }
 		void SetCallback(Callback callback) { mCallback = callback; }
 		LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		int GetWidth() const;
+		int GetHeight() const;
 	};
 }

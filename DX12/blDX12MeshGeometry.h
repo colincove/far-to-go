@@ -24,12 +24,8 @@ namespace BoulderLeaf::Graphics::DX12
 		DirectX::BoundingBox Bounds;
 	};
 
-	template<typename Mesh>
-	struct MeshGeometry
+	struct blDX12Mesh
 	{
-		// Give it a name so we can look it up by name.
-		std::string Name;
-		Mesh* mMesh;
 		// System memory copies. Use Blobs because the vertex/index format can
 		// be generic.
 		// It is up to the client to cast appropriately.
@@ -72,5 +68,13 @@ namespace BoulderLeaf::Graphics::DX12
 			VertexBufferUploader = nullptr;
 			IndexBufferUploader = nullptr;
 		}
+	};
+
+	template<typename Mesh>
+	struct MeshGeometry : public blDX12Mesh
+	{
+		// Give it a name so we can look it up by name.
+		std::string Name;
+		Mesh* mMesh;
 	};
 }

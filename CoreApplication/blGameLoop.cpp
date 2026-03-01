@@ -60,7 +60,7 @@ namespace BoulderLeaf::Core
 				callbacks.PostDraw(gameTime);
 			}
 
-			::Sleep(10);
+			::Sleep(100);
 		}
 	}
 }

@@ -13,4 +13,6 @@ namespace BoulderLeaf::Graphics
 			XMFLOAT2(from.UV.x, from.UV.y)
 		);
 	}
+
+	const std::vector<VertexElementDescription> DX12::DX12StandardVertexDefinition::Description = StandardVertexDefinition::Description;
 }

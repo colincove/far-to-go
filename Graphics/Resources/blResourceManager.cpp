@@ -2,14 +2,12 @@
 
 namespace BoulderLeaf::Graphics
 {
-	void blResourceManager::UpdateResource(blResourceCollar& collar, std::shared_ptr<blResourceManager> manager)
+	blResourceId blResourceManager::GetNewResourceId()
 	{
-		if (collar.mId.mId == 0)
-		{
-			static size_t nextId = 0;
-			collar = blResourceCollar(nextId, manager);
-			++nextId;
-		}
+		static size_t nextId = 0;
+		blResourceId newId(nextId);
+		++nextId;
+		return newId;
 	}
 
 	bool blResourceManager::IsValidResource(blResourceId id)
@@ -17,8 +15,14 @@ namespace BoulderLeaf::Graphics
 		return mReleasedResourceIds.find(id) == mReleasedResourceIds.end();
 	}
 
-	void blResourceManager::ReleaseResource(const blResourceCollar& collar)
+	void blResourceManager::ReleaseResource(const blResourceId& id)
 	{
-		mReleasedResourceIds.insert(collar.mId);
+		mReleasedResourceIds.insert(id);
+	}
+
+	blResourceManager& blResourceManager::Get()
+	{
+		static blResourceManager instance;
+		return instance;
 	}
 }

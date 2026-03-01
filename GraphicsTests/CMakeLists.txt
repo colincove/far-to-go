@@ -3,7 +3,8 @@ add_executable(
 	GraphicsTests.cpp
 	VirtualCamera.cpp
 	main.cpp
-	Mesh.cpp)
+	Mesh.cpp
+	RenderGroups.cpp)
 
 target_link_libraries(
 	GraphicsTests

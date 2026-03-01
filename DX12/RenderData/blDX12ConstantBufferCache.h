@@ -1,0 +1,35 @@
+#pragma once
+
+#include <vector>
+#include <memory>
+#include <blDevice.h>
+#include <blDX12ResourceDataCache.h>
+#include <blBuffer.h>
+#include <blConstantBuffer.h>
+#include <blDX12BufferData.h>
+#include <blConstantBufferDescriptorHeap.h>
+
+namespace BoulderLeaf::Graphics::DX12
+{
+	struct blDX12ConstantBufferCacheData
+	{
+		std::shared_ptr<blConstantBuffer> ConstantBuffer;
+	};
+
+	class blDX12ConstantBufferCache : public blDX12ResourceDataCache<blDX12ConstantBufferCacheData, blDataBufferInterfaceResource>
+	{
+	private:
+		std::shared_ptr<blDevice> mDevice;
+		std::shared_ptr<blDX12BufferDataCache> mBufferCache;
+		std::shared_ptr<blConstantBufferDescriptorHeap> mCbvHeap;
+	public:
+		blDX12ConstantBufferCache(
+			std::shared_ptr<blDevice> device,
+			std::shared_ptr<blConstantBufferDescriptorHeap> cbvHeap,
+			std::shared_ptr<blDX12BufferDataCache> mBufferCache);
+
+		virtual void InitializeCache(
+			const blDataBufferInterfaceResource& resourcePtr,
+			blDX12ConstantBufferCacheData& cache) override;
+	};
+}

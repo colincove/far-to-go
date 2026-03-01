@@ -26,6 +26,22 @@ namespace BoulderLeaf::Graphics
 			XMFLOAT2(from.UV.x, from.UV.y)
 		);
 	}
+
+	const std::vector<VertexElementDescription> DX12::BoxExample::MeshVertexDefinition::Description =
+	{
+		{ "Position",	VertexElementType::Float3 },
+		{ "Normal",		VertexElementType::Float3 },
+		{ "Colour",		VertexElementType::Float4 },
+		{ "UV",			VertexElementType::Float2 }
+	};
+
+	const std::vector<D3D12_INPUT_ELEMENT_DESC> VertexDesc =
+	{
+		{"Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{"Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{"Color", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+	};
 }
 
 namespace BoulderLeaf::Graphics::DX12
@@ -139,6 +155,7 @@ namespace BoulderLeaf::Graphics::DX12
 		m_dx12->mCommandList->DrawIndexedInstanced(
 			mBoxGeo->DrawArgs["box"].IndexCount,
 			1, 0, 0, 0);
+
 		// Indicate a state transition on the resource usage.
 		currentBackBuffer = m_dx12->CurrentBackBuffer();
 		CD3DX12_RESOURCE_BARRIER resourceBarrier2 = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
@@ -194,7 +211,10 @@ namespace BoulderLeaf::Graphics::DX12
 		cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 		slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
 		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0,
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(
+			1, 
+			slotRootParameter, 
+			0,
 			nullptr,
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 		// create a root signature with a single slot which points to a

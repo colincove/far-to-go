@@ -131,7 +131,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mDsvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 		mCbvSrvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-		assert((GetM4xMsaaQuality(sBackbufferFormat, mDevice) > 0));
+		assert((GetM4xMsaaQuality(Constants::BackbufferFormat, mDevice) > 0));
 
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -149,14 +149,14 @@ namespace BoulderLeaf::Graphics::DX12
 		assert((commandListResult == S_OK));
 		mCommandList->SetName(L"BL- DX12 Command List");
 
-		m4xMsaaQuality = GetM4xMsaaQuality(sBackbufferFormat, mDevice);
+		m4xMsaaQuality = GetM4xMsaaQuality(Constants::BackbufferFormat, mDevice);
 		m4xMsaaState = m4xMsaaQuality > 0;
 
 		HRESULT swapChainResult = CreateSwapChain(
 			mDevice, 
 			mCommandQueue, 
 			mFactory,
-			sBackbufferFormat, 
+			Constants::BackbufferFormat,
 			mhMainWnd,
 			mSwapChain);
 
@@ -317,7 +317,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 		depthBufferViewOut->SetName(L"BL - DepthBuffer");
 
-		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		// COMMENTING THIS OUT. It does not make sense. The resource is created with the D3D12_RESOURCE_STATE_DEPTH_WRITE state, so why transition it from COMMON to DEPTH_WRITE?
+		/*CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 			depthBufferViewOut.Get(),
 			D3D12_RESOURCE_STATE_COMMON,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE);
@@ -325,7 +326,7 @@ namespace BoulderLeaf::Graphics::DX12
 		// Transition the resource from its initial state to be used as a depth buffer.
 		mCommandList->ResourceBarrier(
 			1,
-			&barrier);
+			&barrier);*/
 	}
 
 	void DX12_LegacyV1::FlushCommandQueue()

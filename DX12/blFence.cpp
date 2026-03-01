@@ -3,8 +3,8 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blFence::blFence(ComPtr<ID3D12Device8> device) 
+	blFence::blFence(std::shared_ptr<blDevice> device)
 	{
-		DX12_API_CALL(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence)));
+		DX12_API_CALL(device->GetDX12Device()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence)));
 	}
 }

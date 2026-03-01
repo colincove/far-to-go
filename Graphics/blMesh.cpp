@@ -174,4 +174,13 @@ namespace BoulderLeaf::Graphics
 	}
 
 	bool blMeshStorage::IsValid() const { return mBuffer != nullptr; }
+
+	const std::vector<VertexElementDescription> StandardVertexDefinition::Description =
+	{
+		{ "Position",	VertexElementType::Float3 },
+		{ "Normal",		VertexElementType::Float3 },
+		{ "Tangent",	VertexElementType::Float3 },
+		{ "Colour",		VertexElementType::Float4 },
+		{ "UV",			VertexElementType::Float2 }
+	};
 }

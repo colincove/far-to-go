@@ -25,7 +25,8 @@ namespace BoulderLeaf::Graphics::DX12
 		XMFLOAT2 UV;
 	};
 
-	using Mesh = Graphics::blMesh<Vertex>;
+	using DX12StandardVertexDefinition = VertexDefinition<Vertex>;
+	using Mesh = Graphics::blMesh<DX12StandardVertexDefinition>;
 
 	inline bool operator==(const Vertex& lhs, const Vertex& rhs)
 	{

@@ -290,8 +290,8 @@ namespace BoulderLeaf::Graphics::DX12
 			mGeometryData.GetIndexBufferSize(),
 			mMeshGeometry->IndexBufferUploader);
 
-		mMeshGeometry->VertexByteStride = mGeometryData.GetEntry(mBoxGeomIdx).geometry->GetVertexSize();
-		mMeshGeometry->VertexBufferByteSize = mGeometryData.GetVertexBufferSize();
+		mMeshGeometry->VertexByteStride = static_cast<UINT>(mGeometryData.GetEntry(mBoxGeomIdx).geometry->GetVertexSize());
+		mMeshGeometry->VertexBufferByteSize = static_cast<UINT>(mGeometryData.GetVertexBufferSize());
 		mMeshGeometry->IndexFormat = DXGI_FORMAT_R16_UINT;
 	}
 

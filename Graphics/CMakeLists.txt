@@ -2,28 +2,40 @@ add_library(
 	Graphics 
 	blColour.h
 	graphics.cpp
+	blBuffer.cpp
+	blBuffer.h
+	blBufferTypes.cpp
+	blBufferTypes.h
+	blGraphicsCore.h
 	blGraphicsAPI.h
 	blGraphicsAPI.cpp
+	blGraphicsAPIImpl.h
+	blGraphicsAPIImpl.cpp
 	blGraphicsAPI_LegacyV1.h
 	blGraphicsAPI_LegacyV1.cpp
 	blHeadless.h
 	blHeadless.cpp
+	blMaterial.h
+	blMaterial.cpp
+	blShader.h
+	blShader.cpp
 	blMesh.h
 	blMesh.cpp
 	blMeshIndexedCatalogue.h
 	blMeshIndexedCatalogue.cpp
 	blMeshLibrary.h
 	blMeshLibrary.cpp
-	blRenderData.h
-	blRenderData.cpp
-	blRenderDataTypes.h
+	blImageFormat.h
 	blRenderScene.h
 	blRenderScene.cpp
-	blRenderItem.h
-	blRenderItem.cpp
 	blVirtualCamera.h
 	blVirtualCamera.cpp
-	RenderItemTypes/blRenderItemStandardMesh.h
+	blRenderGroup.h
+	blRenderGroup.cpp
+	RenderItems/blRenderItemMesh.h
+	RenderItems/blRenderItem.h
+	RenderItems/blRenderItem.cpp
+	RenderItems/blRenderItemBuffer.h
 	Resources/blResourcesCommon.h
 	Resources/blResourceManager.cpp
 	Resources/blResourceManager.h
@@ -36,10 +48,13 @@ target_include_directories(Graphics
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_SOURCE_DIR}/../Core
 		${CMAKE_CURRENT_SOURCE_DIR}/../Math
-		PRIVATE ./
-		./Resources
+		PRIVATE
+		./
 		../Math
 		../Core
+		PUBLIC
+		./Resources
+		./RenderItems
         )
 
 target_link_libraries(
@@ -49,6 +64,30 @@ target_link_libraries(
 	Core
 	CoreApplication
 )
+
+source_group("RenderItems/Headers Files"
+	FILES 
+	RenderItems/blRenderItemMesh.h
+	RenderItems/blRenderItem.h
+	RenderItems/blRenderItemBuffer.h)
+
+source_group("RenderItems/Source Files"
+	FILES 
+	RenderItems/blRenderItem.cpp)
+
+source_group("Resources/Headers Files"
+	FILES 
+	Resources/blResourcesCommon.h
+	Resources/blResourceManager.h
+	Resources/blResource.h
+	Resources/blMeshResource.h)
+
+source_group("Resources/Source Files"
+	FILES 
+	Resources/blResourceManager.cpp
+	Resources/blResource.cpp
+	Resources/blMeshResource.cpp)
+#source_group("RenderItems/Sources Files" ./RenderItems)
 
 #after adding the include #include <windef.h> I started to get this compile error
 #maybe because this is a library. And it does not know what architecture to compile in?

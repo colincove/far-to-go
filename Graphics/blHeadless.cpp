@@ -12,4 +12,14 @@ namespace BoulderLeaf::Graphics
 	{
 
 	}
+
+	void Headless::DrawMesh(const RenderMeshData& renderData, const  blSceneResourcePtr scene)
+	{
+
+	}
+
+	void Headless::DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	{
+
+	}
 }

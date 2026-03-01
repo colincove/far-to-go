@@ -15,8 +15,24 @@ namespace BoulderLeaf::Graphics
 		// TODO: Implement a method of resource id recycling
 		std::set<blResourceId> mReleasedResourceIds;
 	public:
-		static void UpdateResource(blResourceCollar& collar, std::shared_ptr<blResourceManager> manager);
-		void ReleaseResource(const blResourceCollar& collar);
+		blResourceId GetNewResourceId();
+
+		void ReleaseResource(const blResourceId& id);
 		bool IsValidResource(blResourceId id);
+		static blResourceManager& Get();
+
+		template<typename TResource>
+		blResourcePtr<TResource> CreateResource(const TResource::DataType&& data)
+		{
+			blResourcePtr<TResource> resource = std::make_shared<TResource>(TResource(GetNewResourceId(), data));
+			return resource;
+		}
+
+		template<typename TResource, typename... Args>
+		blResourcePtr<TResource> CreateResource(Args&&... args)
+		{
+			blResourcePtr<TResource> resource = std::make_shared<TResource>(TResource(GetNewResourceId(), std::forward<Args>(args)...));
+			return resource;
+		}
 	};
 }
