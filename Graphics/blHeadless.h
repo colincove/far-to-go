@@ -8,6 +8,7 @@ namespace BoulderLeaf::Graphics
 	protected:
 		void OnWindowMessage(MSG msg) override;
 		void OnResize() override;
+	public:
 		virtual void DrawMesh(const RenderMeshData& renderData, const  blSceneResourcePtr scene) override;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
 	};

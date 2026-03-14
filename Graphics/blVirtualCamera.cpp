@@ -10,7 +10,7 @@ namespace BoulderLeaf::Graphics
 		m_viewAngle(viewAngle),
 		m_aspectRatio(aspectRatio)
 	{
-		assert(aspectRatio <= 1 && aspectRatio > 0);
+		assert(aspectRatio > 0);
 		assert(nearPlane < farPlane);
 		assert(nearPlane > 0);
 		assert(viewAngle > 0);

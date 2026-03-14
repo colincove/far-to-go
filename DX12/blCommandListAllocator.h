@@ -23,5 +23,7 @@ namespace BoulderLeaf::Graphics::DX12
 		{
 			return mDevice;
 		}
+
+		void Reset();
 	};
 }

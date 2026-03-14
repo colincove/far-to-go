@@ -13,13 +13,13 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 
 	void blDX12BufferDataCache::InitializeCache(
-		const blDataBufferInterfaceResource& resource,
+		const blStandardObjectConstantsBufferResource& resource,
 		blDX12BufferData& cache)
 	{
 		using namespace DirectX;
 
 		cache.dataBuffer = blBasicDataBuffer(
-			resource.GetData(),
+			reinterpret_cast<const blDataBufferInterface&>(resource.GetData()),
 			DX12::DX12BufferAdapter::Get());
 
 		cache.uploadBuffer = std::make_shared<blUploadBuffer>(

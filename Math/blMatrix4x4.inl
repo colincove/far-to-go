@@ -50,6 +50,14 @@ namespace BoulderLeaf::Math
 				float m32;
 				float m33;
 			};
+
+			struct
+			{
+				RowVector c0;
+				RowVector c1;
+				RowVector c2;
+				RowVector c3;
+			};
 		};
 
 		constexpr Matrix4x4(float m00, float m01, float m02, float m03,
@@ -260,6 +268,26 @@ namespace BoulderLeaf::Math
 		static inline Vector4 Transform(const Matrix4x4& matrix, const Vector4& vector)
 		{
 			return vector * matrix;
+		}
+
+		static inline Matrix4x4 LookTo(const Vector4& from, const Vector4& dir, const Vector4& arbitraryUp)
+		{
+			/*Vector4 forward = (from - to).Normalize();
+			Vector4 right = arbitraryUp.Cross(forward).Normalize();
+			Vector4 up = forward.Cross(right);
+
+			return Matrix4x4(right.x, right.y, right.z, right.w,
+				up.x, up.y, up.z, up.w,
+				forward.x, forward.y, forward.z, forward.w,
+				from.x, from.y, from.z, from.w);*/
+			return Matrix4x4::Identity();
+		}
+
+		static inline Matrix4x4 LookAt(const Vector4& from, const Vector4& to, const Vector4& arbitraryUp)
+		{
+			//XMVECTOR EyeDirection = XMVectorSubtract(FocusPosition, EyePosition);
+			//return XMMatrixLookToLH(EyePosition, EyeDirection, UpDirection);
+			return Matrix4x4::Identity();
 		}
 	};
 

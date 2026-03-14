@@ -59,6 +59,17 @@ namespace BoulderLeaf::Core
 		assert(GetWindowRect(mWindowHandle, &winRect));
 		return winRect.bottom - winRect.top;
 	}
+
+	float blWindow::AspectRatio() const
+	{
+		RECT winRect;
+		assert(GetWindowRect(mWindowHandle, &winRect));
+		const int width = winRect.right - winRect.left;
+		const int height = winRect.bottom - winRect.top;
+		return static_cast<float>(width) / height;
+	}
+
+
 }
 
 namespace

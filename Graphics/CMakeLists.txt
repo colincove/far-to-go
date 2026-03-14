@@ -35,7 +35,6 @@ add_library(
 	RenderItems/blRenderItemMesh.h
 	RenderItems/blRenderItem.h
 	RenderItems/blRenderItem.cpp
-	RenderItems/blRenderItemBuffer.h
 	Resources/blResourcesCommon.h
 	Resources/blResourceManager.cpp
 	Resources/blResourceManager.h
@@ -68,8 +67,7 @@ target_link_libraries(
 source_group("RenderItems/Headers Files"
 	FILES 
 	RenderItems/blRenderItemMesh.h
-	RenderItems/blRenderItem.h
-	RenderItems/blRenderItemBuffer.h)
+	RenderItems/blRenderItem.h)
 
 source_group("RenderItems/Source Files"
 	FILES 

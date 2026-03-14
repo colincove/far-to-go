@@ -1,0 +1,1 @@
+powershell ".\compile_all_shaders.ps1"

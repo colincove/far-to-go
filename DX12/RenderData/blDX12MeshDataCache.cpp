@@ -7,7 +7,7 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blDX12MeshStorageCache::blDX12MeshStorageCache(std::shared_ptr<blDevice> device)
-		: mDevice(device), blDX12ResourceDataCache()
+		: mDevice(device), super()
 	{
 
 	}
@@ -24,10 +24,13 @@ namespace BoulderLeaf::Graphics::DX12
 			meshData.GetVertexElementDescriptions(),
 			DX12::DX12BufferAdapter::Get());
 
-		cache.meshStorage = std::move(blMeshStorage(
+		cache.meshStorage =
+			std::move(blMeshStorage(
 			meshStorage.GetHeader().mVertexCount,
 			meshStorage.GetHeader().mIndexCount,
-			vertexSize));
+			meshStorage.GetHeader().mVertexSize));
+
+		memcpy(static_cast<void*>(cache.meshStorage.IndexBeginMutable()), static_cast<const void*>(meshStorage.IndexBegin()), meshStorage.GetIndexCount() * sizeof(blMeshStorage::index));
 
 		MarshalBuffer(
 			meshStorage.GetHeader().mVertexCount,

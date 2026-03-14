@@ -18,6 +18,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 	class blDX12MeshDataDeviceCache : public blDX12ResourceDataCache<blDX12MeshDataDeviceCacheData, blMeshBaseResource>
 	{
+	protected:
+		using super = blDX12ResourceDataCache<blDX12MeshDataDeviceCacheData, blMeshBaseResource>;
 	private:
 		std::shared_ptr<blDevice> mDevice;
 		std::shared_ptr<blCommandList> mCommandList;

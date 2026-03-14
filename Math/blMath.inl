@@ -3,6 +3,7 @@
 namespace BoulderLeaf::Math
 {
 	#define PIf 3.14159265f
+	constexpr float PIfDIV4 = PIf / 4.0f; //XM_PIDIV4
 
 	static float Epsilon = 0.000001f;
 

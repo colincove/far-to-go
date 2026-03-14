@@ -470,4 +470,33 @@ namespace BoulderLeaf::Math::Test
 
 		EXPECT_TRUE(Matrix4x4::k_isInvertible);
 	}
+
+	TEST(Matrix4x4, LookAt)
+	{
+		const float x = 0.185314447f;
+		const float y = 3.35441232f;
+		const float z = -3.70318508f;
+		// Build the view matrix.
+		const Vector4 pos = Vector4(x, y, z, 1.0f);
+		const Vector4 target = Vector4(0,0,0,0);
+		const Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
+
+		const Matrix4x4 ViewExpected = Matrix4x4(
+			0.998750210f, 0.0335302800f, 0.0370628871f, 0.00000000f,
+			0.00000000f, 0.741563678f, 0.670882404f, 0.00000000f,
+			0.0499793701f, 0.670043945f, 0.740636945f, 0.00000000f,
+			1.49011612e-08f, 0.00000000f, 5.00000000f, 1.00000000f
+		);
+
+		const Matrix4x4 ViewAltExpected = Matrix4x4(
+			0.998750210f, 0.00000000f, 0.0499793701f, 1.49011612e-08f,
+			0.0335302800f, 0.741563678f, 0.670043945f, 0.00000000f,
+			0.0370628871f, 0.670882404f, 0.740636945f, 5.00000000f,
+			0.00000000f, 0.00000000f, 0.00000000f, 1.00000000f
+		);
+
+		const Matrix4x4 Result = Matrix4x4::LookAt(pos, target, up);
+
+		EXPECT_TRUE(NearEqual(ViewExpected, Result));
+	}
 }

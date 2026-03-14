@@ -146,7 +146,17 @@ namespace BoulderLeaf::Graphics
 			return mVertexDataStart;
 		}
 
+		byte* VertexBeginMutable()
+		{
+			return mVertexDataStart;
+		}
+
 		const index* IndexBegin() const
+		{
+			return mIndexDataStart;
+		}
+
+		index* IndexBeginMutable()
 		{
 			return mIndexDataStart;
 		}

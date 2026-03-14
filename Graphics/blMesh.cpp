@@ -180,7 +180,7 @@ namespace BoulderLeaf::Graphics
 		{ "Position",	VertexElementType::Float3 },
 		{ "Normal",		VertexElementType::Float3 },
 		{ "Tangent",	VertexElementType::Float3 },
-		{ "Colour",		VertexElementType::Float4 },
-		{ "UV",			VertexElementType::Float2 }
+		{ "Color",		VertexElementType::Float4 },
+		{ "TEXCOORD",	VertexElementType::Float2 }
 	};
 }

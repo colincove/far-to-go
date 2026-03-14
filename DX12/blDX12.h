@@ -40,20 +40,22 @@ namespace BoulderLeaf::Graphics::DX12
 		std::map<blSceneResource, blRenderSceneContext> mSceneContextMap;
 		UINT64 mCurrentFence;
 	public:
-		void StartFrame() override;
-		void EndFrame() override;
+		virtual void InitializeBegin() override;
+		virtual void InitializeFinish() override;
+		virtual void DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene) override;
+		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
 	public:
 		blDX12(std::shared_ptr<Core::blWindow> window);
 		~blDX12();
 	protected:
 		void OnWindowMessage(MSG msg) override;
 		void OnResize() override;
-		virtual void DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene) override;
-		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
-		virtual void InitializeGroup(const blRenderGroupId& group) override;
-
+		virtual void InitializeGroupInternal(const blRenderGroupId& group) override;
 		void GroupStartFrame(blRenderGroupId group);
 		void GroupEndFrame(blRenderGroupId group);
+
+		void StartFrameInternal() override;
+		void EndFrameInternal() override;
 	private:
 		void FlushCommandQueue();
 	};

@@ -23,7 +23,8 @@ namespace BoulderLeaf::Graphics
 		Float3,
 		Float4,
 		Matrix3x3,
-		Matrix4x4
+		Matrix4x4,
+
 	};
 
 	struct BufferElementDescription

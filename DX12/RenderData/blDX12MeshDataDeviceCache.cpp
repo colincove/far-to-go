@@ -10,7 +10,7 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blDevice> device,
 		std::shared_ptr<blCommandList> commandList,
 		std::shared_ptr<blDX12MeshStorageCache> meshStorageCache)
-		: mDevice(device), mCommandList(commandList), mMeshStorageCache(meshStorageCache),blDX12ResourceDataCache()
+		: super(), mDevice(device), mCommandList(commandList), mMeshStorageCache(meshStorageCache)
 	{
 
 	}
@@ -48,7 +48,7 @@ namespace BoulderLeaf::Graphics::DX12
 		meshGeometry.VertexByteStride = (UINT) header.mVertexSize;
 		meshGeometry.VertexBufferByteSize = (UINT) header.GetVertexBufferSize();
 		meshGeometry.IndexFormat = DXGI_FORMAT_R16_UINT;
-		meshGeometry.IndexBufferByteSize = (UINT) header.GetVertexBufferSize();
+		meshGeometry.IndexBufferByteSize = (UINT) header.GetIndexBufferSize();
 		
 		SubmeshGeometry submesh;
 		submesh.IndexCount = (UINT) storage.GetIndexCount();

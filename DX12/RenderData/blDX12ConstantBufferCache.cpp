@@ -14,7 +14,7 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 
 	void blDX12ConstantBufferCache::InitializeCache(
-		const blDataBufferInterfaceResource& resource,
+		const blStandardObjectConstantsBufferResource& resource,
 		blDX12ConstantBufferCacheData& cache)
 	{
 		blDX12BufferData& bufferData = mBufferCache->Get(resource);
@@ -31,6 +31,5 @@ namespace BoulderLeaf::Graphics::DX12
 		mDevice->GetDX12Device()->CreateConstantBufferView(
 			&cbvDesc,
 			mCbvHeap->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
-
 	}
 }

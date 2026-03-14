@@ -5,7 +5,6 @@
 #include <directx/dxcore.h>
 #include <directx/d3dx12.h>
 
-
 namespace BoulderLeaf::Graphics::DX12
 {
 	blDepthBuffer::blDepthBuffer(
@@ -41,13 +40,6 @@ namespace BoulderLeaf::Graphics::DX12
 			&optClear,
 			IID_PPV_ARGS(mDepthBufferView.GetAddressOf())));
 
-		// Create descriptor to mip level 0 of entire resource using the
-		// format of the resource.
-		device->GetDX12Device()->CreateDepthStencilView(
-			mDepthBufferView.Get(),
-			nullptr,
-			DepthStencilView());
-
 		D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
 		dsvHeapDesc.NumDescriptors = 1;
 		dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
@@ -55,6 +47,15 @@ namespace BoulderLeaf::Graphics::DX12
 		dsvHeapDesc.NodeMask = 0;
 
 		DX12_API_CALL(device->GetDX12Device()->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
+
+		// Create descriptor to mip level 0 of entire resource using the
+		// format of the resource.
+		device->GetDX12Device()->CreateDepthStencilView(
+			mDepthBufferView.Get(),
+			nullptr,
+			DepthStencilView());
+
+		mDepthBufferView->SetName(L"BL - DepthBuffer");
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE blDepthBuffer::DepthStencilView() const

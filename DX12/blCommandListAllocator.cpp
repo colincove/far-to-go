@@ -10,4 +10,9 @@ namespace BoulderLeaf::Graphics::DX12
 			D3D12_COMMAND_LIST_TYPE_DIRECT,
 			IID_PPV_ARGS(&mCommandListAllocator)));
 	}
+
+	void blCommandListAllocator::Reset()
+	{
+		DX12_API_CALL(mCommandListAllocator->Reset());
+	}
 }

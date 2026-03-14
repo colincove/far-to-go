@@ -22,10 +22,8 @@ namespace BoulderLeaf::Graphics
 
 	struct RenderMeshDataInstanced : public RenderData
 	{
-		//CPU data copied to CPU buffer before GPU upload
-		blDataBufferInterfacePtr instanceData;
 		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
-		blDataBufferInterfaceResourcePtr constantBuffer;
+		blStandardObjectConstantsBufferResourcePtr constantBuffer;
 		blMeshBaseResourcePtr mesh;
 		blMaterialResourcePtr material;
 	};

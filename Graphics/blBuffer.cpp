@@ -85,8 +85,7 @@ namespace BoulderLeaf::Graphics
 		size_t elementSize = 0;
 		for (const BufferElementDescription& elementDescription : elementDescriptions)
 		{
-			elementSize = adapter.SizeOfElement(elementDescription.ElementType);
-			elementSize += elementSize;
+			elementSize += adapter.SizeOfElement(elementDescription.ElementType);
 		}
 
 		return elementSize;

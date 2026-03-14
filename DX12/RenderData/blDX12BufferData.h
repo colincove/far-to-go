@@ -7,6 +7,7 @@
 #include <blDX12ResourceDataCache.h>
 #include <blDX12Math.inl>
 #include "../DirectX-Headers/include/directx/d3dx12.h"
+#include <blBufferTypes.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -76,14 +77,17 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blUploadBuffer> uploadBuffer;
 	};
 
-	class blDX12BufferDataCache : public blDX12ResourceDataCache<blDX12BufferData, blDataBufferInterfaceResource>
+	class blDX12BufferDataCache : 
+		//public blDX12ResourceDataCache<blDX12BufferData, blDataBufferInterfaceResource>
+		public blDX12ResourceDataCache<blDX12BufferData, blStandardObjectConstantsBufferResource>
 	{
 	private:
 		std::shared_ptr<blDevice> mDevice;
 	public:
 		blDX12BufferDataCache(std::shared_ptr<blDevice> device);
+	protected:
 		virtual void InitializeCache(
-			const blDataBufferInterfaceResource& resource,
+			const blStandardObjectConstantsBufferResource& resource,
 			blDX12BufferData& cache) override;
 	};
 }

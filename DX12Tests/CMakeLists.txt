@@ -3,6 +3,7 @@ add_executable(
 	DX12Tests.cpp
 	main.cpp
 	Mesh.cpp
+	WorldViewProjection.cpp
 	MockID3D12Device.h
 	MockID3D12GraphicsCommandList.h)
 

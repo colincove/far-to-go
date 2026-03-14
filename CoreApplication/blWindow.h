@@ -4,6 +4,7 @@
 #include <windef.h>
 #include <string>
 #include <functional>
+#include <blMatrix4x4.inl>
 
 namespace BoulderLeaf::Core
 {
@@ -25,5 +26,9 @@ namespace BoulderLeaf::Core
 		LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		int GetWidth() const;
 		int GetHeight() const;
+
+		const Math::Matrix4x4 GetProjectionMatrix() const;
+
+		float AspectRatio() const;
 	};
 }

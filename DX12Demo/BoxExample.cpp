@@ -10,6 +10,7 @@
 #include <string>
 #include <blMesh.h>
 #include <blMeshLibrary.h>
+#include <blDX12Buffer.h>
 
 #include <thread>
 #include <chrono>
@@ -247,7 +248,36 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 	void BoxExample::BuildBoxGeometry()
 	{
+		const blMeshStorage& cubeStorage = Cube().GetStorage();
+
+		const size_t vertexSize = GetBufferElementSize(
+			DX12::BoxExample::MeshVertexDefinition::Description,
+			DX12::DX12BufferAdapter::Get());
+
 		const Mesh mesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(Cube().GetStorage()));
+		
+		Mesh meshBuffer = Mesh(blMeshStorage(
+			cubeStorage.GetHeader().mVertexCount,
+			cubeStorage.GetHeader().mIndexCount,
+			vertexSize
+		));
+
+		blMeshStorage& meshBufferStorage = meshBuffer.GetStorageMutable();
+
+		MarshalBuffer(
+			meshBuffer.GetStorage().GetHeader().mVertexCount,
+			DX12::BoxExample::MeshVertexDefinition::Description,
+			[&cubeStorage](size_t index)
+			{
+				return static_cast<const byte*>(cubeStorage.GetVertex(index));
+			},
+			[&meshBufferStorage](size_t index)
+			{
+				return static_cast<byte*>(meshBufferStorage.GetVertexMutable(index));
+			},
+			DX12::DX12BufferAdapter::Get()
+		);
+
 		const blMeshStorage& storage = mesh.GetStorage();
 		const blMeshStorage::Header& header = storage.GetHeader();
 		
@@ -275,9 +305,9 @@ namespace BoulderLeaf::Graphics::DX12
 		mBoxGeo->VertexByteStride = (UINT) header.mVertexSize;
 		mBoxGeo->VertexBufferByteSize = (UINT) header.GetVertexBufferSize();
 		mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-		mBoxGeo->IndexBufferByteSize = (UINT) header.GetVertexBufferSize();
+		mBoxGeo->IndexBufferByteSize = (UINT) header.GetIndexBufferSize();
 		SubmeshGeometry submesh;
-		submesh.IndexCount = (UINT) storage.GetIndexCount();
+		submesh.IndexCount = (UINT) storage.GetHeader().mVertexCount;
 
 		submesh.StartIndexLocation = 0;
 		submesh.BaseVertexLocation = 0;

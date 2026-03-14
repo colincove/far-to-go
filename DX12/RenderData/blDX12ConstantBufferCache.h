@@ -8,15 +8,18 @@
 #include <blConstantBuffer.h>
 #include <blDX12BufferData.h>
 #include <blConstantBufferDescriptorHeap.h>
+#include <blBufferTypes.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
 	struct blDX12ConstantBufferCacheData
 	{
 		std::shared_ptr<blConstantBuffer> ConstantBuffer;
-	};
-
-	class blDX12ConstantBufferCache : public blDX12ResourceDataCache<blDX12ConstantBufferCacheData, blDataBufferInterfaceResource>
+	}; 
+	
+	class blDX12ConstantBufferCache : 
+		//public blDX12ResourceDataCache<blDX12ConstantBufferCacheData, blDataBufferInterfaceResource>
+		public blDX12ResourceDataCache<blDX12ConstantBufferCacheData, blStandardObjectConstantsBufferResource>
 	{
 	private:
 		std::shared_ptr<blDevice> mDevice;
@@ -28,8 +31,9 @@ namespace BoulderLeaf::Graphics::DX12
 			std::shared_ptr<blConstantBufferDescriptorHeap> cbvHeap,
 			std::shared_ptr<blDX12BufferDataCache> mBufferCache);
 
+	protected:
 		virtual void InitializeCache(
-			const blDataBufferInterfaceResource& resourcePtr,
+			const blStandardObjectConstantsBufferResource& resourcePtr,
 			blDX12ConstantBufferCacheData& cache) override;
 	};
 }

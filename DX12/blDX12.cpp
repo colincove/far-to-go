@@ -6,6 +6,7 @@
 //DirectX
 #include "dxgi1_3.h"
 #include <dxgidebug.h>
+#include <DirectXColors.h>
 
 //Standard
 #include <atldef.h>
@@ -57,7 +58,10 @@ namespace BoulderLeaf::Graphics::DX12
 
 		globalRenderDataRef.swapChain = std::make_shared<blSwapChain>(
 			2,
-			globalRenderDataRef.device);
+			globalRenderDataRef.device,
+			window,
+			globalRenderDataRef.commandQueue,
+			globalRenderDataRef.factory);
 
 		globalRenderDataRef.shaderCache = std::make_shared<blShaderCache>(globalRenderDataRef.device);
 		globalRenderDataRef.meshStorageCache = std::make_shared<blDX12MeshStorageCache>(globalRenderDataRef.device);
@@ -94,35 +98,38 @@ namespace BoulderLeaf::Graphics::DX12
 
 	}
 
-	void blDX12::StartFrame()
+	void blDX12::StartFrameInternal()
 	{
+		// Reuse the memory associated with command recording.
+		// We can only reset when the associated command lists have finished
+		// execution on the GPU.
+		mGlobalRenderDataPtr->commandListAllocator->Reset();
+
 		for (blRenderGroupId group : blRenderGroups::Iterator())
 		{
-			if (IsGroupInitialized(group))
-			{
-				GroupStartFrame(group);
-			}
+			GroupStartFrame(group);
 		}
 
 		for (int i = 0; i < C_ARRAY_COUNT(mRenderComponents); i++)
 		{
 			mRenderComponents[i]->StartFrame();
 		}
+
+		// Clear the back buffer and depth buffer.
+		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = mGlobalRenderDataPtr->depthBuffer->DepthStencilView();
+		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = mGlobalRenderDataPtr->swapChain->CurrentBackBufferView();
 	}
 
-	void blDX12::EndFrame()
+	void blDX12::EndFrameInternal()
 	{
 		std::vector<ID3D12CommandList*> cmdsLists;
 		cmdsLists.reserve(blRenderGroups::GetCount());
 
 		for (blRenderGroupId group : blRenderGroups::Iterator())
 		{
-			if (IsGroupInitialized(group))
-			{
-				GroupEndFrame(group);		
-				blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
-				cmdsLists.push_back(groupData.commandList->GetCommandListPtr().Get());
-			}
+			GroupEndFrame(group);	
+			blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
+			cmdsLists.push_back(groupData.commandList->GetCommandListPtr().Get());
 		}
 
 		mGlobalRenderDataPtr->commandQueue->GetDX12CommandQueue()->ExecuteCommandLists(
@@ -144,7 +151,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mMeshInstancedRenderComponent.Render(renderData, scene);
 	}
 
-	void blDX12::InitializeGroup(const blRenderGroupId& group)
+	void blDX12::InitializeGroupInternal(const blRenderGroupId& group)
 	{
 		blRenderGroupData& dx12GroupData = mGlobalRenderDataPtr->renderGroupData[group];
 		BoulderLeaf::Graphics::blRenderGroupData groupData = blRenderGroups::GetRenderGroupData(group);
@@ -155,18 +162,73 @@ namespace BoulderLeaf::Graphics::DX12
 			dx12GroupData.commandList,
 			mGlobalRenderDataPtr->meshStorageCache);
 
-		GroupStartFrame(group);
+		ComPtr<ID3D12GraphicsCommandList> commandList = dx12GroupData.commandList->GetCommandListPtr();
+
+
+		//When should I do this? it was not in the example
+		//You cannot call Reset unless it is in a closed state
+		DX12_API_CALL(commandList->Close());
+		DX12_API_CALL(commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr));
+	}
+
+	void blDX12::InitializeBegin()
+	{
+
+	}
+
+	void blDX12::InitializeFinish()
+	{
+		// Execute the initialization commands.
+		//m_dx12->mCommandList->Close(); //I am assuming that I don't need to do this, beause I am doing it above. 
+		std::vector<ID3D12CommandList*> cmdsLists;
+		cmdsLists.reserve(blRenderGroups::GetCount());
+
+		for (blRenderGroupId group : blRenderGroups::Iterator())
+		{
+			blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
+
+			//again. Why do do Need to do this? I got an error.
+			//Command lists must be closed before execution.
+			groupData.commandList->GetCommandListPtr()->Close();
+			cmdsLists.push_back(groupData.commandList->GetCommandListPtr().Get());
+		}
+
+		mGlobalRenderDataPtr->commandQueue->GetDX12CommandQueue()->ExecuteCommandLists(
+			static_cast<UINT>(cmdsLists.size()),
+			reinterpret_cast<ID3D12CommandList* const*>(cmdsLists.data()) // will this work? took it from LLM. 
+		);
+
+		// Wait until initialization is complete.
+		FlushCommandQueue();
 	}
 
 	void blDX12::GroupStartFrame(blRenderGroupId group)
 	{
 		blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
 		ComPtr<ID3D12GraphicsCommandList> commandList = groupData.commandList->GetCommandListPtr();
-		commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr);
+
+		// passing mCurrentPSO is garbage here. I am just trying to debug why the Input Assembler stage does 
+		// not have the correct geometry in it. 
+		commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), 
+			mGlobalRenderDataPtr->mCurrentPSO ? mGlobalRenderDataPtr->mCurrentPSO->GetDX12PSO().Get() : nullptr);
 
 		//TODO make sure we are setting up viewPort correctly. 
 		commandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
 		commandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
+
+		// Indicate a state transition on the resource usage.
+		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
+		CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		commandList->ResourceBarrier(1, &resourceBarrier);
+
+		//intresting. if I have multiple command lists, do I need to clear the render target view for each one? That does not sound right. 
+		//maybe you are only supposed to do this for your primary command list?
+		commandList->ClearRenderTargetView(mGlobalRenderDataPtr->swapChain->CurrentBackBufferView(),
+			Colors::LightSteelBlue, 0, nullptr);
+		commandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+			1.0f, 0, 0, nullptr);
 	}
 
 	void blDX12::GroupEndFrame(blRenderGroupId group)

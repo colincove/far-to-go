@@ -34,7 +34,6 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blSwapChain> swapChain;
 		std::shared_ptr<blShaderCache> shaderCache;
 		std::shared_ptr<blDX12MeshStorageCache> meshStorageCache;
-		std::shared_ptr<blDX12MeshDataDeviceCache> meshDataDeviceCache;
 		std::shared_ptr<blDX12ConstantBufferCache> constantBufferCache;
 		std::shared_ptr<blDX12BufferDataCache> bufferCache;
 		std::shared_ptr<blPSOCache> mPSOCache;
