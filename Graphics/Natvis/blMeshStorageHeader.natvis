@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="BoulderLeaf::Graphics::blMeshStorage">
+		<Intrinsic Name="bufferPtr" Expression="mBuffer._Mypair._Myval2" />
+		<Intrinsic Name="headerPtr" Expression="(BoulderLeaf::Graphics::blMeshStorage::Header*) bufferPtr()" />
+		<Intrinsic Name="vertexSize" Expression="sizeof(BoulderLeaf::Graphics::StandardVertex)" />
+		<Intrinsic Name="headerRegionSize" Expression="sizeof(BoulderLeaf::Graphics::blMeshStorage::Header)" />
+		<Intrinsic Name="indexBufferRegionSize" Expression="sizeof(BoulderLeaf::Graphics::blMeshStorage::index) * headerPtr()->mIndexCount" />
+		<DisplayString>{mBuffer._Mypair._Myval2}</DisplayString>
+		<Expand>
+			<Synthetic Name="Header">
+				<Expand>
+					<Item Name="HeaderRegionSize">headerRegionSize()</Item>
+					<Item Name="Header">headerPtr()</Item>
+				</Expand>
+			</Synthetic>
+			<Synthetic Name="Vertex Array">
+				<DisplayString>{headerPtr()->mVertexCount}</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>headerPtr()->mVertexCount</Size>
+						<ValuePointer>(BoulderLeaf::Graphics::StandardVertex*) ((byte*) bufferPtr() + headerRegionSize() + indexBufferRegionSize())</ValuePointer>
+						<ValuePointer>(BoulderLeaf::Graphics::StandardVertex*) (bufferPtr() + headerRegionSize())</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
+			<Synthetic Name="Index Array">
+				<DisplayString>{headerPtr()->mIndexCount}</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>headerPtr()->mIndexCount</Size>
+						<ValuePointer>(BoulderLeaf::Graphics::blMeshStorage::index*)((byte*) bufferPtr() + headerRegionSize())</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+</AutoVisualizer>

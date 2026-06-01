@@ -32,20 +32,23 @@ namespace BoulderLeaf::Metrics
 
         std::wstring newestVersionFound;
 
-        for (auto const& directory_entry : std::filesystem::directory_iterator(pixInstallationPath))
+        if (std::filesystem::exists(pixInstallationPath))
         {
-            if (directory_entry.is_directory())
+            for (auto const& directory_entry : std::filesystem::directory_iterator(pixInstallationPath))
             {
-                if (newestVersionFound.empty() || newestVersionFound < directory_entry.path().filename().c_str())
+                if (directory_entry.is_directory())
                 {
-                    newestVersionFound = directory_entry.path().filename().c_str();
+                    if (newestVersionFound.empty() || newestVersionFound < directory_entry.path().filename().c_str())
+                    {
+                        newestVersionFound = directory_entry.path().filename().c_str();
+                    }
                 }
             }
         }
 
         if (newestVersionFound.empty())
         {
-            // TODO: Error, no PIX installation found
+            return L"";
         }
 
         return pixInstallationPath / newestVersionFound / L"WinPixGpuCapturer.dll";
@@ -55,12 +58,15 @@ namespace BoulderLeaf::Metrics
     {
         // Check to see if a copy of WinPixGpuCapturer.dll has already been injected into the application.
         // This may happen if the application is launched through the PIX UI. 
-        auto didLoaBeforedPix = GetModuleHandle("WinPixGpuCapturer.dll");
         if (GetModuleHandle("WinPixGpuCapturer.dll") == 0)
         {
-            auto path = GetLatestWinPixGpuCapturerPath();
-            auto charArray = wide_to_char(path.c_str());
-            LoadLibrary(charArray.get());
+            std::wstring path = GetLatestWinPixGpuCapturerPath();
+
+            if (!path.empty())
+            {
+                auto charArray = wide_to_char(path.c_str());
+                LoadLibrary(charArray.get());
+            }
         }
 
         return GetModuleHandle("WinPixGpuCapturer.dll");

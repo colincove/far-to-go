@@ -17,6 +17,7 @@ namespace BoulderLeaf::Graphics
 
 	void blResourceManager::ReleaseResource(const blResourceId& id)
 	{
+		mResourceMap.erase(id);
 		mReleasedResourceIds.insert(id);
 	}
 

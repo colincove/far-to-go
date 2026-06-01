@@ -1,6 +1,26 @@
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
+#CMake Error at MetricsTests/CMakeLists.txt:7 (target_link_libraries):
+# Target "MetricsTests" links to:
+
+#  GTest::gtest
+#but the target was not found.  Possible reasons include:
+
+# * There is a typo in the target name.
+#* A find_package call is missing for an IMPORTED target.
+# * An ALIAS target is missing.
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        v1.14.0 # Use a specific release tag
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 # after adding bullet3 physics, there was a compile error. These errors involved using tuple from the TR1 (Technical Report 1) namespace
 # the tuple class was included in cXX11, so we want the standard 'std' namespace version.
 # optionally, defining _HAS_TR1_NAMESPACE also resolved the issue, as it includes the TR1 namespace in the compilation. SSS

@@ -15,7 +15,6 @@
 
 //Standard
 #include <iostream>
-#include <atlstr.h>
 #include <assert.h>
 
 namespace

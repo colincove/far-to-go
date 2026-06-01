@@ -45,6 +45,9 @@ namespace BoulderLeaf::Graphics
 		const blMeshStorage::Header& header = mesh.GetStorage().GetHeader();
 		const blMeshStorage::Header& vertexHeader = mesh.GetStorage().GetHeader();
 
+		std::vector<int> testVector;
+		testVector.emplace_back(1);
+
 		EXPECT_EQ(header.mIndexCount, vertexHeader.mIndexCount);
 		EXPECT_EQ(header.mVertexCount, vertexHeader.mVertexCount);
 

@@ -41,7 +41,8 @@ add_library(
 	Resources/blResource.cpp
 	Resources/blResource.h
 	Resources/blMeshResource.cpp
-	Resources/blMeshResource.h)
+	Resources/blMeshResource.h
+	Natvis/blMeshStorageHeader.natvis)
 
 target_include_directories(Graphics
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -85,6 +86,11 @@ source_group("Resources/Source Files"
 	Resources/blResourceManager.cpp
 	Resources/blResource.cpp
 	Resources/blMeshResource.cpp)
+
+source_group("Natvis"
+	FILES 
+	Natvis/blMeshStorageHeader.natvis)
+
 #source_group("RenderItems/Sources Files" ./RenderItems)
 
 #after adding the include #include <windef.h> I started to get this compile error

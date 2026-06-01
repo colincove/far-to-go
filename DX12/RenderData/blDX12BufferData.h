@@ -85,6 +85,7 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blDevice> mDevice;
 	public:
 		blDX12BufferDataCache(std::shared_ptr<blDevice> device);
+		virtual void UpdateCache(const blResourceId& resourceId) override;
 	protected:
 		virtual void InitializeCache(
 			const blStandardObjectConstantsBufferResource& resource,

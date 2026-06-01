@@ -11,18 +11,17 @@
 
 //Standard
 #include <iostream>
-#include <atlstr.h>
 #include <assert.h>
 
 namespace BoulderLeaf::Graphics::DX12::Test
 {
 	namespace
 	{
-		const CString ctab = "    ";
+		const std::wstring ctab = L"    ";
 
-		CString CreateTabs(const unsigned int indentation)
+		std::wstring CreateTabs(const unsigned int indentation)
 		{
-			CString result;
+			std::wstring result;
 
 			for (unsigned int i = 0; i < indentation; ++i)
 			{
@@ -32,7 +31,7 @@ namespace BoulderLeaf::Graphics::DX12::Test
 			return result;
 		}
 		
-		const CString ctabs[5]
+		const std::wstring ctabs[5]
 		{
 			CreateTabs(0),
 			CreateTabs(1),
@@ -60,7 +59,7 @@ namespace BoulderLeaf::Graphics::DX12::Test
 			DXGI_ADAPTER_DESC desc;
 			adapter->GetDesc(&desc);
 
-			std::cout << "Adapter: " << CString(desc.Description) << "\n";
+			std::wcout << "Adapter: " << desc.Description << "\n";
 			LogAdapterOutputs(adapter);
 			adapterList.push_back(adapter);
 			++i;
@@ -78,7 +77,7 @@ namespace BoulderLeaf::Graphics::DX12::Test
 			{
 				DXGI_OUTPUT_DESC desc;
 				output->GetDesc(&desc);
-				std::cout << ctabs[1] << "Ouput: " << CString(desc.DeviceName) << "\n";
+				std::wcout << ctabs[1] << "Ouput: " << std::wstring(desc.DeviceName) << "\n";
 				LogOutputDisplayModes(output, DXGI_FORMAT_B8G8R8A8_UNORM);
 				++i;
 			}
@@ -100,9 +99,9 @@ namespace BoulderLeaf::Graphics::DX12::Test
 				UINT n = mode.RefreshRate.Numerator;
 				UINT d = mode.RefreshRate.Denominator;
 
-				std::cout << ctabs[2] << "Width: " << mode.Width << "\n";
-				std::cout << ctabs[2] << "Heght: " << mode.Height << "\n";
-				std::cout << ctabs[2] << "RefreshRate: " << n << "/" << d << "\n";
+				std::wcout << ctabs[2] << "Width: " << mode.Width << "\n";
+				std::wcout << ctabs[2] << "Heght: " << mode.Height << "\n";
+				std::wcout << ctabs[2] << "RefreshRate: " << n << "/" << d << "\n";
 			}
 		}
 

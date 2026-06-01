@@ -495,7 +495,7 @@ namespace BoulderLeaf::Math::Test
 			0.00000000f, 0.00000000f, 0.00000000f, 1.00000000f
 		);
 
-		const Matrix4x4 Result = Matrix4x4::LookAt(pos, target, up);
+		const Matrix4x4 Result = Matrix4x4::LookAtRH(pos, target, up);
 
 		EXPECT_TRUE(NearEqual(ViewExpected, Result));
 	}

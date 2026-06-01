@@ -7,4 +7,4 @@ else
     mkdir build
 }
 
-cmake -G "Visual Studio 17 2022" .\build
+cmake -G "Visual Studio 18 2026" .\build

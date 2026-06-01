@@ -49,24 +49,31 @@ namespace BoulderLeaf::Graphics
 	void blDemoScene01::Update()
 	{
 		using namespace Math;
-		mTheta += 0.05f;
-		mPhi += 0.05f;
+		mTheta += 0.005f;
+		mPhi += 0.005f;
 		// Convert Spherical to Cartesian coordinates.
 		float x = mRadius * sinf(mPhi) * cosf(mTheta);
 		float z = mRadius * sinf(mPhi) * sinf(mTheta);
 		float y = mRadius * cosf(mPhi);
 
 		Vector4 pos = Vector4(x, y, z, 1.0f);
-		Vector4 target = Vector4(0, 0, 0, 0);
+
+
+		//Vector4 pos = Vector4::Point3D(5, 2, 2);
+		Vector4 target = Vector4::Zero();
 		Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 		
-		//TODO
-		//XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
-		Matrix4x4 view = Matrix4x4::LookAt(pos, target, up);
+		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(2, 0, 0);
+		const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up) * translate;
+		const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
+		const Matrix4x4 proj = mCamera.GetProjectionMatrix();
+		const Matrix4x4 worldViewProj = world * view * proj;
 
-		Matrix4x4 world = Matrix4x4::Identity();
-		Matrix4x4 proj = mCamera.GetProjectionMatrix();
-		Matrix4x4 worldViewProj = world * view * proj;
+		//TODO
+		//we currently do not update constant buffer resources. So it does not change. 
+
+		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
+		mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
 	}
 }

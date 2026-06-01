@@ -52,13 +52,26 @@ namespace BoulderLeaf::Graphics
 		DataBuffer
 	};
 
+	class blResourceBase
+	{
+	protected:
+		blResourceId mId;
+	public:
+		blResourceBase(blResourceId id) :mId(id) {}
+		const blResourceId& GetId() const
+		{
+			return mId;
+		}
+	};
+
+	using blResourceBasePtr = std::shared_ptr<blResourceBase>;
+
 	template<typename TData, eResourceType TType>
-	class blResource
+	class blResource : public blResourceBase
 	{
 		friend class blResourceManager;
 	private:
 		TData mData;
-		blResourceId mId;
 	public:
 		using DataType = TData;
 		constexpr static eResourceType ResourceType = TType;
@@ -66,12 +79,12 @@ namespace BoulderLeaf::Graphics
 
 		template<class... Types>
 		blResource(blResourceId id, Types... args) : mData(std::forward<Types>(args)...),
-			mId(id)
+			blResourceBase(id)
 		{
 		}
 
-		blResource(blResourceId id, const TData& data) : mData(data), mId(id){}
-		blResource(blResourceId id, TData&& data) : mData(std::move(data)), mId(id) {}
+		blResource(blResourceId id, const TData& data) : mData(data), blResourceBase(id) {}
+		blResource(blResourceId id, TData&& data) : mData(std::move(data)), blResourceBase(id) {}
 	public:
 		const TData& GetData() const
 		{
@@ -81,12 +94,6 @@ namespace BoulderLeaf::Graphics
 		TData& GetDataMutable()
 		{
 			return mData;
-		}
-
-	public:
-		const blResourceId& GetId() const
-		{
-			return mId;
 		}
 	};
 

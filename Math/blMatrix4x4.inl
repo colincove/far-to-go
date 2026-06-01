@@ -53,10 +53,10 @@ namespace BoulderLeaf::Math
 
 			struct
 			{
-				RowVector c0;
-				RowVector c1;
-				RowVector c2;
-				RowVector c3;
+				RowVector r0;
+				RowVector r1;
+				RowVector r2;
+				RowVector r3;
 			};
 		};
 
@@ -68,6 +68,12 @@ namespace BoulderLeaf::Math
 			m10(m10), m11(m11), m12(m12), m13(m13),
 			m20(m20), m21(m21), m22(m22), m23(m23),
 			m30(m30), m31(m31), m32(m32), m33(m33)
+		{
+
+		}
+
+		constexpr Matrix4x4(RowVector r0, RowVector r1, RowVector r2, RowVector r3)
+			: r0(r0), r1(r1), r2(r2), r3(r3)
 		{
 
 		}
@@ -270,24 +276,57 @@ namespace BoulderLeaf::Math
 			return vector * matrix;
 		}
 
-		static inline Matrix4x4 LookTo(const Vector4& from, const Vector4& dir, const Vector4& arbitraryUp)
+		static inline Matrix4x4 LookToRH(const Vector4& from, const Vector4& dir, const Vector4& arbitraryUp)
 		{
-			/*Vector4 forward = (from - to).Normalize();
-			Vector4 right = arbitraryUp.Cross(forward).Normalize();
-			Vector4 up = forward.Cross(right);
-
-			return Matrix4x4(right.x, right.y, right.z, right.w,
-				up.x, up.y, up.z, up.w,
-				forward.x, forward.y, forward.z, forward.w,
-				from.x, from.y, from.z, from.w);*/
-			return Matrix4x4::Identity();
+			//TODO: Test. Verify. 
+			return LookAtRH(from, from + dir, arbitraryUp);
 		}
 
-		static inline Matrix4x4 LookAt(const Vector4& from, const Vector4& to, const Vector4& arbitraryUp)
+		static inline Matrix4x4 LookToLH(const Vector4& from, const Vector4& dir, const Vector4& arbitraryUp)
 		{
-			//XMVECTOR EyeDirection = XMVectorSubtract(FocusPosition, EyePosition);
-			//return XMMatrixLookToLH(EyePosition, EyeDirection, UpDirection);
-			return Matrix4x4::Identity();
+			//TODO: Test. Verify. 
+			return LookAtLH(from, from + dir, arbitraryUp);
+		}
+
+		static inline Matrix4x4 LookAtLH(const Vector4& from, const Vector4& to, const Vector4& arbitraryUp)
+		{
+            // Match DirectXMath XMMatrixLookAtRH for a right-handed, row-major view matrix.
+			// zaxis = normalize(eye - focus) for RH; xaxis = normalize(cross(up, zaxis)); yaxis = cross(zaxis, xaxis)
+			const Vector4 forward = (to - from).Normalize(); // forward from camera into scene
+			const Vector4 right = arbitraryUp.Cross(forward).Normalize(); // right
+			const Vector4 up = forward.Cross(right); // up
+
+			return Matrix4x4(
+				right.x, right.y, right.z, 0,
+				up.x, up.y, up.z, 0,
+				forward.x, forward.y, forward.z, 0,
+				-right.Dot(from), -up.Dot(from), -forward.Dot(from), 1);
+		}
+
+		static inline Matrix4x4 LookAtRH(const Vector4& from, const Vector4& to, const Vector4& arbitraryUp)
+		{
+			// Match DirectXMath XMMatrixLookAtRH for a right-handed, row-major view matrix.
+			// zaxis = normalize(eye - focus) for RH; xaxis = normalize(cross(up, zaxis)); yaxis = cross(zaxis, xaxis)
+			const Vector4 forward = (from - to).Normalize(); // forward from camera into scene
+			const Vector4 right = arbitraryUp.Cross(forward).Normalize() * -1; // right
+			const Vector4 up = forward.Cross(right); // up
+
+			return Matrix4x4(
+				right.x, right.y, right.z, 0,
+				up.x, up.y, up.z, 0,
+				forward.x, forward.y, forward.z, 0,
+				-right.Dot(from), -up.Dot(from), -forward.Dot(from), 1);
+		}
+
+		static inline Matrix4x4 ViewMatrix(const Vector4& from, const Vector4& to, const Vector4& arbitraryUp)
+		{
+			//https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/lookat-function/framing-lookat-function.html
+			//This method does not calculate the camera-to-world matrix, but rather the world-to-camera matrix—its inverse. Typically, this matrix is desired in programs that use real-time graphics APIs; it is often referred to as the view matrix. It is used in the vertex shader to transform vertices from world space to camera space. Therefore, using this method to directly obtain the world-to-camera matrix can be more convenient than the method provided above, which yields the camera-to-world matrix instead.
+			//TLDR: LookAt makes logical sense and is easier to understand, but ViewMatrix is more directly useful for graphics programming. Both are valid and can be used based on preference and context.
+			const Matrix4x4 lookAtMatrix = LookAtLH(from, to, arbitraryUp); // Camera to world
+			const Matrix4x4 lookAtMatrixInverse = lookAtMatrix.Inverse();
+			return Matrix4x4(lookAtMatrixInverse.r0, lookAtMatrixInverse.r1, lookAtMatrixInverse.r2, lookAtMatrix.r3); //world to camera
+			 // Invert the LookAt matrix to get the view matrix (world to camera)
 		}
 	};
 

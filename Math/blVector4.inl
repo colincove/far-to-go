@@ -109,6 +109,11 @@ namespace BoulderLeaf::Math
 		{
 			return Point3D(vector.x, vector.y, vector.z);
 		}
+
+		static inline Vector4 Zero()
+		{
+			return Vector4(0, 0, 0, 0);
+		}
  	};
 
 

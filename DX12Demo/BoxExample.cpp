@@ -85,14 +85,15 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void BoxExample::Update(const Metrics::blTime& gameTime)
 	{
-		mTheta += 0.05f;
-		mPhi += 0.05f;
+		mTheta += 0.0005f;
+		mPhi += 0.0005f;
 		// Convert Spherical to Cartesian coordinates.
 		float x = mRadius * sinf(mPhi) * cosf(mTheta);
 		float z = mRadius * sinf(mPhi) * sinf(mTheta);
 		float y = mRadius * cosf(mPhi);
 		// Build the view matrix.
 		XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
+		//XMVECTOR pos = XMVectorSet(1, 1, 1, 1.0f);
 		XMVECTOR target = XMVectorZero();
 		XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
@@ -307,7 +308,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mBoxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
 		mBoxGeo->IndexBufferByteSize = (UINT) header.GetIndexBufferSize();
 		SubmeshGeometry submesh;
-		submesh.IndexCount = (UINT) storage.GetHeader().mVertexCount;
+		submesh.IndexCount = (UINT) storage.GetHeader().mIndexCount;
 
 		submesh.StartIndexLocation = 0;
 		submesh.BaseVertexLocation = 0;

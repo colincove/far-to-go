@@ -10,6 +10,7 @@
 #include <blWindow.h>
 #include <blSwapChain.h>
 #include <map>
+#include <set>
 #include <blRenderScene.h>
 #include <blRenderSceneContext.h>
 #include <blGlobalRenderData.h>
@@ -34,8 +35,11 @@ namespace BoulderLeaf::Graphics::DX12
 			&mMeshRenderComponent , 
 			&mMeshInstancedRenderComponent 
 		};
+
+		std::set<blResourceId> mDirtyResources;
 	private:
 		std::shared_ptr<blGlobalRenderData> mGlobalRenderDataPtr;
+		std::vector<std::shared_ptr<blDX12ResourceCacheBase>> mResourceCaches;
 		std::shared_ptr<Core::blWindow> mWindow;
 		std::map<blSceneResource, blRenderSceneContext> mSceneContextMap;
 		UINT64 mCurrentFence;
@@ -44,6 +48,7 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual void InitializeFinish() override;
 		virtual void DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene) override;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
+		virtual void MarkResourceDirty(const blResourceId resourceId) override;
 	public:
 		blDX12(std::shared_ptr<Core::blWindow> window);
 		~blDX12();

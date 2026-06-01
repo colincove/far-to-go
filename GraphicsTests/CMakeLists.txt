@@ -12,7 +12,7 @@ target_link_libraries(
 	GTest::gtest
 	GTest::gtest_main
 )
-
+add_compile_definitions(Debug=1)
 install(TARGETS GraphicsTests CONFIGURATIONS Debug DESTINATION Debug)
 
 gtest_add_tests(

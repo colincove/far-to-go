@@ -24,6 +24,7 @@ namespace BoulderLeaf::Graphics
 		blStandardObjectConstantsBufferResourcePtr mObjectConstantBufferResource;
 		blStandardObjectConstantsBufferPtr mInstanceDataResource;
 		RenderMeshDataInstanced mDrawData;
+		Math::Matrix4x4 mWorld = Matrix4x4::Identity();
 	private:
 		float mTheta;
 		float mPhi;

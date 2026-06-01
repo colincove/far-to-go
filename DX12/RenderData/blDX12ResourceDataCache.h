@@ -13,17 +13,29 @@ namespace BoulderLeaf::Graphics::DX12
 		// Add other common cache data members here
 	};
 
+	class blDX12ResourceCacheBase
+	{
+	public:
+		blDX12ResourceCacheBase();
+		virtual void UpdateCache(const blResourceId& resourceId) {};
+	private:
+		std::vector<blResourceCacheData> mCacheMetaData;
+	public:
+		bool IsCacheInitialized(const blResourceId id) const;
+	protected:
+		void SetCacheInitialized(const blResourceId id, bool value);
+	};
+
 	template<typename TCacheData, typename TResource>
-	class blDX12ResourceDataCache
+	class blDX12ResourceDataCache: public blDX12ResourceCacheBase
 	{
 	public:
 		constexpr static eResourceType ResourceType = TResource::ResourceType;
 	private:
 		std::vector<TCacheData> mCache;
-		std::vector<blResourceCacheData> mCacheMetaData;
 	public:
 		blDX12ResourceDataCache()
-			:mCache(), mCacheMetaData()
+			:blDX12ResourceCacheBase(), mCache()
 		{
 
 		}
@@ -32,21 +44,26 @@ namespace BoulderLeaf::Graphics::DX12
 		{
 			const blResourceId id = resource.GetId();
 
+			TCacheData& cache = GetByIdNoInit(id);
+
+			if (!IsCacheInitialized(id))
+			{
+				InitializeCache(resource, cache);
+				SetCacheInitialized(id, true);
+			}
+
+			return cache;
+		}
+
+		// TODO: this function sucks. this cache interface sucks
+		TCacheData& GetByIdNoInit(const blResourceId id)
+		{
 			if (mCache.size() <= id.GetRaw())
 			{
 				mCache.resize(id.GetRaw() + 1);
-				mCacheMetaData.resize(id.GetRaw() + 1);
 			}
 
 			TCacheData& cache = mCache[id.GetRaw()];
-			blResourceCacheData& metaData = mCacheMetaData[id.GetRaw()];
-
-			if (!metaData.Initialized)
-			{
-				InitializeCache(resource, cache);
-				metaData.Initialized = true;
-			}
-
 			return cache;
 		}
 	protected:

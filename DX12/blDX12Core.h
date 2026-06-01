@@ -5,7 +5,7 @@
 
 #include <wrl.h>
 #include <assert.h>
-#include <atldef.h>
+//#include <atldef.h>
 #include <dxgiformat.h>
 #include <blImageFormat.h>
 #include <blGraphicsCore.h>

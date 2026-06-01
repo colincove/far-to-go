@@ -9,7 +9,6 @@
 #include <DirectXColors.h>
 
 //Standard
-#include <atldef.h>
 #include <assert.h>
 
 namespace BoulderLeaf::Graphics::DX12
@@ -79,6 +78,14 @@ namespace BoulderLeaf::Graphics::DX12
 			globalRenderDataRef.constantBufferDescriptorHeap,
 			globalRenderDataRef.bufferCache);
 
+		mResourceCaches = {
+			globalRenderDataRef.shaderCache,
+			globalRenderDataRef.meshStorageCache,
+			globalRenderDataRef.constantBufferCache,
+			globalRenderDataRef.bufferCache,
+			globalRenderDataRef.mPSOCache
+		};
+
 		// Wait until initialization is complete.
 		FlushCommandQueue();
 	}
@@ -100,6 +107,20 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blDX12::StartFrameInternal()
 	{
+		// TODO: We can optimize this by only updating the caches that are associated with the dirty resources.
+		for (std::shared_ptr<blDX12ResourceCacheBase> cache : mResourceCaches)
+		{
+			for (blResourceId resourceId : mDirtyResources)
+			{
+				if (cache->IsCacheInitialized(resourceId))
+				{
+					cache->UpdateCache(resourceId);
+				}
+			}
+		}
+
+		mDirtyResources.clear();
+
 		// Reuse the memory associated with command recording.
 		// We can only reset when the associated command lists have finished
 		// execution on the GPU.
@@ -149,6 +170,11 @@ namespace BoulderLeaf::Graphics::DX12
 	void blDX12::DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene)
 	{
 		mMeshInstancedRenderComponent.Render(renderData, scene);
+	}
+
+	void blDX12::MarkResourceDirty(const blResourceId resourceId)
+	{
+		mDirtyResources.insert(resourceId);
 	}
 
 	void blDX12::InitializeGroupInternal(const blRenderGroupId& group)
