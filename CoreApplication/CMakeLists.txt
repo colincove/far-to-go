@@ -3,7 +3,10 @@ add_library(
 	blGameLoop.h
 	blGameLoop.cpp
 	blWindow.h
-	blWindow.cpp)
+	blWindow.cpp
+	blConfig.h
+	blConfig.cpp
+	CoreApplicationFunctions.cmake)
 
 set_target_properties(CoreApplication PROPERTIES LINKER_LANGUAGE CXX)
 

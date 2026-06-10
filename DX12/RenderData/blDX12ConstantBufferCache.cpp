@@ -13,6 +13,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	}
 
+	//TODO: Why is this data specific to standard object constants? I want to be able to use this for any type of constant buffer.
 	void blDX12ConstantBufferCache::InitializeCache(
 		const blStandardObjectConstantsBufferResource& resource,
 		blDX12ConstantBufferCacheData& cache)
@@ -27,7 +28,10 @@ namespace BoulderLeaf::Graphics::DX12
 		cbAddress += boxCBufIndex * objCBByteSize;
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 		cbvDesc.BufferLocation = cbAddress;
-		cbvDesc.SizeInBytes = Math::CalcConstantBufferByteSize(static_cast<UINT>(bufferData.dataBuffer.GetElementSize()));
+		cbvDesc.SizeInBytes = Math::CalcConstantBufferByteSize(static_cast<UINT>(bufferData.dataBuffer.GetElementSize()))
+			//I added this trying to understand why I was not getting more then 
+			//1 element in my constance buffer. DId not work?
+			* resource.GetData().Count();
 		mDevice->GetDX12Device()->CreateConstantBufferView(
 			&cbvDesc,
 			mCbvHeap->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());

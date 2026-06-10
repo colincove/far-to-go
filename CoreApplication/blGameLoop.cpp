@@ -13,11 +13,19 @@ namespace BoulderLeaf::Core
 	{
 		MSG msg = { };
 		Metrics::blTime gameTime;
+		bool isFirstTick = true;
 
 		assert(callbacks.ShouldContinue && "Must provide a valid ShouldContinue callback");
 		while (callbacks.ShouldContinue())
 		{
-			gameTime = gameTime.NewTick();
+			if (isFirstTick)
+			{
+				isFirstTick = false;
+			}
+			else
+			{
+				gameTime = gameTime.NewTick();
+			}
 
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
 			{

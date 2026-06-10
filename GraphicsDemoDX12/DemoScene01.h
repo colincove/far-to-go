@@ -10,6 +10,7 @@
 #include <blBufferTypes.h>
 #include <blVirtualCamera.h>
 #include <blWindow.h>
+#include <blTime.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -29,12 +30,10 @@ namespace BoulderLeaf::Graphics
 		float mTheta;
 		float mPhi;
 		float mRadius = 5.0f;
-		//XMFLOAT4X4 mWorld = XMFLOAT4X4_Identity();
-		//XMFLOAT4X4 mView = XMFLOAT4X4_Identity();
 		VirtualCamera mCamera;
 	public:
 		blDemoScene01(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window);
 		void Draw();
-		void Update();
+		void Update(Metrics::blTime& gameTime);
 	};
 }

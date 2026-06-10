@@ -34,13 +34,16 @@ namespace BoulderLeaf::Graphics
 		}
 
 	private:
-		blResourceId(size_t id) : mId(id), mInitialized(true) {}
+		blResourceId(size_t id) : blResourceId(id, true){}
+		blResourceId(size_t id, bool initialized) : mId(id), mInitialized(initialized) {}
 	private:
 		size_t mId;
 		bool mInitialized;
 	public:
 		size_t GetRaw() const { return mId; }
 		bool IsValid() const { return mInitialized; }
+
+		static blResourceId Invalid;
 	};
 
 	enum class eResourceType
@@ -49,7 +52,8 @@ namespace BoulderLeaf::Graphics
 		Mesh,
 		Shader,
 		Material,
-		DataBuffer
+		DataBuffer,
+		Count
 	};
 
 	class blResourceBase

@@ -29,25 +29,21 @@ namespace BoulderLeaf::Graphics::DX12
 			static_cast<UINT>(resource.GetData().Count()),
 			true);
 
-		cache.uploadBuffer->CopyData(0, cache.dataBuffer.Get(0));
+		cache.uploadBuffer->CopyInstanedData(0, resource.GetData().Count(), cache.dataBuffer.Get(0));
 	}
 
 	void blDX12BufferDataCache::UpdateCache(const blResourceId& resourceId)
 	{
-		//TODO: UpdateCache needs to take the actual resource data. In order to update the data. You dummy. 
-		//cache.dataBuffer = blBasicDataBuffer(
-		//	reinterpret_cast<const blDataBufferInterface&>(resource.GetData()),
-		//	DX12::DX12BufferAdapter::Get());
-
 		blDX12BufferData& cache = GetByIdNoInit(resourceId);
 
-		const blResourcePtr<blStandardObjectConstantsBufferResource> resourcePtr = blResourceManager::Get()
+		const blStandardObjectConstantsBufferResourcePtr resourcePtr = blResourceManager::Get()
 			.GetResource<blStandardObjectConstantsBufferResource>(resourceId);
 
 		cache.dataBuffer = blBasicDataBuffer(
 			reinterpret_cast<const blDataBufferInterface&>(resourcePtr->GetData()),
 			DX12::DX12BufferAdapter::Get());
 
-		cache.uploadBuffer->CopyData(0, cache.dataBuffer.Get(0));
+		cache.uploadBuffer->CopyInstanedData(0, resourcePtr->GetData().Count(), cache.dataBuffer.Get(0));
+		//cache.uploadBuffer->CopyData(0, cache.dataBuffer.Get(0));
 	}
 }

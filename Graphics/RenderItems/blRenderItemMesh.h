@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <RenderItems/blRenderItem.h>
+#include <blCompositeMesh.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -25,6 +26,14 @@ namespace BoulderLeaf::Graphics
 		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
 		blStandardObjectConstantsBufferResourcePtr constantBuffer;
 		blMeshBaseResourcePtr mesh;
+		blMaterialResourcePtr material;
+	};
+
+	struct RenderCompositeMeshDataInstanced : public RenderData
+	{
+		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
+		blStandardObjectConstantsBufferResourcePtr constantBuffer;
+		blCompositeMeshResourcePtr compositeMesh;
 		blMaterialResourcePtr material;
 	};
 }

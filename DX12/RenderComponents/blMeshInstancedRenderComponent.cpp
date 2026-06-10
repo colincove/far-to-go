@@ -26,6 +26,7 @@ namespace BoulderLeaf::Graphics::DX12
 		globalRenderData.mCurrentPSO = psoCacheData.PSO;
 
 		// Do I not do anything with this data? How do constant buffers get bound? I'm confused. 
+		//TODO: Why is this data specific to standard object constants? I want to be able to use this for any type of constant buffer.
 		const blDX12ConstantBufferCacheData& constantBufferCache = globalRenderData.constantBufferCache->Get(*renderData.constantBuffer.get());
 		
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = globalRenderData.depthBuffer->DepthStencilView();

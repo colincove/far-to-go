@@ -41,7 +41,7 @@ int main()
 		},
 		.Update = [&demoScene](Metrics::blTime& gameTime) -> void
 		{
-			demoScene.Update();
+			demoScene.Update(gameTime);
 		},
 		.PreDraw = [&api](Metrics::blTime& gameTime) -> void
 		{

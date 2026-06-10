@@ -46,11 +46,13 @@ namespace BoulderLeaf::Graphics
 		mGraphicsAPI->DrawMeshInstanced(mDrawData, mSceneResource);
 	}
 
-	void blDemoScene01::Update()
+	void blDemoScene01::Update(Metrics::blTime& gameTime)
 	{
 		using namespace Math;
-		mTheta += 0.005f;
-		mPhi += 0.005f;
+		static float rotationSpeed = 0.5f; // radians per second
+		float deltaSeconds = gameTime.DeltaSeconds();
+		mTheta += gameTime.DeltaSeconds() * rotationSpeed;
+		mPhi += gameTime.DeltaSeconds() * rotationSpeed;
 		// Convert Spherical to Cartesian coordinates.
 		float x = mRadius * sinf(mPhi) * cosf(mTheta);
 		float z = mRadius * sinf(mPhi) * sinf(mTheta);
@@ -63,7 +65,7 @@ namespace BoulderLeaf::Graphics
 		Vector4 target = Vector4::Zero();
 		Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 		
-		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(2, 0, 0);
+		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(2, -2, 0);
 		const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up) * translate;
 		const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
 		const Matrix4x4 proj = mCamera.GetProjectionMatrix();

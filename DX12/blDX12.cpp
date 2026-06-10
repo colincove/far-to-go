@@ -16,9 +16,10 @@ namespace BoulderLeaf::Graphics::DX12
 	blDX12::blDX12(std::shared_ptr<Core::blWindow> window) :
 		blGraphicsAPIImpl(window),
 		mWindow(window),
-		mGlobalRenderDataPtr(std::make_shared<blGlobalRenderData>()),
-		mMeshRenderComponent(std::make_shared<blGlobalRenderData>()),
-		mMeshInstancedRenderComponent(std::make_shared<blGlobalRenderData>()),
+		mGlobalRenderDataPtr(std::make_unique<blGlobalRenderData>()),
+		mMeshRenderComponent(),
+		mMeshInstancedRenderComponent(),
+		mCompositeMeshRenderComponent(),
 		mCurrentFence(0)
 	{
 #ifdef DEBUG
@@ -36,8 +37,17 @@ namespace BoulderLeaf::Graphics::DX12
 		}
 #endif // DEBUG
 
-		mMeshRenderComponent = blMeshRenderComponent(mGlobalRenderDataPtr);
-		mMeshInstancedRenderComponent = blMeshInstancedRenderComponent(mGlobalRenderDataPtr);
+		mMeshRenderComponent = std::make_unique < blMeshRenderComponent>(mGlobalRenderDataPtr);
+		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
+		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
+
+		//this vector is kind of dumb. Does not scale. And holds raw pointers to components that are owned by unique_ptrs. But it is what it is for now. We can optimize this later if we need to.
+		mRenderComponents = std::vector<blRenderComponentBase*>
+		{
+			mMeshRenderComponent.get(),
+			mMeshInstancedRenderComponent.get(),
+			mMeshInstancedRenderComponent.get()
+		};
 
 		blGlobalRenderData& globalRenderDataRef = *mGlobalRenderDataPtr.get();
 
@@ -131,9 +141,9 @@ namespace BoulderLeaf::Graphics::DX12
 			GroupStartFrame(group);
 		}
 
-		for (int i = 0; i < C_ARRAY_COUNT(mRenderComponents); i++)
+		for (blRenderComponentBase* renderComponent : mRenderComponents)
 		{
-			mRenderComponents[i]->StartFrame();
+			renderComponent->StartFrame();
 		}
 
 		// Clear the back buffer and depth buffer.
@@ -164,12 +174,17 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blDX12::DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene)
 	{
-		mMeshRenderComponent.Render(renderItem, scene);
+		mMeshRenderComponent->Render(renderItem, scene);
 	}
 
 	void blDX12::DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene)
 	{
-		mMeshInstancedRenderComponent.Render(renderData, scene);
+		mMeshInstancedRenderComponent->Render(renderData, scene);
+	}
+
+	void blDX12::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	{
+		mCompositeMeshRenderComponent->Render(renderData, scene);
 	}
 
 	void blDX12::MarkResourceDirty(const blResourceId resourceId)

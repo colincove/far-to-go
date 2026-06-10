@@ -17,6 +17,7 @@
 #include <blGraphicsAPIImpl.h>
 #include <RenderComponents/blMeshRenderComponent.h>
 #include <RenderComponents/blMeshInstancedRenderComponent.h>
+#include <RenderComponents/blCompositeMeshRenderComponent.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -27,14 +28,11 @@ namespace BoulderLeaf::Graphics::DX12
 	class blDX12 : public blGraphicsAPIImpl<DX12ResourceState>
 	{
 	private:
-		blMeshRenderComponent mMeshRenderComponent;
-		blMeshInstancedRenderComponent mMeshInstancedRenderComponent;
+		std::unique_ptr<blMeshRenderComponent> mMeshRenderComponent;
+		std::unique_ptr<blMeshInstancedRenderComponent> mMeshInstancedRenderComponent;
+		std::unique_ptr<blCompositeMeshRenderComponent> mCompositeMeshRenderComponent;
 
-		blRenderComponentBase* mRenderComponents[2] = 
-		{
-			&mMeshRenderComponent , 
-			&mMeshInstancedRenderComponent 
-		};
+		std::vector<blRenderComponentBase*> mRenderComponents;
 
 		std::set<blResourceId> mDirtyResources;
 	private:
@@ -48,6 +46,7 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual void InitializeFinish() override;
 		virtual void DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene) override;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
+		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
 		virtual void MarkResourceDirty(const blResourceId resourceId) override;
 	public:
 		blDX12(std::shared_ptr<Core::blWindow> window);

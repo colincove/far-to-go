@@ -27,3 +27,6 @@ target_link_libraries(
 )
 
 install(TARGETS DX12Demo CONFIGURATIONS Debug DESTINATION Debug)
+
+bl_copy_configs_to_brinary_dir(
+	${CMAKE_CURRENT_SOURCE_DIR}/../Graphics/Config)

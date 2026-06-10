@@ -1,6 +1,7 @@
 #pragma once
 
 #include <blGraphicsAPI.h>
+#include <Resources/blResourceManager.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -17,7 +18,7 @@ namespace BoulderLeaf::Graphics
 		blGraphicsAPIImpl() = default;
 		blGraphicsAPIImpl(std::shared_ptr<Core::blWindow> window) : API(window)
 		{
-
+			blResourceManager::Get().Initialize();
 		}
 	private:
 		std::vector<TResourceState> mResourceStates;

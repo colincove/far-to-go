@@ -65,6 +65,11 @@ namespace BoulderLeaf::Graphics::DX12
 			memcpy(&mMappedData[elementIndex * mElementByteSize], &data, mElementByteSize);
 		}
 
+		void CopyInstanedData(int startIndex, int numElements, const byte& data)
+		{
+			memcpy(&mMappedData[startIndex * mElementByteSize], &data, mElementByteSize * numElements);
+		}
+
 		ComPtr<ID3D12Resource> mUploadBuffer;
 		BYTE* mMappedData = nullptr;
 		UINT mElementByteSize = 0;

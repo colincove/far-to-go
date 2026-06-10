@@ -43,19 +43,26 @@ namespace BoulderLeaf::Graphics
 	public:
 		using index = std::uint16_t;
 
+		enum Version : int
+		{
+			Initial,
+		};
+
 		struct Header
 		{
 			Header(
 				size_t vertexCount,
 				size_t indexCount,
 				size_t vertexSize)
-				: mVertexCount(vertexCount),
+				: mVersion(Version::Initial),
+				mVertexCount(vertexCount),
 				mIndexCount(indexCount),
 				mVertexSize(vertexSize)
 			{
 
 			}
 
+			Version mVersion = Version::Initial;
 			size_t mVertexCount;
 			size_t mVertexSize;
 			size_t mIndexCount;
@@ -73,7 +80,8 @@ namespace BoulderLeaf::Graphics
 
 		friend bool operator==(const Header& lhs, const Header& rhs)
 		{
-			return lhs.mVertexCount == rhs.mVertexCount &&
+			return lhs.mVersion == rhs.mVersion &&
+				lhs.mVertexCount == rhs.mVertexCount &&
 				lhs.mIndexCount == rhs.mIndexCount &&
 				lhs.mVertexSize == rhs.mVertexSize;
 		};

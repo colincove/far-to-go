@@ -22,4 +22,10 @@ namespace BoulderLeaf::Graphics
 	{
 
 	}
+
+	void Headless::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	{
+
+	}
+
 }

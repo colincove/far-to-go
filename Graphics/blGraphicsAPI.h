@@ -40,6 +40,7 @@ namespace BoulderLeaf::Graphics
 		void RecieveWindowMessage(MSG msg);
 		virtual void DrawMesh(const RenderMeshData& renderData, const blSceneResourcePtr scene) = 0;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) = 0;
+		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene) = 0;
 		virtual void MarkResourceDirty(const blResourceId resourceId) = 0;
 		void StartFrame();
 		void EndFrame();

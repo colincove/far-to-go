@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <Resources/blResource.h>
+#include <Resources/blResourceManager.h>
 #include <optional>
 
 namespace BoulderLeaf::Graphics::DX12
@@ -37,7 +38,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blDX12ResourceDataCache()
 			:blDX12ResourceCacheBase(), mCache()
 		{
-
+			mCache.resize(blResourceManager::Get().GetResourceTypeBudget(ResourceType));
 		}
 
 		TCacheData& Get(const TResource& resource)
@@ -58,11 +59,6 @@ namespace BoulderLeaf::Graphics::DX12
 		// TODO: this function sucks. this cache interface sucks
 		TCacheData& GetByIdNoInit(const blResourceId id)
 		{
-			if (mCache.size() <= id.GetRaw())
-			{
-				mCache.resize(id.GetRaw() + 1);
-			}
-
 			TCacheData& cache = mCache[id.GetRaw()];
 			return cache;
 		}

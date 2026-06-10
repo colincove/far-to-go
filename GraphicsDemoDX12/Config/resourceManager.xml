@@ -1,0 +1,9 @@
+<resource_manager>
+	<budgets>
+		<budget type="Scene">100</budget>
+		<budget type="Mesh">10000</budget>
+		<budget type="Shader">10000</budget>
+		<budget type="Material">10000</budget>
+		<budget type="DataBuffer">1000</budget>
+	</budgets>
+</resource_manager>

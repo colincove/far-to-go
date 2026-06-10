@@ -6,6 +6,8 @@ add_library(
 	blBuffer.h
 	blBufferTypes.cpp
 	blBufferTypes.h
+	blCompositeMesh.cpp
+	blCompositeMesh.h
 	blGraphicsCore.h
 	blGraphicsAPI.h
 	blGraphicsAPI.cpp
@@ -42,7 +44,9 @@ add_library(
 	Resources/blResource.h
 	Resources/blMeshResource.cpp
 	Resources/blMeshResource.h
-	Natvis/blMeshStorageHeader.natvis)
+	Natvis/blMeshStorageHeader.natvis
+	Config/resourceManager.xml
+	Config.cmake)
 
 target_include_directories(Graphics
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -52,6 +56,7 @@ target_include_directories(Graphics
 		./
 		../Math
 		../Core
+		../RapidXML/rapidxml-1.13
 		PUBLIC
 		./Resources
 		./RenderItems
@@ -63,6 +68,7 @@ target_link_libraries(
 	DX12
 	Core
 	CoreApplication
+	RapidXML
 )
 
 source_group("RenderItems/Headers Files"
@@ -90,6 +96,10 @@ source_group("Resources/Source Files"
 source_group("Natvis"
 	FILES 
 	Natvis/blMeshStorageHeader.natvis)
+
+source_group("Config"
+	FILES 
+	Config/resourceManager.xml)
 
 #source_group("RenderItems/Sources Files" ./RenderItems)
 

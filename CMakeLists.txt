@@ -36,6 +36,10 @@ enable_testing()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/DirectXShaderCompiler/cmake/caches/PredefinedParams.cmake)
 
+#TODO: research better ways to manage common build functionality such as modules. 
+#this currently works though. But is not discoverable.
+include(${CMAKE_CURRENT_SOURCE_DIR}/CoreApplication/CoreApplicationFunctions.cmake)
+
 #NOTE: We are not fetching GTest here because it conflicts with the libraries imported via bullet3.
 # include(FetchContent)
 # FetchContent_Declare(
