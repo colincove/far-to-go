@@ -36,6 +36,8 @@ add_library(
 	blDx12VertexData.h
 	blDx12VertexData.cpp
 	blDX12UploadBuffer.h
+	blDX12Imgui.cpp
+	blDX12Imgui.h
 	blRenderContext.h
 	blRenderContext.cpp
 	blRootSignature.h
@@ -78,6 +80,8 @@ add_library(
 	RenderData/blDX12PSODataCache.cpp
 	RenderData/blDX12ConstantBufferCache.h
 	RenderData/blDX12ConstantBufferCache.cpp
+	RenderData/blDX12CompositeMeshDataCache.h
+	RenderData/blDX12CompositeMeshDataCache.cpp
 	)
 
 source_group("Render Components/Headers Files"
@@ -102,7 +106,8 @@ source_group("Render Data/Headers Files"
 	RenderData/blDX12MeshDataCache.h
 	RenderData/blDX12ResourceDataCache.h
 	RenderData/blDX12PSODataCache.h
-	RenderData/blDX12ConstantBufferCache.h)
+	RenderData/blDX12ConstantBufferCache.h
+	RenderData/blDX12CompositeMeshDataCache.h)
 
 source_group("Render Data/Source Files"
 	FILES 
@@ -112,7 +117,8 @@ source_group("Render Data/Source Files"
 	RenderData/blDX12MeshDataDeviceCache.cpp
 	RenderData/blDX12ShaderCache.cpp
 	RenderData/blDX12PSODataCache.cpp
-	RenderData/blDX12ConstantBufferCache.cpp)
+	RenderData/blDX12ConstantBufferCache.cpp
+	RenderData/blDX12CompositeMeshDataCache.cpp)
 
 target_include_directories(DX12
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -128,6 +134,7 @@ target_include_directories(DX12
 
 target_link_libraries(DX12 PRIVATE
 	CoreApplication
+	Imgui
 	DirectX-Headers 
 	DirectX-Guids 
 	${dxlibs}

@@ -15,7 +15,7 @@ namespace BoulderLeaf::Graphics
 		blRenderGroupId groupId = blRenderGroupId(id);
 
 		blRenderGroupData& data = Data[groupId];
-		data.Name = name;
+		data.Name = std::string(name);
 		data.NameWide = std::wstring(name.begin(), name.end());
 
 		return groupId;

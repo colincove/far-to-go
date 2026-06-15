@@ -16,13 +16,16 @@
 #include <blDX12ConstantBufferCache.h>
 #include <blDX12BufferData.h>
 #include <blConstantBufferDescriptorHeap.h>
+#include <RenderData/blDX12CompositeMeshDataCache.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
 	struct blRenderGroupData
 	{
+		std::shared_ptr<blCommandListAllocator> commandListAllocator;
 		std::shared_ptr<blCommandList> commandList;
 		std::shared_ptr<blDX12MeshDataDeviceCache> meshDataDeviceCache;
+		std::shared_ptr<blCompositeMeshDataCache> compositeMeshStorageCache;
 	};
 
 	struct blGlobalRenderData

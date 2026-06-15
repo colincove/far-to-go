@@ -35,7 +35,7 @@ int main()
 	MSG msg = { };
 
 	Example currentExampleType = Example::None;
-	Example nextExampleType = Example::Box;
+	Example nextExampleType = Example::ImGui;
 
 	Core::blGameLoop gameLoop;
 	Core::blGameLoop::Callbacks callbacks =

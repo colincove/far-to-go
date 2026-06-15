@@ -175,6 +175,17 @@ namespace BoulderLeaf::Graphics
 
 	bool blMeshStorage::IsValid() const { return mBuffer != nullptr; }
 
+	void blMeshStorage::GraftMeshData(const blMeshStorage& other, const size_t index, const size_t vertex)
+	{
+		if (index + other.GetIndexCount() > GetIndexCount() || vertex + other.GetVertexCount() > GetVertexCount())
+		{
+			throw std::out_of_range("GraftMeshData: The provided index and vertex offsets exceed the bounds of the current mesh storage.");
+		}
+
+		memcpy(&GetIndexMutable(index), other.mIndexDataStart, other.GetIndexCount() * sizeof(index));
+		memcpy(GetVertexMutable(vertex), other.mVertexDataStart, other.GetVertexCount() * GetVertexSize());
+	}
+
 	const std::vector<VertexElementDescription> StandardVertexDefinition::Description =
 	{
 		{ "Position",	VertexElementType::Float3 },

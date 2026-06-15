@@ -18,6 +18,7 @@
 #include <RenderComponents/blMeshRenderComponent.h>
 #include <RenderComponents/blMeshInstancedRenderComponent.h>
 #include <RenderComponents/blCompositeMeshRenderComponent.h>
+#include <blDX12Imgui.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -40,8 +41,10 @@ namespace BoulderLeaf::Graphics::DX12
 		std::vector<std::shared_ptr<blDX12ResourceCacheBase>> mResourceCaches;
 		std::shared_ptr<Core::blWindow> mWindow;
 		std::map<blSceneResource, blRenderSceneContext> mSceneContextMap;
+		std::shared_ptr<blDX12Imgui> mDX12Imgui;
 		UINT64 mCurrentFence;
 	public:
+		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 		virtual void InitializeBegin() override;
 		virtual void InitializeFinish() override;
 		virtual void DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene) override;

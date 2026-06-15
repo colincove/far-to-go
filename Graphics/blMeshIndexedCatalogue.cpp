@@ -22,8 +22,6 @@ namespace BoulderLeaf::Graphics
 	blMeshIndexedCatalogue::index blMeshIndexedCatalogue::AddMesh(const blMeshStorage& mesh)
 	{
 		const index newIndex = mCurrentIndex;
-		mCurrentIndex++;
-
 		const Entry& lastEntry = GetLastEntry();
 
 		mEntries.push_back(Entry(
@@ -33,6 +31,7 @@ namespace BoulderLeaf::Graphics
 			mesh.GetHeader().GetIndexBufferSize()
 		));
 
+		mCurrentIndex++;
 		return newIndex;
 	}
 

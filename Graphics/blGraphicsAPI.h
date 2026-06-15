@@ -38,6 +38,7 @@ namespace BoulderLeaf::Graphics
 		API(std::shared_ptr<Core::blWindow> window);
 	public:
 		void RecieveWindowMessage(MSG msg);
+		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { return true; }
 		virtual void DrawMesh(const RenderMeshData& renderData, const blSceneResourcePtr scene) = 0;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) = 0;
 		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene) = 0;

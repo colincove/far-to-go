@@ -65,7 +65,7 @@ namespace BoulderLeaf::Graphics
 		Vector4 target = Vector4::Zero();
 		Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 		
-		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(2, -2, 0);
+		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(0, 0, 3);
 		const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up) * translate;
 		const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
 		const Matrix4x4 proj = mCamera.GetProjectionMatrix();

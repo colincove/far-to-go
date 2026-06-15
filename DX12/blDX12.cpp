@@ -11,16 +11,22 @@
 //Standard
 #include <assert.h>
 
+namespace
+{
+	bool imguiEnabled = true;
+}
+
 namespace BoulderLeaf::Graphics::DX12
 {
 	blDX12::blDX12(std::shared_ptr<Core::blWindow> window) :
 		blGraphicsAPIImpl(window),
 		mWindow(window),
-		mGlobalRenderDataPtr(std::make_unique<blGlobalRenderData>()),
+		mGlobalRenderDataPtr(std::make_shared<blGlobalRenderData>()),
 		mMeshRenderComponent(),
 		mMeshInstancedRenderComponent(),
 		mCompositeMeshRenderComponent(),
-		mCurrentFence(0)
+		mCurrentFence(0),
+		mDX12Imgui(std::make_shared<blDX12Imgui>(mGlobalRenderDataPtr, mWindow))
 	{
 #ifdef DEBUG
 		ComPtr<ID3D12Debug> debugController;
@@ -37,7 +43,7 @@ namespace BoulderLeaf::Graphics::DX12
 		}
 #endif // DEBUG
 
-		mMeshRenderComponent = std::make_unique < blMeshRenderComponent>(mGlobalRenderDataPtr);
+		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
 		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
 		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
 
@@ -105,6 +111,11 @@ namespace BoulderLeaf::Graphics::DX12
 		FlushCommandQueue();
 	}
 
+	LRESULT blDX12::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		return mDX12Imgui->WndProc(hWnd, msg, wParam, lParam);
+	}
+
 	void blDX12::OnWindowMessage(MSG msg)
 	{
 
@@ -134,7 +145,7 @@ namespace BoulderLeaf::Graphics::DX12
 		// Reuse the memory associated with command recording.
 		// We can only reset when the associated command lists have finished
 		// execution on the GPU.
-		mGlobalRenderDataPtr->commandListAllocator->Reset();
+		//mGlobalRenderDataPtr->commandListAllocator->Reset();
 
 		for (blRenderGroupId group : blRenderGroups::Iterator())
 		{
@@ -149,10 +160,20 @@ namespace BoulderLeaf::Graphics::DX12
 		// Clear the back buffer and depth buffer.
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = mGlobalRenderDataPtr->depthBuffer->DepthStencilView();
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = mGlobalRenderDataPtr->swapChain->CurrentBackBufferView();
+
+		if (imguiEnabled)
+		{
+			mDX12Imgui->StartFrame();
+		}
 	}
 
 	void blDX12::EndFrameInternal()
 	{
+		if (imguiEnabled)
+		{
+			mDX12Imgui->EndFrame();
+		}
+		
 		std::vector<ID3D12CommandList*> cmdsLists;
 		cmdsLists.reserve(blRenderGroups::GetCount());
 
@@ -195,10 +216,18 @@ namespace BoulderLeaf::Graphics::DX12
 	void blDX12::InitializeGroupInternal(const blRenderGroupId& group)
 	{
 		blRenderGroupData& dx12GroupData = mGlobalRenderDataPtr->renderGroupData[group];
-		BoulderLeaf::Graphics::blRenderGroupData groupData = blRenderGroups::GetRenderGroupData(group);
-		dx12GroupData.commandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator);
+		BoulderLeaf::Graphics::blRenderGroupData& groupData = blRenderGroups::GetRenderGroupData(group);
+		dx12GroupData.commandListAllocator = std::make_shared<blCommandListAllocator>(mGlobalRenderDataPtr->device);
+		//dx12GroupData.commandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator);
+		dx12GroupData.commandList = std::make_shared<blCommandList>(dx12GroupData.commandListAllocator);
 		dx12GroupData.commandList->GetCommandListPtr()->SetName(groupData.NameWide.c_str());
+
 		dx12GroupData.meshDataDeviceCache = std::make_shared<blDX12MeshDataDeviceCache>(
+			mGlobalRenderDataPtr->device,
+			dx12GroupData.commandList,
+			mGlobalRenderDataPtr->meshStorageCache);
+
+		dx12GroupData.compositeMeshStorageCache = std::make_shared<blCompositeMeshDataCache>(
 			mGlobalRenderDataPtr->device,
 			dx12GroupData.commandList,
 			mGlobalRenderDataPtr->meshStorageCache);
@@ -209,12 +238,16 @@ namespace BoulderLeaf::Graphics::DX12
 		//When should I do this? it was not in the example
 		//You cannot call Reset unless it is in a closed state
 		DX12_API_CALL(commandList->Close());
-		DX12_API_CALL(commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr));
+		DX12_API_CALL(commandList->Reset(dx12GroupData.commandListAllocator->GetAllocatorPtr().Get(), nullptr));
+		//DX12_API_CALL(commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr));
 	}
 
 	void blDX12::InitializeBegin()
 	{
-
+		if (imguiEnabled)
+		{
+			mDX12Imgui->Initialize();
+		}
 	}
 
 	void blDX12::InitializeFinish()
@@ -247,11 +280,9 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
 		ComPtr<ID3D12GraphicsCommandList> commandList = groupData.commandList->GetCommandListPtr();
-
-		// passing mCurrentPSO is garbage here. I am just trying to debug why the Input Assembler stage does 
-		// not have the correct geometry in it. 
-		commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), 
-			mGlobalRenderDataPtr->mCurrentPSO ? mGlobalRenderDataPtr->mCurrentPSO->GetDX12PSO().Get() : nullptr);
+		groupData.commandListAllocator->GetAllocatorPtr().Get()->Reset();
+		commandList->Reset(groupData.commandListAllocator->GetAllocatorPtr().Get(), nullptr);
+		//commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr);
 
 		//TODO make sure we are setting up viewPort correctly. 
 		commandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
@@ -259,12 +290,26 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Indicate a state transition on the resource usage.
 		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
-		CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
-			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		/*CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);*/
+
+		//Trying to figure out why Imgui will not render. There is an issue with shader resource views, from what I can tell. 
+		//So I am fooling around with resource states. 
+		D3D12_RESOURCE_BARRIER resourceBarrier = {};
+		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		resourceBarrier.Transition.pResource = currentBackBuffer;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
 		commandList->ResourceBarrier(1, &resourceBarrier);
 
 		//intresting. if I have multiple command lists, do I need to clear the render target view for each one? That does not sound right. 
 		//maybe you are only supposed to do this for your primary command list?
+		//Yes. If we have 2 groups, then we will clear the render targets multiple times. It is broken. 
+		//Need to rethink groups most likely. They were dumb anyway. Just trying to create structure when I
+		//do not know what I am doing. 
 		commandList->ClearRenderTargetView(mGlobalRenderDataPtr->swapChain->CurrentBackBufferView(),
 			Colors::LightSteelBlue, 0, nullptr);
 		commandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),

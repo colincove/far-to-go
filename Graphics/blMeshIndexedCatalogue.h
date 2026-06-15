@@ -35,5 +35,6 @@ namespace BoulderLeaf::Graphics
 	public:
 		index AddMesh(const blMeshStorage& mesh);
 		Entry& GetEntry(index idx);
+		index GetMeshCount() const { return mCurrentIndex; }
 	};
 }

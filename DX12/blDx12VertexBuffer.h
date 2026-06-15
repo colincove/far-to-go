@@ -2,6 +2,8 @@
 
 #include <blDX12Core.h>
 #include <functional>
+#include <blMesh.h>
+#include <blDX12MeshGeometry.h>
 
 struct CD3DX12_RESOURCE_DESC;
 
@@ -57,4 +59,11 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12Resource>& uploadBuffer,
 		UpdateSubresourcesFunction updateSubresourcesFunction
 	);
+
+	void GenerateSubresources(
+		const blMeshStorage& storage,
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		blDX12Mesh& meshGeometry,
+		SubmeshGeometry& submesh);
 }

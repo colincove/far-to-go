@@ -7,6 +7,7 @@
 #include <blDX12.h>
 #include <blGameLoop.h>
 #include <DemoScene01.h>
+#include <DemoScene02.h>
 
 using namespace BoulderLeaf;
 using namespace BoulderLeaf::Graphics;
@@ -25,7 +26,7 @@ int main()
 
 	MSG msg = { };
 
-	blDemoScene01 demoScene(api, window);
+	blDemoScene02 demoScene(api, window);
 
 	Core::blGameLoop gameLoop;
 	Core::blGameLoop::Callbacks callbacks =

@@ -112,4 +112,43 @@ namespace BoulderLeaf::Graphics::DX12
 		//note: must keep this return value alive until the command list has been executed
 		return defaultBuffer;
 	}
+
+	void GenerateSubresources(
+		const blMeshStorage& storage,
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		blDX12Mesh& meshGeometry,
+		SubmeshGeometry& submesh)
+	{
+		const blMeshStorage::Header& header = storage.GetHeader();
+
+		D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.VertexBufferCPU);
+		CopyMemory(meshGeometry.VertexBufferCPU->GetBufferPointer(), storage.VertexBegin(), header.GetVertexBufferSize());
+		D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.IndexBufferCPU);
+		CopyMemory(meshGeometry.IndexBufferCPU->GetBufferPointer(), storage.IndexBegin(), header.GetVertexBufferSize());
+
+		meshGeometry.VertexBufferGPU = CreateDefaultBuffer(
+			device,
+			commandList,
+			storage.VertexBegin(),
+			header.GetVertexBufferSize(),
+			meshGeometry.VertexBufferUploader);
+
+		meshGeometry.IndexBufferGPU = CreateDefaultBuffer(
+			device,
+			commandList,
+			storage.IndexBegin(),
+			header.GetVertexBufferSize(),
+			meshGeometry.IndexBufferUploader);
+
+		meshGeometry.VertexByteStride = (UINT)header.mVertexSize;
+		meshGeometry.VertexBufferByteSize = (UINT)header.GetVertexBufferSize();
+		meshGeometry.IndexFormat = DXGI_FORMAT_R16_UINT;
+		meshGeometry.IndexBufferByteSize = (UINT)header.GetIndexBufferSize();
+
+		submesh = SubmeshGeometry();
+		submesh.IndexCount = (UINT)storage.GetIndexCount();
+		submesh.StartIndexLocation = 0;
+		submesh.BaseVertexLocation = 0;
+	}
 }

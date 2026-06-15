@@ -56,10 +56,15 @@ namespace BoulderLeaf::Graphics
 	namespace
 	{
 		void BuildCylinderTopCap(
-			float bottomRadius, float topRadius, float height,
-			unsigned int sliceCount, unsigned int stackCount, StandardMesh::Prototype& meshData)
+			float bottomRadius, 
+			float topRadius, 
+			float height,
+			unsigned int sliceCount, 
+			unsigned int stackCount, 
+			StandardMesh::Prototype& meshData)
 		{
 			unsigned int baseIndex = (unsigned int)meshData.vertices.size();
+			const Math::Vector3 Normal(0.0f, 1.0f, 0.0f);
 			float y = 0.5f * height;
 			float dTheta = 2.0f * PIf / sliceCount;
 			// Duplicate cap ring vertices because the texture coordinates and
@@ -75,7 +80,7 @@ namespace BoulderLeaf::Graphics
 				meshData.vertices.push_back(
 					StandardVertex(
 						Math::Vector3(x, y, z),
-						Math::Vector3(0.0f, 1.0f, 0.0f),
+						Normal,
 						Math::Vector3(1.0f, 0.0f, 0.0f),
 						Math::Vector4(),
 						Math::Vector2(u, v)));
@@ -84,7 +89,7 @@ namespace BoulderLeaf::Graphics
 			meshData.vertices.push_back(
 				StandardVertex(
 					Math::Vector3(0.0f, y, 0.0f),
-					Math::Vector3(0.0f, 1.0f, 0.0f),
+					Normal,
 					Math::Vector3(1.0f, 0.0f, 0.0f),
 					Math::Vector4(),
 					Math::Vector2(0.5f, 0.5f)));
@@ -151,8 +156,13 @@ namespace BoulderLeaf::Graphics
 			}
 		}
 
-		BuildCylinderTopCap(bottomRadius, topRadius, height,
-			sliceCount, stackCount, prototype);
+		BuildCylinderTopCap(
+			bottomRadius, 
+			topRadius, 
+			height,
+			sliceCount, 
+			stackCount, 
+			prototype);
 
 		return StandardMesh(prototype);
 	}
@@ -190,8 +200,10 @@ namespace BoulderLeaf::Graphics
 			meshData.vertices[i].Position = pos[i];
 
 
-		//for (uint32 i = 0; i < numSubdivisions; ++i)
-			//Subdivide(meshData);
+		for (int i = 0; i < numSubdivisions; ++i)
+		{
+			SubdividePrototype<StandardMesh::TVertexDef>(meshData);
+		}
 
 		// Project vertices onto sphere and scale.
 		for (unsigned int i = 0; i < meshData.vertices.size(); ++i)

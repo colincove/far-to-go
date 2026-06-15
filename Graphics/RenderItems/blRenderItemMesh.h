@@ -35,5 +35,7 @@ namespace BoulderLeaf::Graphics
 		blStandardObjectConstantsBufferResourcePtr constantBuffer;
 		blCompositeMeshResourcePtr compositeMesh;
 		blMaterialResourcePtr material;
+		blResourceId submeshId;
+		size_t instance;
 	};
 }

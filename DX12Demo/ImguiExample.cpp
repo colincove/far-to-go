@@ -209,6 +209,7 @@ namespace BoulderLeaf::Graphics::DX12
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = m_dx12->DepthStencilView();
 		const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
 		auto backBufferView = dx12.GetBackBufferView(backBufferIdx);
+
 		dx12.mCommandList->ClearRenderTargetView(dx12.GetBackBufferView(backBufferIdx), clear_color_with_alpha, 0, nullptr);
 		m_dx12->mCommandList->ClearDepthStencilView(m_dx12->DepthStencilView(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
