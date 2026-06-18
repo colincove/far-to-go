@@ -45,23 +45,19 @@ int main()
 			msg = msgRecieved;
 			dx12->RecieveWindowMessage(msg);
 		},
-		.PreUpdate = [&currentExample, &currentExampleType, &nextExampleType, &dx12](Metrics::blTime& gameTime) -> void
+		.Tick = [&currentExample, &currentExampleType, &nextExampleType, &dx12](const Metrics::blTime& gameTime) -> void
 		{
 			if (currentExampleType != nextExampleType)
 			{
 				currentExample.reset(GetNewExample(dx12, nextExampleType));
 				currentExampleType = nextExampleType;
 			}
-		},
-		.Update = [&currentExample](Metrics::blTime& gameTime) -> void
-		{
+
 			if (currentExample.get() != nullptr)
 			{
 				currentExample->Update(gameTime);
 			}
-		},
-		.Draw = [&currentExample](Metrics::blTime& gameTime) -> void
-		{
+
 			if (currentExample.get() != nullptr)
 			{
 				currentExample->Draw();

@@ -12,9 +12,11 @@ namespace BoulderLeaf::Graphics
 		mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
 	{
 		mBoxMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
-			blResourceManager::Get().CreateResource<StandardMeshResource>(Cube()));
+			blResourceManager::Get().CreateResourceWithName<StandardMeshResource>(L"Cube", Cube()));
 
-		mShaderResource = blResourceManager::Get().CreateResource<blShaderResource>(blShader(
+		mShaderResource = blResourceManager::Get().CreateResourceWithName<blShaderResource>( 
+			L"graphics_dx12_demoscene01",
+			blShader(
 			"graphics_dx12_demoscene01",
 			std::vector<blShader::Parameter>
 			{
@@ -24,10 +26,12 @@ namespace BoulderLeaf::Graphics
 
 		mMaterialResource = blResourceManager::Get().CreateResource<blMaterialResource>(mShaderResource, false);
 		mSceneResource = blResourceManager::Get().CreateResource<blSceneResource>();
+		mObjectConstantBufferResource = blResourceManager::Get().CreateResourceWithName<blStandardObjectConstantsBufferResource>(
+			L"blDemoScene01 Standard Object Constants Buffer");
 
-		mObjectConstantBufferResource = blResourceManager::Get().CreateResource<blStandardObjectConstantsBufferResource>();
 		mObjectConstantBufferResource->GetDataMutable().reserve(1000);
 		mObjectConstantBufferResource->GetDataMutable().push_back({Math::Matrix4x4::Identity()});
+		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
 
 		// this reinterpret_pointer_cast is not working right. Review.
 		// It is likely due to how resources are designed. It is bad. THe "data" might be compatible,
@@ -46,7 +50,7 @@ namespace BoulderLeaf::Graphics
 		mGraphicsAPI->DrawMeshInstanced(mDrawData, mSceneResource);
 	}
 
-	void blDemoScene01::Update(Metrics::blTime& gameTime)
+	void blDemoScene01::Update(const Metrics::blTime& gameTime)
 	{
 		using namespace Math;
 		static float rotationSpeed = 0.5f; // radians per second
@@ -65,17 +69,21 @@ namespace BoulderLeaf::Graphics
 		Vector4 target = Vector4::Zero();
 		Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 		
-		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(0, 0, 3);
+		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(-2, 0, 3);
+		const Matrix4x4 translate2 = Matrix4x4::TranslationMatrix(0, 0, 5);
 		const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up) * translate;
+		const Matrix4x4 view2 = Matrix4x4::ViewMatrix(pos, target, up) * translate2;
 		const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
 		const Matrix4x4 proj = mCamera.GetProjectionMatrix();
 		const Matrix4x4 worldViewProj = world * view * proj;
+		const Matrix4x4 worldViewProj2 = world * view2 * proj;
 
 		//TODO
 		//we currently do not update constant buffer resources. So it does not change. 
 
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
+		mObjectConstantBufferResource->GetDataMutable()[1].WorldViewProj = worldViewProj2.Transpose();
 		mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
 	}
 }

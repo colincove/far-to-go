@@ -12,7 +12,7 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12CommandAllocator> mCommandListAllocator;
 		std::shared_ptr<blDevice> mDevice;
 	public:
-		blCommandListAllocator(std::shared_ptr<blDevice> device);
+		blCommandListAllocator(std::shared_ptr<blDevice> device, std::wstring name = L"");
 
 		const ComPtr<ID3D12CommandAllocator> GetAllocatorPtr() const
 		{

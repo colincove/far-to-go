@@ -34,6 +34,6 @@ namespace BoulderLeaf::Graphics
 	public:
 		blDemoScene01(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window);
 		void Draw();
-		void Update(Metrics::blTime& gameTime);
+		void Update(const Metrics::blTime& gameTime);
 	};
 }

@@ -2,7 +2,8 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blMeshInstancedRenderComponent::blMeshInstancedRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr)
+	blMeshInstancedRenderComponent::blMeshInstancedRenderComponent(
+		std::shared_ptr<blGlobalRenderData> globalRenderDataPtr)
 		: blRenderComponent(globalRenderDataPtr)
 	{
 	}
@@ -23,8 +24,6 @@ namespace BoulderLeaf::Graphics::DX12
 		const blDX12MeshDataDeviceCacheData& meshDeviceCacheData = groupData.meshDataDeviceCache->Get(meshResource);
 		const blPSOCacheData& psoCacheData = globalRenderData.mPSOCache->Get(shaderResource);
 
-		globalRenderData.mCurrentPSO = psoCacheData.PSO;
-
 		// Do I not do anything with this data? How do constant buffers get bound? I'm confused. 
 		//TODO: Why is this data specific to standard object constants? I want to be able to use this for any type of constant buffer.
 		const blDX12ConstantBufferCacheData& constantBufferCache = globalRenderData.constantBufferCache->Get(*renderData.constantBuffer.get());
@@ -43,10 +42,17 @@ namespace BoulderLeaf::Graphics::DX12
 		commandList.IASetVertexBuffers(0, 1, &vertexBufferView);
 		commandList.IASetIndexBuffer(&indexBufferView);
 		commandList.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList.SetGraphicsRootDescriptorTable(0, globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		
 		commandList.SetPipelineState(psoCacheData.PSO->GetDX12PSO().Get());
-		commandList.DrawIndexedInstanced(
-			meshCacheData.meshStorage.GetIndexCount(),
-			renderData.constantBuffer->GetData().Count(), 0, 0, 0);
+		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+
+		for (int i = 0; i < renderData.constantBuffer->GetData().size(); ++i)
+		{
+			commandList.SetGraphicsRootDescriptorTable(0, cbvHandle);
+			commandList.DrawIndexedInstanced(
+				(int) meshCacheData.meshStorage.GetIndexCount(),
+				1, 0, 0, 0);
+			cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());
+		}
 	}
 }

@@ -38,9 +38,13 @@ namespace BoulderLeaf::Graphics
 		groupData.initialized = true;
 	}
 
+	void API::Update(const Metrics::blTime& time)
+	{
+		UpdateInternal(time);
+	}
+
 	void API::StartFrame() 
 	{
-
 		StartFrameInternal();
 	}
 

@@ -2,6 +2,8 @@
 
 #include <optional>
 #include <memory>
+#include <string>
+#include <array>
 
 namespace BoulderLeaf::Graphics
 {
@@ -56,15 +58,25 @@ namespace BoulderLeaf::Graphics
 		Count
 	};
 
+	extern std::array<const wchar_t*, static_cast<int>(eResourceType::Count)> kResourceTypeNames;
+
 	class blResourceBase
 	{
 	protected:
 		blResourceId mId;
+		std::wstring mName;
 	public:
-		blResourceBase(blResourceId id) :mId(id) {}
+		blResourceBase(blResourceId id) :blResourceBase(id, L"[BL] Resource") {}
+		blResourceBase(blResourceId id, std::wstring name) :mId(id), mName(name) {}
+
 		const blResourceId& GetId() const
 		{
 			return mId;
+		}
+
+		const std::wstring& GetName() const
+		{
+			return mName;
 		}
 	};
 
@@ -76,19 +88,29 @@ namespace BoulderLeaf::Graphics
 		friend class blResourceManager;
 	private:
 		TData mData;
+
+
+		static std::wstring NewName()
+		{
+			return L"[BL][" + kResourceTypeNames[static_cast<int>(ResourceType)] + L"] Resource";
+		}
 	public:
 		using DataType = TData;
 		constexpr static eResourceType ResourceType = TType;
+
 		blResource() = delete;
 
 		template<class... Types>
-		blResource(blResourceId id, Types... args) : mData(std::forward<Types>(args)...),
-			blResourceBase(id)
+		blResource(blResourceId id, std::wstring name, Types... args) : mData(std::forward<Types>(args)...),
+			blResourceBase(id, name)
 		{
 		}
 
-		blResource(blResourceId id, const TData& data) : mData(data), blResourceBase(id) {}
-		blResource(blResourceId id, TData&& data) : mData(std::move(data)), blResourceBase(id) {}
+		blResource(blResourceId id, const TData& data) : blResource(id, NewName(), data) {}
+		blResource(blResourceId id, TData&& data) : blResource(id, NewName(), data) {}
+
+		blResource(blResourceId id, std::wstring name, const TData& data) : mData(data), blResourceBase(id, name) {}
+		blResource(blResourceId id, std::wstring name, TData&& data) : mData(std::move(data)), blResourceBase(id, name) {}
 	public:
 		const TData& GetData() const
 		{

@@ -23,6 +23,17 @@ namespace BoulderLeaf::Graphics
 
 	blRenderGroupData& blRenderGroups::GetRenderGroupData(blRenderGroupId groupId)
 	{
+		if (groupId == blRenderGroups::Default)
+		{
+			static blRenderGroupData DefaultRenderGroupData =
+			{
+				"Default",
+				L"Default"
+			};
+
+			return DefaultRenderGroupData;
+		}
+
 		assert(groupId.value > 0 && groupId.value <= MaxValue);
 		return Data[groupId];
 	}

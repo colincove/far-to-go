@@ -14,8 +14,13 @@ namespace BoulderLeaf::Graphics::DX12
 	class blUploadBuffer
 	{
 	public:
-		blUploadBuffer(ID3D12Device* device, UINT elementByteSize, UINT elementCount, bool isConstantBuffer)
-			:mElementByteSize(elementByteSize)
+		blUploadBuffer(
+			ID3D12Device* device, 
+			UINT elementByteSize, 
+			UINT elementCount, 
+			bool isConstantBuffer)
+			:mElementByteSize(elementByteSize),
+			mIsConstantBuffer(isConstantBuffer)
 		{
 			// Constant buffer elements need to be multiples of 256 bytes.
 			// This is because the hardware can only view constant data
@@ -24,13 +29,11 @@ namespace BoulderLeaf::Graphics::DX12
 			// UINT64 OffsetInBytes; // multiple of 256
 			// UINT SizeInBytes; // multiple of 256
 			// } D3D12_CONSTANT_BUFFER_VIEW_DESC;
-			if (isConstantBuffer)
-			{
-				mElementByteSize = Math::CalcConstantBufferByteSize(mElementByteSize);
-			}
+			mConstantBufferElementByteSize = Math::CalcConstantBufferByteSize(mElementByteSize);
+			const UINT elementBySizeToUse = isConstantBuffer ? mConstantBufferElementByteSize : elementByteSize;
 
 			auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-			auto desc = CD3DX12_RESOURCE_DESC::Buffer(mElementByteSize * elementCount);
+			auto desc = CD3DX12_RESOURCE_DESC::Buffer(elementBySizeToUse * elementCount);
 
 			device->CreateCommittedResource(
 				&heapProp,
@@ -39,6 +42,8 @@ namespace BoulderLeaf::Graphics::DX12
 				D3D12_RESOURCE_STATE_GENERIC_READ,
 				nullptr,
 				IID_PPV_ARGS(&mUploadBuffer));
+
+			mUploadBuffer->SetName(L"[BL] Upload Buffer");
 
 			mUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mMappedData));
 			// We do not need to unmap until we are done with the resource.
@@ -67,12 +72,20 @@ namespace BoulderLeaf::Graphics::DX12
 
 		void CopyInstanedData(int startIndex, int numElements, const byte& data)
 		{
-			memcpy(&mMappedData[startIndex * mElementByteSize], &data, mElementByteSize * numElements);
+			const UINT elementBySizeToUse = mIsConstantBuffer ? mConstantBufferElementByteSize : mElementByteSize;
+			// ignore startIndex right now. support later, in a different way
+			memcpy(&mMappedData[0], &data, numElements * elementBySizeToUse);
+
+			/*for (int i = 0; i < numElements; ++i)
+			{
+				memcpy(&mMappedData[i * elementBySizeToUse], &data, mElementByteSize * i);
+			}*/
 		}
 
 		ComPtr<ID3D12Resource> mUploadBuffer;
 		BYTE* mMappedData = nullptr;
 		UINT mElementByteSize = 0;
+		UINT mConstantBufferElementByteSize = 0;
 		bool mIsConstantBuffer = false;		
 	};
 

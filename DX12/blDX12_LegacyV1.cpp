@@ -237,7 +237,7 @@ namespace BoulderLeaf::Graphics::DX12
 				swapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
 			// Next entry in heap.
 			rtvHeapHandle.Offset(1, mRtvDescriptorSize);
-			swapChainBuffer[i]->SetName(L"BL - RenderTargetViewToBackBuffer");
+			swapChainBuffer[i]->SetName(L"[BL] RenderTargetViewToBackBuffer");
 		}
 
 		return swapChainBuffer;
@@ -314,7 +314,7 @@ namespace BoulderLeaf::Graphics::DX12
 			nullptr,
 			DepthStencilView());
 
-		depthBufferViewOut->SetName(L"BL - DepthBuffer");
+		depthBufferViewOut->SetName(L"[BL] DepthBuffer");
 
 		// COMMENTING THIS OUT. It does not make sense. The resource is created with the D3D12_RESOURCE_STATE_DEPTH_WRITE state, so why transition it from COMMON to DEPTH_WRITE?
 		/*CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(

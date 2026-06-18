@@ -65,6 +65,12 @@ namespace BoulderLeaf::Graphics
 		template<typename TResource>
 		blResourcePtr<TResource> CreateResource(const TResource::DataType&& data)
 		{
+			return CreateResourceWithName(L"", data);
+		}
+
+		template<typename TResource>
+		blResourcePtr<TResource> CreateResourceWithName(const TResource::DataType&& data)
+		{
 			assert(mInitialized);
 
 			const blResourceId resourceId = GetNewResourceId();
@@ -93,6 +99,12 @@ namespace BoulderLeaf::Graphics
 		template<typename TResource, typename... Args>
 		blResourcePtr<TResource> CreateResource(Args&&... args)
 		{
+			return CreateResourceWithName<TResource>(L"Resource", std::forward<Args>(args)...);
+		}
+
+		template<typename TResource, typename... Args>
+		blResourcePtr<TResource> CreateResourceWithName(std::wstring name, Args&&... args)
+		{
 			assert(mInitialized);
 
 			const blResourceId resourceId = GetNewResourceId();
@@ -112,7 +124,7 @@ namespace BoulderLeaf::Graphics
 			blResourceMetaData& resourceMetaData = GetResourceDataMutable(resourceId);
 			resourceMetaData.TypeId = resourceTypeId;
 
-			blResourcePtr<TResource> resource = std::make_shared<TResource>(TResource(resourceId, std::forward<Args>(args)...));
+			blResourcePtr<TResource> resource = std::make_shared<TResource>(TResource(resourceId, name, std::forward<Args>(args)...));
 			blResourceBasePtr basePtr = std::reinterpret_pointer_cast<blResourceBase>(resource);
 			mResourceMap.insert({ resource->GetId(), basePtr });
 			return resource;

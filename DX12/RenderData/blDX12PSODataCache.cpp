@@ -19,6 +19,7 @@ namespace BoulderLeaf::Graphics::DX12
 			shaderCacheData.RootSignature->GetRootSignature(),
 			shaderCacheData.InputLayout,
 			shaderCacheData.mvsByteCode,
-			shaderCacheData.mpsByteCode);
+			shaderCacheData.mpsByteCode,
+			shader.GetName());
 	}
 }

@@ -38,37 +38,10 @@ namespace BoulderLeaf::Core
 				}
 			}
 
-			if (callbacks.PreUpdate)
+			if (callbacks.Tick)
 			{
-				callbacks.PreUpdate(gameTime);
+				callbacks.Tick(gameTime);
 			}
-
-			if (callbacks.Update)
-			{
-				callbacks.Update(gameTime);
-			}
-
-			if (callbacks.PostUpdate)
-			{
-				callbacks.PostUpdate(gameTime);
-			}
-
-			if (callbacks.PreDraw)
-			{
-				callbacks.PreDraw(gameTime);
-			}
-
-			if (callbacks.Draw)
-			{
-				callbacks.Draw(gameTime);
-			}
-
-			if (callbacks.PostDraw)
-			{
-				callbacks.PostDraw(gameTime);
-			}
-
-			//::Sleep(100);
 		}
 	}
 }

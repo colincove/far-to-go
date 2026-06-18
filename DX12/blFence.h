@@ -4,6 +4,7 @@
 #include <d3d12.h>
 #include <memory>
 #include <blDevice.h>
+#include <string>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -12,7 +13,7 @@ namespace BoulderLeaf::Graphics::DX12
 	private:
 		ComPtr<ID3D12Fence> mFence;
 	public:
-		blFence(std::shared_ptr<blDevice> device);
+		blFence(std::shared_ptr<blDevice> device, std::wstring name = L"Default");
 		ComPtr<ID3D12Fence> GetFence() { return mFence; }
 	};
 }

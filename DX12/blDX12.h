@@ -42,6 +42,7 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<Core::blWindow> mWindow;
 		std::map<blSceneResource, blRenderSceneContext> mSceneContextMap;
 		std::shared_ptr<blDX12Imgui> mDX12Imgui;
+		std::shared_ptr<blCommandList> mCommandList;
 		UINT64 mCurrentFence;
 	public:
 		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;

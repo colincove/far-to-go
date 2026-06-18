@@ -90,7 +90,7 @@ namespace BoulderLeaf::Graphics::DX12
 				i, IID_PPV_ARGS(&mSwapChainBuffers[i])));
 			// Create an RTV to it.
 			device->GetDX12Device()->CreateRenderTargetView(mSwapChainBuffers[i].Get(), nullptr, rtvHeapHandle);
-			mSwapChainBuffers[i]->SetName(std::format(L"[BL]SwapChainBuffer({})", i).c_str());
+			mSwapChainBuffers[i]->SetName(std::format(L"[BL] SwapChainBuffer({})", i).c_str());
 			// Next entry in heap.
 			rtvHeapHandle.Offset(1, mRtvDescriptorSize);
 		}

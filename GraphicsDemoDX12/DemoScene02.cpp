@@ -91,7 +91,7 @@ namespace BoulderLeaf::Graphics
 		}
 	}
 
-	void blDemoScene02::Update(Metrics::blTime& gameTime)
+	void blDemoScene02::Update(const Metrics::blTime& gameTime)
 	{
 		using namespace Math;
 		static float rotationSpeed = 0.5f; // radians per second
@@ -115,9 +115,6 @@ namespace BoulderLeaf::Graphics
 		const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
 		const Matrix4x4 proj = mCamera.GetProjectionMatrix();
 		const Matrix4x4 worldViewProj = world * view * proj;
-
-		//TODO
-		//we currently do not update constant buffer resources. So it does not change. 
 
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();

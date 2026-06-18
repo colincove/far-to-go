@@ -20,20 +20,20 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		blDX12BufferData& bufferData = mBufferCache->Get(resource);
 
-		UINT objCBByteSize = Math::CalcConstantBufferByteSize(static_cast<UINT>(bufferData.dataBuffer.GetElementSize()));
-		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = bufferData.uploadBuffer->mUploadBuffer->GetGPUVirtualAddress();
-		// Offset to the ith object constant buffer in the buffer.
-		// Here our i = 0.
-		int boxCBufIndex = 0;
-		cbAddress += boxCBufIndex * objCBByteSize;
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-		cbvDesc.BufferLocation = cbAddress;
-		cbvDesc.SizeInBytes = Math::CalcConstantBufferByteSize(static_cast<UINT>(bufferData.dataBuffer.GetElementSize()))
-			//I added this trying to understand why I was not getting more then 
-			//1 element in my constance buffer. DId not work?
-			* resource.GetData().Count();
-		mDevice->GetDX12Device()->CreateConstantBufferView(
-			&cbvDesc,
-			mCbvHeap->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+		const UINT objCBByteSize = Math::CalcConstantBufferByteSize(static_cast<UINT>(bufferData.dataBuffer.GetElementSize()));
+		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = bufferData.uploadBuffer->Resource()->GetGPUVirtualAddress();
+		auto cbvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
+
+		for (int i = 0; i < resource.GetData().Count(); ++i)
+		{
+			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+			cbvDesc.BufferLocation = cbAddress + i * objCBByteSize;
+			cbvDesc.SizeInBytes = objCBByteSize;
+			mDevice->GetDX12Device()->CreateConstantBufferView(
+				&cbvDesc,
+				cbvHandle);
+			cbvHandle.Offset(mDevice->GetCbvSrvDescriptorSize());
+
+		}
 	}
 }

@@ -15,6 +15,7 @@ namespace BoulderLeaf::Graphics
 	{
 		friend class CompositeMeshConstIterator;
 	private:
+
 		blMeshIndexedCatalogue mCatalogue;
 		std::map<blResourceId, blMeshIndexedCatalogue::index> mExternalIdToMeshInternalIdMap;
 		std::map<blMeshIndexedCatalogue::index, blMeshBaseResourcePtr> mInternalIdToMeshEntryMap;

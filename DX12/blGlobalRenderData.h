@@ -40,7 +40,6 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blDX12ConstantBufferCache> constantBufferCache;
 		std::shared_ptr<blDX12BufferDataCache> bufferCache;
 		std::shared_ptr<blPSOCache> mPSOCache;
-		std::shared_ptr<blPSO> mCurrentPSO;
 		std::shared_ptr<blDepthBuffer> depthBuffer;
 		std::shared_ptr<blFence> fence;
 		std::shared_ptr<blConstantBufferDescriptorHeap> constantBufferDescriptorHeap;

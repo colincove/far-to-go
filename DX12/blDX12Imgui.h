@@ -19,5 +19,6 @@ namespace BoulderLeaf::Graphics::DX12
 	private:
 		std::shared_ptr<blGlobalRenderData> mGlobalRenderData;	
 		std::shared_ptr<Core::blWindow> mWindow;
+		std::shared_ptr<blConstantBufferDescriptorHeap> mConstantBufferDescriptorHeap;
 	};
 }

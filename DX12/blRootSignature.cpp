@@ -76,5 +76,8 @@ namespace BoulderLeaf::Graphics::DX12
 			serializedRootSig->GetBufferPointer(),
 			serializedRootSig->GetBufferSize(),
 			IID_PPV_ARGS(&mRootSignature)));
+
+		std::wstring stemp = L"[BL] " + std::wstring(shader.mName.begin(), shader.mName.end());
+		mRootSignature->SetName(stemp.c_str());
 	}
 }

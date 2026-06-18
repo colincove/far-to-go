@@ -197,10 +197,11 @@ namespace BoulderLeaf::Graphics
 		meshData.vertices.resize(12);
 		meshData.indices.assign(&k[0], &k[60]);
 		for (unsigned int i = 0; i < 12; ++i)
+		{
 			meshData.vertices[i].Position = pos[i];
+		}
 
-
-		for (int i = 0; i < numSubdivisions; ++i)
+		for (unsigned int i = 0; i < numSubdivisions; ++i)
 		{
 			SubdividePrototype<StandardMesh::TVertexDef>(meshData);
 		}

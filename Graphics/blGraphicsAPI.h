@@ -19,6 +19,7 @@
 #include <blShader.h>
 #include <Resources/blResourceManager.h>
 #include <blRenderGroup.h>
+#include <blTime.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -45,10 +46,12 @@ namespace BoulderLeaf::Graphics
 		virtual void MarkResourceDirty(const blResourceId resourceId) = 0;
 		void StartFrame();
 		void EndFrame();
+		void Update(const Metrics::blTime& time);
 		void Initialize();
 	protected:
 		virtual void InitializeFinish() {};
 		virtual void InitializeBegin() {};
+		virtual void UpdateInternal(const Metrics::blTime& time) {};
 		virtual void StartFrameInternal() {};
 		virtual void EndFrameInternal() {};
 		virtual void OnWindowMessage(MSG msg);

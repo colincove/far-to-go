@@ -16,7 +16,8 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12DescriptorHeap> mDescriptorHeap;
 	public:
 		blConstantBufferDescriptorHeap(
-			const std::shared_ptr<blDevice> device);
+			const std::shared_ptr<blDevice> device,
+			std::wstring name = L"NA");
 
 		ComPtr<ID3D12DescriptorHeap> GetDescriptorHeap() const { return mDescriptorHeap; };
 	};

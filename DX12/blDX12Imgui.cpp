@@ -78,6 +78,7 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<Core::blWindow> window)
 		: mGlobalRenderData(globalRenderData),
 		mWindow(window)
+		
 	{
 
 	}
@@ -89,6 +90,10 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blDX12Imgui::Initialize()
 	{
+		mConstantBufferDescriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(
+			mGlobalRenderData->device,
+			L"DX12Imgui");
+
 		//ImguiRenderGroup = BoulderLeaf::Graphics::blRenderGroups::RegisterExternal("Imgui");
 
 		ImGui::CreateContext();
@@ -119,7 +124,7 @@ namespace BoulderLeaf::Graphics::DX12
 			};
 
 		g_pd3dSrvDescHeapAlloc.Create(mGlobalRenderData->device->GetDX12Device().Get(), 
-			mGlobalRenderData->constantBufferDescriptorHeap->GetDescriptorHeap().Get());
+			mConstantBufferDescriptorHeap->GetDescriptorHeap().Get());
 
 		ImGui_ImplDX12_Init(&info);
 	}
@@ -146,7 +151,7 @@ namespace BoulderLeaf::Graphics::DX12
 		//blRenderGroupData& renderGroupData = mGlobalRenderData->renderGroupData[ImguiRenderGroup];
 
 		//this function is asking for a pointer to an array. I should sore these as an array in DX12
-		ID3D12DescriptorHeap* descriptorHeaps[] = { mGlobalRenderData->constantBufferDescriptorHeap->GetDescriptorHeap().Get()};
+		ID3D12DescriptorHeap* descriptorHeaps[] = { mConstantBufferDescriptorHeap->GetDescriptorHeap().Get()};
 		renderGroupData.commandList->GetCommandListPtr().Get()->SetDescriptorHeaps(1, descriptorHeaps);
 
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), renderGroupData.commandList->GetCommandListPtr().Get());

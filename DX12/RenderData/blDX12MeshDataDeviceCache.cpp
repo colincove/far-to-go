@@ -29,5 +29,7 @@ namespace BoulderLeaf::Graphics::DX12
 			mCommandList->GetCommandListPtr().Get(),
 			cache.meshGeometry,
 			cache.submesh);
+
+		cache.meshGeometry.SetResourceNames(resource.GetName());
 	}
 }

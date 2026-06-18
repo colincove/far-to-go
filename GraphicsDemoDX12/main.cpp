@@ -26,7 +26,7 @@ int main()
 
 	MSG msg = { };
 
-	blDemoScene02 demoScene(api, window);
+	blDemoScene01 demoScene(api, window);
 
 	Core::blGameLoop gameLoop;
 	Core::blGameLoop::Callbacks callbacks =
@@ -36,24 +36,12 @@ int main()
 			msg = msgRecieved;
 			api->RecieveWindowMessage(msg);
 		},
-		.PreUpdate = [](Metrics::blTime& gameTime) -> void
+		.Tick = [&demoScene, &api](const Metrics::blTime& gameTime) -> void
 		{
-			
-		},
-		.Update = [&demoScene](Metrics::blTime& gameTime) -> void
-		{
+			api->Update(gameTime);
 			demoScene.Update(gameTime);
-		},
-		.PreDraw = [&api](Metrics::blTime& gameTime) -> void
-		{
 			api->StartFrame();
-		},
-		.Draw = [&demoScene](Metrics::blTime& gameTime) -> void
-		{
 			demoScene.Draw();
-		},
-		.PostDraw = [&api](Metrics::blTime& gameTime) -> void
-		{
 			api->EndFrame();
 		},
 		.ShouldContinue = [&msg]() -> bool

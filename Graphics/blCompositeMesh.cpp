@@ -25,7 +25,7 @@ namespace BoulderLeaf::Graphics
 
 	size_t blCompositeMesh::GetIndexBufferSize() const
 	{
-		size_t total;
+		size_t total = 0;
 
 		for (const blMeshBaseResourcePtr& mesh : CompositeMeshConstIterator(this))
 		{

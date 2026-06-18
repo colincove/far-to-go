@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <minwindef.h>
 
 using namespace DirectX;
 
@@ -28,6 +29,6 @@ namespace BoulderLeaf::Graphics::DX12::Math
 		// 0x022B & 0xff00
 		// 0x0200
 		// 512
-		return (byteSize + 255) & ~255;
+		return EnforceByteStrideLength(byteSize, 256);
 	}
 }

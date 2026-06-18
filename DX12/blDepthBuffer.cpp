@@ -55,12 +55,11 @@ namespace BoulderLeaf::Graphics::DX12
 			nullptr,
 			DepthStencilView());
 
-		mDepthBufferView->SetName(L"BL - DepthBuffer");
+		mDepthBufferView->SetName(L"[BL] DepthBuffer");
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE blDepthBuffer::DepthStencilView() const
 	{
-		return CD3DX12_CPU_DESCRIPTOR_HANDLE(
-			mDsvHeap->GetCPUDescriptorHandleForHeapStart());
+		return mDsvHeap->GetCPUDescriptorHandleForHeapStart();
 	}
 }

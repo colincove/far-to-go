@@ -30,10 +30,18 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual ~blRenderComponent() = default;
 
 		blRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr)
-			: blRenderComponentBase(globalRenderDataPtr)
+			: blRenderComponentBase(globalRenderDataPtr),
+			mCommandList()
 		{
 		}
 
 		virtual void Render(const TRenderData& renderData, const blSceneResourcePtr scene) = 0;
+	protected:
+		std::shared_ptr<blCommandList> mCommandList;
+	public:
+		std::shared_ptr<blCommandList> GetCommandList() const
+		{
+			return mCommandList;
+		}
 	};
 }

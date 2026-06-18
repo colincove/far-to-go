@@ -14,15 +14,7 @@ namespace BoulderLeaf::Core
 		struct Callbacks
 		{
 			std::function<void(MSG&)> MessageRecieved;
-
-			std::function<void(Metrics::blTime&)> PreUpdate;
-			std::function<void(Metrics::blTime&)> Update;
-			std::function<void(Metrics::blTime&)> PostUpdate;
-
-			std::function<void(Metrics::blTime&)> PreDraw;
-			std::function<void(Metrics::blTime&)> Draw;
-			std::function<void(Metrics::blTime&)> PostDraw;
-
+			std::function<void(const Metrics::blTime&)> Tick;
 			std::function<bool()> ShouldContinue;
 		};
 

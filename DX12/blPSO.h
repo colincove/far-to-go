@@ -16,7 +16,8 @@ namespace BoulderLeaf::Graphics::DX12
 			ComPtr<ID3D12RootSignature> rootSignature,
 			std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout,
 			ComPtr<ID3DBlob> mvsByteCode,
-			ComPtr<ID3DBlob> mpsByteCode);
+			ComPtr<ID3DBlob> mpsByteCode,
+			std::wstring name = L"");
 
 		ComPtr<ID3D12PipelineState> GetDX12PSO() const { return mPSO; }
 

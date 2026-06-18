@@ -13,7 +13,7 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12CommandQueue> mCommandQueue;
 		std::shared_ptr<blDevice> mDevice;
 	public:
-		blCommandQueue(std::shared_ptr<blDevice> device);
+		blCommandQueue(std::shared_ptr<blDevice> device, std::wstring name = L"");
 
 		ComPtr<ID3D12CommandQueue> GetDX12CommandQueue()
 		{

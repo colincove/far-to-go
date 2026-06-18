@@ -43,6 +43,8 @@ namespace BoulderLeaf::Graphics::DX12
 		}
 #endif // DEBUG
 
+		blGlobalRenderData& globalRenderDataRef = *mGlobalRenderDataPtr.get();
+
 		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
 		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
 		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
@@ -55,8 +57,6 @@ namespace BoulderLeaf::Graphics::DX12
 			mMeshInstancedRenderComponent.get()
 		};
 
-		blGlobalRenderData& globalRenderDataRef = *mGlobalRenderDataPtr.get();
-
 		globalRenderDataRef.viewPort.TopLeftX = 0;
 		globalRenderDataRef.viewPort.TopLeftY = 0;
 		globalRenderDataRef.viewPort.Width = static_cast<float>(window->GetWidth());
@@ -67,8 +67,8 @@ namespace BoulderLeaf::Graphics::DX12
 		globalRenderDataRef.scissorRect = { 0, 0, static_cast<long>(window->GetWidth()), static_cast<long>(window->GetHeight()) };
 
 		globalRenderDataRef.device = std::make_shared<blDevice>();
-		globalRenderDataRef.commandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device);
-		globalRenderDataRef.commandQueue = std::make_shared<blCommandQueue>(globalRenderDataRef.device);
+		globalRenderDataRef.commandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
+		globalRenderDataRef.commandQueue = std::make_shared<blCommandQueue>(globalRenderDataRef.device, L"Global");
 		globalRenderDataRef.factory = std::make_shared<blFactory>();
 
 		globalRenderDataRef.swapChain = std::make_shared<blSwapChain>(
@@ -86,8 +86,10 @@ namespace BoulderLeaf::Graphics::DX12
 		globalRenderDataRef.bufferCache = std::make_shared<blDX12BufferDataCache>(globalRenderDataRef.device);
 		
 		globalRenderDataRef.depthBuffer = std::make_shared<blDepthBuffer>(globalRenderDataRef.device, window);
-		globalRenderDataRef.fence = std::make_shared<blFence>(globalRenderDataRef.device);
-		globalRenderDataRef.constantBufferDescriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(globalRenderDataRef.device);
+		globalRenderDataRef.fence = std::make_shared<blFence>(globalRenderDataRef.device, L"Global");
+		globalRenderDataRef.constantBufferDescriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(
+			globalRenderDataRef.device,
+			L"Global");
 
 		globalRenderDataRef.constantBufferCache = std::make_shared<blDX12ConstantBufferCache>(
 			globalRenderDataRef.device,
@@ -104,6 +106,13 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Wait until initialization is complete.
 		FlushCommandQueue();
+
+		/*mCommandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator);
+
+		//When should I do this? it was not in the example
+		//You cannot call Reset unless it is in a closed state
+		DX12_API_CALL(mCommandList->GetCommandListPtr()->Close());
+		DX12_API_CALL(mCommandList->GetCommandListPtr()->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr));*/
 	}
 
 	blDX12::~blDX12()
@@ -156,10 +165,6 @@ namespace BoulderLeaf::Graphics::DX12
 		{
 			renderComponent->StartFrame();
 		}
-
-		// Clear the back buffer and depth buffer.
-		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = mGlobalRenderDataPtr->depthBuffer->DepthStencilView();
-		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = mGlobalRenderDataPtr->swapChain->CurrentBackBufferView();
 
 		if (imguiEnabled)
 		{
@@ -217,10 +222,11 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		blRenderGroupData& dx12GroupData = mGlobalRenderDataPtr->renderGroupData[group];
 		BoulderLeaf::Graphics::blRenderGroupData& groupData = blRenderGroups::GetRenderGroupData(group);
-		dx12GroupData.commandListAllocator = std::make_shared<blCommandListAllocator>(mGlobalRenderDataPtr->device);
-		//dx12GroupData.commandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator);
-		dx12GroupData.commandList = std::make_shared<blCommandList>(dx12GroupData.commandListAllocator);
-		dx12GroupData.commandList->GetCommandListPtr()->SetName(groupData.NameWide.c_str());
+		dx12GroupData.commandListAllocator = std::make_shared<blCommandListAllocator>(
+			mGlobalRenderDataPtr->device,
+			groupData.NameWide);
+
+		dx12GroupData.commandList = std::make_shared<blCommandList>(dx12GroupData.commandListAllocator, groupData.NameWide);
 
 		dx12GroupData.meshDataDeviceCache = std::make_shared<blDX12MeshDataDeviceCache>(
 			mGlobalRenderDataPtr->device,

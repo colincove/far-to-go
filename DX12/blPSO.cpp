@@ -9,7 +9,8 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12RootSignature> rootSignature,
 		std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout,
 		ComPtr<ID3DBlob> mvsByteCode,
-		ComPtr<ID3DBlob> mpsByteCode)
+		ComPtr<ID3DBlob> mpsByteCode,
+		std::wstring name)
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 		ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -44,5 +45,8 @@ namespace BoulderLeaf::Graphics::DX12
 		std::size_t h1 = std::hash<int>{}(mvsByteCode->GetBufferSize());
 		std::size_t h2 = std::hash<int>{}(mpsByteCode->GetBufferSize());
 		mHash = h1 ^ (h2 << 1);
+
+		std::wstring wName = L"[BL] " + name;
+		mPSO->SetName(wName.c_str());
 	}
 }

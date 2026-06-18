@@ -68,6 +68,14 @@ namespace BoulderLeaf::Graphics::DX12
 			VertexBufferUploader = nullptr;
 			IndexBufferUploader = nullptr;
 		}
+
+		void SetResourceNames(std::wstring name)
+		{
+			VertexBufferGPU->SetName((L"[BL][VertexBufferGPU] " + name).c_str());
+			IndexBufferGPU->SetName((L"[BL][IndexBufferGPU] " + name).c_str());
+			VertexBufferUploader->SetName((L"[BL][VertexBufferUploader] " + name).c_str());
+			IndexBufferUploader->SetName((L"[BL][IndexBufferUploader] " + name).c_str());
+		}
 	};
 
 	template<typename Mesh>

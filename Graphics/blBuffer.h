@@ -14,6 +14,8 @@
 #include <Resources/blResource.h>
 #include <stdexcept>
 #include <string>
+#include <blGraphicsCore.h>
+#include <minwindef.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -49,6 +51,8 @@ namespace BoulderLeaf::Graphics
 		virtual void MarshalVector4(const Math::Vector4& srcElement, byte* destElement) const = 0;
 		virtual void MarshalMatrix3x3(const Math::Matrix3x3& srcElement, byte* destElement) const = 0;
 		virtual void MarshalMatrix4x4(const Math::Matrix4x4& srcElement, byte* destElement) const = 0;
+
+		size_t SizeOf(const std::vector<BufferElementDescription>& elementDescriptions) const;
 	};
 
 	void MarshalBuffer(
@@ -70,7 +74,17 @@ namespace BoulderLeaf::Graphics
 
 	class blDataBufferInterface
 	{
+	private:
+		std::wstring mName;
 	public:
+
+		blDataBufferInterface(const std::wstring& name)
+			:mName(name)
+		{
+		}
+
+		blDataBufferInterface() : blDataBufferInterface(L"[BL] Data Buffer") {}
+
 		virtual const std::vector<BufferElementDescription>& GetDataElementDescriptions() const
 		{
 			static std::vector<BufferElementDescription> defaultDescriptions;
@@ -98,20 +112,27 @@ namespace BoulderLeaf::Graphics
 		{
 			throw std::invalid_argument("Not Implemented. Abstract.");
 		}
+
+		const std::wstring& GetName() const
+		{
+			return mName;
+		}
 	};
 
-	template<typename TDataDefinition>
+	template<typename TDataDefinition, typename... Args>
 	class blDataBuffer :
 		public std::vector<typename TDataDefinition::ElementType>,
 		public blDataBufferInterface
 	{
-	private:
+	public:
 		using BaseVector = std::vector<typename TDataDefinition::ElementType>;
 	public:
 		using TData = TDataDefinition::ElementType;
 
 		// inherit all constructors from vector
 		using BaseVector::vector;
+
+		blDataBuffer(Args&&... args) : blDataBufferInterface(), BaseVector(std::forward<Args>(args)...) {}
 
 		virtual size_t Count() const override { return BaseVector::size(); };
 		virtual const byte& Get(size_t index) const override
@@ -142,29 +163,37 @@ namespace BoulderLeaf::Graphics
 		std::vector<BufferElementDescription> mElementDescriptions;
 		size_t mElementSize;
 		size_t mCount;
+		UINT mCalculatedStrideLength;
 	public:
 		blBasicDataBuffer() {}
 		blBasicDataBuffer(
-			const std::vector<BufferElementDescription>& elementDescriptions, 
+			const std::vector<BufferElementDescription>& elementDescriptions,
 			size_t count,
-			const blBufferElementAdapter& adapter)
+			const blBufferElementAdapter& adapter,
+			const UINT optEnforcedStride = 0)
 			: mElementDescriptions(elementDescriptions),
-			mCount(count)
+			mCount(count),
+			mCalculatedStrideLength(0)
 		{
 			mElementSize = GetBufferElementSize(
 				elementDescriptions,
 				adapter);
 
-			mBuffer = std::make_unique<byte[]>(mElementSize * count);
+			mCalculatedStrideLength = optEnforcedStride == 0 ? 
+				static_cast<UINT>(mElementSize) : EnforceByteStrideLength(static_cast<UINT>(mElementSize), optEnforcedStride);
+
+			mBuffer = std::make_unique<byte[]>(mCalculatedStrideLength * count);
 		}
 
 		blBasicDataBuffer(
 			const blDataBufferInterface& dataBuffer,
-			const blBufferElementAdapter& adapter)
+			const blBufferElementAdapter& adapter,
+			const unsigned int optEnforcedStride = 0)
 			: blBasicDataBuffer(
 				dataBuffer.GetDataElementDescriptions(),
 				dataBuffer.Count(),
-				adapter)
+				adapter,
+				optEnforcedStride)
 		{
 			MarshalBuffer(
 				dataBuffer.Count(),
@@ -192,17 +221,17 @@ namespace BoulderLeaf::Graphics
 
 		virtual const byte& Get(size_t index) const
 		{
-			return mBuffer[index * mElementSize];
+			return mBuffer[index * mCalculatedStrideLength];
 		};
 
 		virtual byte& GetMutable(size_t index)
 		{
-			return mBuffer[index * mElementSize];
+			return mBuffer[index * mCalculatedStrideLength];
 		};
 
 		virtual size_t GetElementSize()
 		{
-			return mElementSize;
+			return mCalculatedStrideLength;
 		}
 	};
 }
