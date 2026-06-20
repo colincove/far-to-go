@@ -16,7 +16,7 @@ namespace BoulderLeaf::Graphics::DX12
 			return;
 		}
 
-		blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[item.group];
+		blRenderGroupData& groupData = mGlobalRenderData->renderGroupData[item.group];
 
 		//TODO render
 		const blCompositeMeshDataCacheData& cache = groupData.compositeMeshStorageCache->Get(

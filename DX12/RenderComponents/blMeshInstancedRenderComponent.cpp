@@ -14,7 +14,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blMeshInstancedRenderComponent::Render(const RenderMeshDataInstanced& renderData, const  blSceneResourcePtr scene)
 	{
-		blGlobalRenderData& globalRenderData = *mGlobalRenderDataPtr.get();
+		blGlobalRenderData& globalRenderData = *mGlobalRenderData.get();
 
 		const blMaterial& material = renderData.material->GetData();
 		const blShaderResource& shaderResource = *material.shader;
@@ -37,22 +37,21 @@ namespace BoulderLeaf::Graphics::DX12
 		D3D12_INDEX_BUFFER_VIEW indexBufferView = meshDeviceCacheData.meshGeometry.IndexBufferView();
 
 		// Specify the buffers we are going to render to.
-		ID3D12GraphicsCommandList& commandList = *mCommandList->GetCommandListPtr().Get();
-		commandList.OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
+		mCommandList->OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
 		ID3D12DescriptorHeap* descriptorHeaps[] = { globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()};
-		commandList.SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-		commandList.SetGraphicsRootSignature(shaderCacheData.RootSignature->GetRootSignature().Get());
-		commandList.IASetVertexBuffers(0, 1, &vertexBufferView);
-		commandList.IASetIndexBuffer(&indexBufferView);
-		commandList.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		mCommandList->SetGraphicsRootSignature(shaderCacheData.RootSignature->GetRootSignature().Get());
+		mCommandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+		mCommandList->IASetIndexBuffer(&indexBufferView);
+		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
-		commandList.SetPipelineState(psoCacheData.PSO->GetDX12PSO().Get());
+		mCommandList->SetPipelineState(psoCacheData.PSO->GetDX12PSO().Get());
 		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
 
 		for (int i = 0; i < renderData.constantBuffer->GetData().size(); ++i)
 		{
-			commandList.SetGraphicsRootDescriptorTable(0, cbvHandle);
-			commandList.DrawIndexedInstanced(
+			mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+			mCommandList->DrawIndexedInstanced(
 				(int) meshCacheData.meshStorage.GetIndexCount(),
 				1, 0, 0, 0);
 			cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());

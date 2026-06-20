@@ -14,6 +14,12 @@
 namespace
 {
 	bool imguiEnabled = true;
+
+	#define RENDER_COMPONENT_FUNCTION_CALL(functionName) \
+	for (blRenderComponentBase* renderComponent : mRenderComponents) \
+	{ \
+		renderComponent->functionName(); \
+	}
 }
 
 namespace BoulderLeaf::Graphics::DX12
@@ -25,8 +31,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mMeshRenderComponent(),
 		mMeshInstancedRenderComponent(),
 		mCompositeMeshRenderComponent(),
-		mCurrentFence(0),
-		mDX12Imgui(std::make_shared<blDX12Imgui>(mGlobalRenderDataPtr, mWindow))
+		mCurrentFence(0)
 	{
 		//this is not working for me right now. not sure why. some build issues. 
 //#ifdef DEBUG
@@ -57,12 +62,7 @@ namespace BoulderLeaf::Graphics::DX12
 		globalRenderDataRef.scissorRect = { 0, 0, static_cast<long>(window->GetWidth()), static_cast<long>(window->GetHeight()) };
 
 		globalRenderDataRef.device = std::make_shared<blDevice>();
-		globalRenderDataRef.commandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
-		globalRenderDataRef.commandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator, L"Default");
-		globalRenderDataRef.commandListAllocator2 = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
-		globalRenderDataRef.imguiCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Imgui");
-		globalRenderDataRef.commandList2 = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator2, L"Default");
-		globalRenderDataRef.imgguiCommandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->imguiCommandListAllocator, L"Imgui");
+
 		globalRenderDataRef.commandQueue = std::make_shared<blCommandQueue>(globalRenderDataRef.device, L"Global");
 		globalRenderDataRef.factory = std::make_shared<blFactory>();
 
@@ -99,16 +99,23 @@ namespace BoulderLeaf::Graphics::DX12
 			globalRenderDataRef.mPSOCache
 		};
 
+		mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
+		mCommandList = std::make_shared<blCommandList>(mCommandListAllocator, L"Default");
+		mEndCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global End");
+		mEndCommandList = std::make_shared<blCommandList>(mEndCommandListAllocator, L"Global End");
+
 		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
 		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
 		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
+		mDX12ImguiRenderComponent = std::make_shared<blDX12Imgui>(mGlobalRenderDataPtr, mWindow);
 
 		//this vector is kind of dumb. Does not scale. And holds raw pointers to components that are owned by unique_ptrs. But it is what it is for now. We can optimize this later if we need to.
 		mRenderComponents = std::vector<blRenderComponentBase*>
 		{
-			mMeshRenderComponent.get(),
+			//mMeshRenderComponent.get(), //not functioning right now. 
 			mMeshInstancedRenderComponent.get(),
-			mMeshInstancedRenderComponent.get()
+			mDX12ImguiRenderComponent.get(),
+			mCompositeMeshRenderComponent.get()
 		};
 
 		// Wait until initialization is complete.
@@ -122,7 +129,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 	LRESULT blDX12::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		return mDX12Imgui->WndProc(hWnd, msg, wParam, lParam);
+		return mDX12ImguiRenderComponent->WndProc(hWnd, msg, wParam, lParam);
 	}
 
 	void blDX12::OnWindowMessage(MSG msg)
@@ -137,31 +144,26 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blDX12::InitializeInternal()
 	{
-		if (imguiEnabled)
-		{
-			mDX12Imgui->Initialize();
-		}
+		RENDER_COMPONENT_FUNCTION_CALL(Initialize)
 
 		// Execute the initialization commands.
 		//m_dx12->mCommandList->Close(); //I am assuming that I don't need to do this, beause I am doing it above. 
 		std::vector<ID3D12CommandList*> cmdsLists;
 
-		mGlobalRenderDataPtr->commandList->Close();
-		mGlobalRenderDataPtr->commandList2->Close();
-		mGlobalRenderDataPtr->imgguiCommandList->Close();
-		mMeshInstancedRenderComponent->GetCommandList()->Close();
+		mCommandList->Close();
+		mEndCommandList->Close();
 
 		// Wait until initialization is complete.
 		FlushCommandQueue();
 
 		mGlobalRenderDataPtr->meshDataDeviceCache = std::make_shared<blDX12MeshDataDeviceCache>(
 			mGlobalRenderDataPtr->device,
-			mGlobalRenderDataPtr->commandList,
+			mCommandList, //this should work. Buuuuuut. I need to figure out more about how the command list is related to this cache. I might be missing something. 
 			mGlobalRenderDataPtr->meshStorageCache);
 
 		mGlobalRenderDataPtr->compositeMeshStorageCache = std::make_shared<blCompositeMeshDataCache>(
 			mGlobalRenderDataPtr->device,
-			mGlobalRenderDataPtr->commandList,
+			mCommandList, //this should work. Buuuuuut. I need to figure out more about how the command list is related to this cache. I might be missing something. 
 			mGlobalRenderDataPtr->meshStorageCache);
 	}
 
@@ -181,37 +183,16 @@ namespace BoulderLeaf::Graphics::DX12
 
 		mDirtyResources.clear();
 
-		for (blRenderComponentBase* renderComponent : mRenderComponents)
-		{
-			//renderComponent->StartFrame();
-		}
-		mGlobalRenderDataPtr->imguiCommandListAllocator->Reset();
-		mGlobalRenderDataPtr->imgguiCommandList->Reset();
+		RENDER_COMPONENT_FUNCTION_CALL(StartFrame)
 
-		mMeshInstancedRenderComponent->GetCommandListAllocator()->Reset();
-		mMeshInstancedRenderComponent->GetCommandList()->Reset();
-
-		mGlobalRenderDataPtr->commandListAllocator->Reset();
-		mGlobalRenderDataPtr->commandList->Reset();
-
-		mGlobalRenderDataPtr->commandListAllocator2->Reset();
-		mGlobalRenderDataPtr->commandList2->Reset();
-
-		if (imguiEnabled)
-		{
-			mDX12Imgui->StartFrame();
-		}
+		mCommandListAllocator->Reset();
+		mCommandList->Reset();
+		mEndCommandListAllocator->Reset();
+		mEndCommandList->Reset();
 
 		//TODO make sure we are setting up viewPort correctly. 
-		mGlobalRenderDataPtr->commandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
-		mGlobalRenderDataPtr->commandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
-
-		mGlobalRenderDataPtr->commandList2->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
-		mGlobalRenderDataPtr->commandList2->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
-		mMeshInstancedRenderComponent->GetCommandList()->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
-		mMeshInstancedRenderComponent->GetCommandList()->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
-		mGlobalRenderDataPtr->imgguiCommandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
-		mGlobalRenderDataPtr->imgguiCommandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
+		mCommandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
+		mCommandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
 
 		// Indicate a state transition on the resource usage.
 		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
@@ -224,50 +205,42 @@ namespace BoulderLeaf::Graphics::DX12
 		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-		mGlobalRenderDataPtr->commandList->ResourceBarrier(1, &resourceBarrier);
-		mGlobalRenderDataPtr->commandList->ClearRenderTargetView(mGlobalRenderDataPtr->swapChain->CurrentBackBufferView(),
+		mCommandList->ResourceBarrier(1, &resourceBarrier);
+		mCommandList->ClearRenderTargetView(mGlobalRenderDataPtr->swapChain->CurrentBackBufferView(),
 			Colors::LightSteelBlue, 0, nullptr);
-		mGlobalRenderDataPtr->commandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),
+		mCommandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
 			1.0f, 0, 0, nullptr);
+
+		// Record command for ending the frame
+		resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		mEndCommandList->ResourceBarrier(1,
+			&resourceBarrier);
 	}
 
 	void blDX12::EndFrameInternal()
 	{
-		if (imguiEnabled)
-		{
-			mDX12Imgui->EndFrame();
-		}
-
-		mMeshInstancedRenderComponent->GetCommandList()->Close();
-		// Done recording commands.
-		
-
-		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
-		std::shared_ptr<blCommandList> commandList = mGlobalRenderDataPtr->commandList2;
-		// TODO present and wait for GPU
-		CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
-			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		commandList->ResourceBarrier(1,
-			&resourceBarrier);
+		RENDER_COMPONENT_FUNCTION_CALL(EndFrame)
 
 		// Done recording commands.
-		mGlobalRenderDataPtr->commandList->Close();
-		mGlobalRenderDataPtr->commandList2->Close();
-		mGlobalRenderDataPtr->imgguiCommandList->Close();
+		mCommandList->Close();
+		mEndCommandList->Close();
 
 		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
-			std::vector<std::shared_ptr<blCommandList>> {mGlobalRenderDataPtr->commandList}
+			std::vector<std::shared_ptr<blCommandList>> {mCommandList}
 		);
 
 		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
 			std::vector<std::shared_ptr<blCommandList>> {
 				mMeshInstancedRenderComponent->GetCommandList(),
-				mGlobalRenderDataPtr->imgguiCommandList}
+				mDX12ImguiRenderComponent->GetCommandList()
+			}
 		);
 
 		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
-			std::vector<std::shared_ptr<blCommandList>> {mGlobalRenderDataPtr->commandList2}
+			std::vector<std::shared_ptr<blCommandList>> {mEndCommandList}
 		);
 
 		mGlobalRenderDataPtr->swapChain->Present();

@@ -9,7 +9,7 @@ namespace BoulderLeaf::Graphics::DX12
 	class blRenderComponentBase
 	{
 	protected:
-		std::shared_ptr<blGlobalRenderData> mGlobalRenderDataPtr;
+		std::shared_ptr<blGlobalRenderData> mGlobalRenderData;
 		std::shared_ptr<blCommandList> mCommandList;
 		std::shared_ptr<blCommandListAllocator> mCommandListAllocator;
 	public:
@@ -18,28 +18,35 @@ namespace BoulderLeaf::Graphics::DX12
 
 		blRenderComponentBase(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr,
 			std::wstring name = L"blRenderComponentBase")
-			: mGlobalRenderDataPtr(globalRenderDataPtr)
+			: mGlobalRenderData(globalRenderDataPtr)
 		{
-
 			mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataPtr->device, L"RenderComponent");
 			mCommandList = std::make_shared<blCommandList>(mCommandListAllocator, name);
-
-			DX12_API_CALL(mCommandList->GetCommandListPtr()->Close());
-			mCommandListAllocator->Reset();
-			DX12_API_CALL(mCommandList->GetCommandListPtr()->Reset(mCommandListAllocator->GetAllocatorPtr().Get(), nullptr));
 		}
+
+		virtual void Initialize() 
+		{
+			mCommandList->Close();
+		};
 
 		virtual void StartFrame() 
 		{
-			ComPtr<ID3D12GraphicsCommandList> commandList = mCommandList->GetCommandListPtr();
 			mCommandListAllocator->GetAllocatorPtr().Get()->Reset();
-			commandList->Reset(mCommandListAllocator->GetAllocatorPtr().Get(), nullptr);
+			mCommandList->Reset(mCommandListAllocator);
+			mCommandList->RSSetViewports(1, &mGlobalRenderData->viewPort);
+			mCommandList->RSSetScissorRects(1, &mGlobalRenderData->scissorRect);
 		};
-		virtual void EndFrame() {};
+
+		virtual void EndFrame()
+		{
+			mCommandList->Close();
+		};
+
 		std::shared_ptr<blCommandList> GetCommandList()
 		{
 			return mCommandList;
 		}
+
 		std::shared_ptr<blCommandListAllocator> GetCommandListAllocator()
 		{
 			return mCommandListAllocator;
