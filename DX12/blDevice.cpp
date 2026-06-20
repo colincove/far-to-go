@@ -9,7 +9,7 @@ namespace BoulderLeaf::Graphics::DX12
 			D3D_FEATURE_LEVEL_11_0,
 			IID_PPV_ARGS(&mDevice)));
 
-		mDevice->SetName((L"[BL] " + name).c_str());
+		DX12_API_CALL(mDevice->SetName((L"[BL] " + name).c_str()));
 
 		mRtvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		mDsvDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);

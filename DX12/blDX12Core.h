@@ -17,7 +17,7 @@ namespace BoulderLeaf::Graphics::DX12
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 #ifdef DEBUG
-	#define DX12_API_CALL(a) assert((a) == S_OK)
+	#define DX12_API_CALL(a) {HRESULT r = (a); if(FAILED(r)) throw stdruntime_error("DX12 API failed: " + stdto_string((long)r));}
 #else
 	#define DX12_API_CALL(a) (a)
 #endif // DEBUG

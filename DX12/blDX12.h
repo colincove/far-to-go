@@ -42,12 +42,10 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<Core::blWindow> mWindow;
 		std::map<blSceneResource, blRenderSceneContext> mSceneContextMap;
 		std::shared_ptr<blDX12Imgui> mDX12Imgui;
-		std::shared_ptr<blCommandList> mCommandList;
 		UINT64 mCurrentFence;
 	public:
 		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
-		virtual void InitializeBegin() override;
-		virtual void InitializeFinish() override;
+		virtual void InitializeInternal() override;
 		virtual void DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene) override;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
 		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
@@ -58,9 +56,6 @@ namespace BoulderLeaf::Graphics::DX12
 	protected:
 		void OnWindowMessage(MSG msg) override;
 		void OnResize() override;
-		virtual void InitializeGroupInternal(const blRenderGroupId& group) override;
-		void GroupStartFrame(blRenderGroupId group);
-		void GroupEndFrame(blRenderGroupId group);
 
 		void StartFrameInternal() override;
 		void EndFrameInternal() override;

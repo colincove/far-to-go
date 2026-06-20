@@ -31,13 +31,6 @@ namespace BoulderLeaf::Graphics
 	{
 	}
 
-	void API::InitializeGroup(const blRenderGroupId& group)
-	{
-		InitializeGroupInternal(group);
-		RenderGroupData& groupData = renderGroupData[group];
-		groupData.initialized = true;
-	}
-
 	void API::Update(const Metrics::blTime& time)
 	{
 		UpdateInternal(time);
@@ -56,16 +49,7 @@ namespace BoulderLeaf::Graphics
 	void API::Initialize()
 	{
 		assert(!mInitialized);
-		InitializeBegin();
-
-		for (blRenderGroupId group : blRenderGroups::Iterator())
-		{
-			RenderGroupData& groupData = renderGroupData[group];
-			assert(!groupData.initialized);
-			InitializeGroup(group);
-		}
-
-		InitializeFinish();
+		InitializeInternal();
 		mInitialized = true;
 	}
 }

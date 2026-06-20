@@ -66,10 +66,10 @@ namespace BoulderLeaf::Graphics::DX12
 		//You need to do this goofy looking QueryInterface thing. It is very odd. WHy?
 		//(code taken from imgui dx12 backend examples)
 		IDXGISwapChain1* swapChain1 = nullptr;
-		factory->GetDX12Factory()->CreateSwapChainForHwnd(commandQueue->GetDX12CommandQueue().Get(), window->GetWindowHandle(), &desc, &fullscreenDesc, NULL, &swapChain1);
+		DX12_API_CALL(factory->GetDX12Factory()->CreateSwapChainForHwnd(commandQueue->GetDX12CommandQueue().Get(), window->GetWindowHandle(), &desc, &fullscreenDesc, NULL, &swapChain1));
 		DX12_API_CALL(swapChain1->QueryInterface(IID_PPV_ARGS(&mSwapChain)));
 		swapChain1->Release();
-
+		
 		D3D12_DESCRIPTOR_HEAP_DESC rvtHeapDesc;
 		rvtHeapDesc.NumDescriptors = bufferCount;
 		rvtHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
@@ -82,7 +82,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(
 			mRtvHeap->GetCPUDescriptorHandleForHeapStart());
-
+		
 		for (UINT i = 0; i < bufferCount; i++)
 		{
 			// Get the ith buffer in the swap chain.

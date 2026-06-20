@@ -39,7 +39,7 @@ namespace BoulderLeaf::Graphics::DX12
 		psoDesc.SampleDesc.Count = 1;
 		psoDesc.SampleDesc.Quality = 0;
 		psoDesc.DSVFormat = Constants::DepthStencilFormat;
-		device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO));
+		DX12_API_CALL(device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 
 		//TODO: Find better way to hash PSO to manage caches and generating of PSOs
 		std::size_t h1 = std::hash<int>{}(mvsByteCode->GetBufferSize());

@@ -17,6 +17,6 @@ namespace BoulderLeaf::Graphics::DX12
 		cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		cbvHeapDesc.NodeMask = 0;
 		DX12_API_CALL(device->GetDX12Device()->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(mDescriptorHeap.GetAddressOf())));
-		mDescriptorHeap->SetName((L"[BL] " + name).c_str());
+		DX12_API_CALL(mDescriptorHeap->SetName((L"[BL] " + name).c_str()));
 	}
 }

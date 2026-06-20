@@ -78,6 +78,6 @@ namespace BoulderLeaf::Graphics::DX12
 			IID_PPV_ARGS(&mRootSignature)));
 
 		std::wstring stemp = L"[BL] " + std::wstring(shader.mName.begin(), shader.mName.end());
-		mRootSignature->SetName(stemp.c_str());
+		DX12_API_CALL(mRootSignature->SetName(stemp.c_str()));
 	}
 }

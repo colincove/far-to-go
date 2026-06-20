@@ -52,28 +52,24 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12Resource> defaultBuffer;
 		const CD3DX12_HEAP_PROPERTIES heapPropertiesDefault(D3D12_HEAP_TYPE_DEFAULT);
 		const CD3DX12_RESOURCE_DESC bufferDesc(CD3DX12_RESOURCE_DESC::Buffer(byteSize));
-		const HRESULT bufferResult = device->CreateCommittedResource(
+		DX12_API_CALL(device->CreateCommittedResource(
 			&heapPropertiesDefault,
 			D3D12_HEAP_FLAG_NONE,
 			&bufferDesc,
 			D3D12_RESOURCE_STATE_COMMON,
 			nullptr,
 			IID_PPV_ARGS(defaultBuffer.GetAddressOf())
-		);
-
-		assert(bufferResult == S_OK);
+		));
 
 		const CD3DX12_HEAP_PROPERTIES heapPropertiesUpload(D3D12_HEAP_TYPE_UPLOAD);
-		const HRESULT uploadResourceResult = device->CreateCommittedResource(
+		DX12_API_CALL(device->CreateCommittedResource(
 			&heapPropertiesUpload,
 			D3D12_HEAP_FLAG_NONE,
 			&bufferDesc,
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(uploadBuffer.GetAddressOf())
-		);
-
-		assert(uploadResourceResult == S_OK);
+		));
 
 		const D3D12_SUBRESOURCE_DATA subresoureData(initData, byteSize, byteSize);
 
@@ -122,9 +118,9 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		const blMeshStorage::Header& header = storage.GetHeader();
 
-		D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.VertexBufferCPU);
+		DX12_API_CALL(D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.VertexBufferCPU));
 		CopyMemory(meshGeometry.VertexBufferCPU->GetBufferPointer(), storage.VertexBegin(), header.GetVertexBufferSize());
-		D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.IndexBufferCPU);
+		DX12_API_CALL(D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.IndexBufferCPU));
 		CopyMemory(meshGeometry.IndexBufferCPU->GetBufferPointer(), storage.IndexBegin(), header.GetVertexBufferSize());
 
 		meshGeometry.VertexBufferGPU = CreateDefaultBuffer(

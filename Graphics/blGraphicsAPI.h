@@ -49,14 +49,12 @@ namespace BoulderLeaf::Graphics
 		void Update(const Metrics::blTime& time);
 		void Initialize();
 	protected:
-		virtual void InitializeFinish() {};
-		virtual void InitializeBegin() {};
+		virtual void InitializeInternal() {};
 		virtual void UpdateInternal(const Metrics::blTime& time) {};
 		virtual void StartFrameInternal() {};
 		virtual void EndFrameInternal() {};
 		virtual void OnWindowMessage(MSG msg);
 		virtual void OnResize();
-		virtual void InitializeGroupInternal(const blRenderGroupId& group) {};
 	private:
 		void InitializeGroup(const blRenderGroupId& group);
 	};

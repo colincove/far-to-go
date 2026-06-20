@@ -55,7 +55,7 @@ namespace BoulderLeaf::Graphics::DX12
 			nullptr,
 			DepthStencilView());
 
-		mDepthBufferView->SetName(L"[BL] DepthBuffer");
+		DX12_API_CALL(mDepthBufferView->SetName(L"[BL] DepthBuffer"));
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE blDepthBuffer::DepthStencilView() const

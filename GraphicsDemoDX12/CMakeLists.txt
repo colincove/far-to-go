@@ -28,6 +28,8 @@ target_include_directories(GraphicsDemoDX12
 	../Graphics
 )
 
+add_compile_definitions(Debug=1)
+
 #TODO: install directory based on build type
 install(TARGETS GraphicsDemoDX12 CONFIGURATIONS Debug DESTINATION Debug)
 

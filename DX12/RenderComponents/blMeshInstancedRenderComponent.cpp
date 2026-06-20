@@ -4,14 +4,17 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	blMeshInstancedRenderComponent::blMeshInstancedRenderComponent(
 		std::shared_ptr<blGlobalRenderData> globalRenderDataPtr)
-		: blRenderComponent(globalRenderDataPtr)
+		: blRenderComponent(globalRenderDataPtr, L"blMeshInstancedRenderComponent"),
+		mMeshDataDeviceCache(std::make_shared<blDX12MeshDataDeviceCache>(
+			globalRenderDataPtr->device,
+			mCommandList,
+			globalRenderDataPtr->meshStorageCache))
 	{
 	}
 
 	void blMeshInstancedRenderComponent::Render(const RenderMeshDataInstanced& renderData, const  blSceneResourcePtr scene)
 	{
 		blGlobalRenderData& globalRenderData = *mGlobalRenderDataPtr.get();
-		blRenderGroupData& groupData = globalRenderData.renderGroupData[renderData.group];
 
 		const blMaterial& material = renderData.material->GetData();
 		const blShaderResource& shaderResource = *material.shader;
@@ -21,7 +24,7 @@ namespace BoulderLeaf::Graphics::DX12
 		const blMeshBaseResource& meshResource = *renderData.mesh;
 		const blMeshBase& mesh = meshResource.GetData();
 		const blDX12MeshStorageCacheData& meshCacheData = globalRenderData.meshStorageCache->Get(meshResource);
-		const blDX12MeshDataDeviceCacheData& meshDeviceCacheData = groupData.meshDataDeviceCache->Get(meshResource);
+		const blDX12MeshDataDeviceCacheData& meshDeviceCacheData = mMeshDataDeviceCache->Get(meshResource);
 		const blPSOCacheData& psoCacheData = globalRenderData.mPSOCache->Get(shaderResource);
 
 		// Do I not do anything with this data? How do constant buffers get bound? I'm confused. 
@@ -34,7 +37,7 @@ namespace BoulderLeaf::Graphics::DX12
 		D3D12_INDEX_BUFFER_VIEW indexBufferView = meshDeviceCacheData.meshGeometry.IndexBufferView();
 
 		// Specify the buffers we are going to render to.
-		ID3D12GraphicsCommandList& commandList = *groupData.commandList->GetCommandListPtr().Get();
+		ID3D12GraphicsCommandList& commandList = *mCommandList->GetCommandListPtr().Get();
 		commandList.OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
 		ID3D12DescriptorHeap* descriptorHeaps[] = { globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()};
 		commandList.SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);

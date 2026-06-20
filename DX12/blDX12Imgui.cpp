@@ -110,7 +110,7 @@ namespace BoulderLeaf::Graphics::DX12
 		info.CommandQueue = mGlobalRenderData->commandQueue->GetDX12CommandQueue().Get();
 		info.DSVFormat = Constants::DepthStencilFormat;
 		info.RTVFormat = Constants::BackbufferFormat;
-		info.SrvDescriptorHeap = mGlobalRenderData->swapChain->GetRtvHeap().Get();
+		info.SrvDescriptorHeap = mConstantBufferDescriptorHeap->GetDescriptorHeap().Get();
 		info.NumFramesInFlight = 1;
 
 		info.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_desc_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_desc_handle)
@@ -147,13 +147,12 @@ namespace BoulderLeaf::Graphics::DX12
 		// Rendering
 		ImGui::Render();
 
-		blRenderGroupData& renderGroupData = mGlobalRenderData->renderGroupData[blRenderGroups::Default];
-		//blRenderGroupData& renderGroupData = mGlobalRenderData->renderGroupData[ImguiRenderGroup];
-
 		//this function is asking for a pointer to an array. I should sore these as an array in DX12
 		ID3D12DescriptorHeap* descriptorHeaps[] = { mConstantBufferDescriptorHeap->GetDescriptorHeap().Get()};
-		renderGroupData.commandList->GetCommandListPtr().Get()->SetDescriptorHeaps(1, descriptorHeaps);
-
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), renderGroupData.commandList->GetCommandListPtr().Get());
+		mGlobalRenderData->imgguiCommandList->SetDescriptorHeaps(1, descriptorHeaps);
+		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = mGlobalRenderData->depthBuffer->DepthStencilView();
+		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = mGlobalRenderData->swapChain->CurrentBackBufferView();
+		mGlobalRenderData->imgguiCommandList->OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), mGlobalRenderData->imgguiCommandList->GetCommandListPtr().Get());
 	}
 }

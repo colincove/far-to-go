@@ -28,7 +28,9 @@ namespace BoulderLeaf::Graphics::DX12
 		mCurrentFence(0),
 		mDX12Imgui(std::make_shared<blDX12Imgui>(mGlobalRenderDataPtr, mWindow))
 	{
-#ifdef DEBUG
+		//this is not working for me right now. not sure why. some build issues. 
+//#ifdef DEBUG
+#if 1
 		ComPtr<ID3D12Debug> debugController;
 		DX12_API_CALL(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
 		debugController->EnableDebugLayer();
@@ -45,18 +47,6 @@ namespace BoulderLeaf::Graphics::DX12
 
 		blGlobalRenderData& globalRenderDataRef = *mGlobalRenderDataPtr.get();
 
-		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
-		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
-		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
-
-		//this vector is kind of dumb. Does not scale. And holds raw pointers to components that are owned by unique_ptrs. But it is what it is for now. We can optimize this later if we need to.
-		mRenderComponents = std::vector<blRenderComponentBase*>
-		{
-			mMeshRenderComponent.get(),
-			mMeshInstancedRenderComponent.get(),
-			mMeshInstancedRenderComponent.get()
-		};
-
 		globalRenderDataRef.viewPort.TopLeftX = 0;
 		globalRenderDataRef.viewPort.TopLeftY = 0;
 		globalRenderDataRef.viewPort.Width = static_cast<float>(window->GetWidth());
@@ -68,6 +58,11 @@ namespace BoulderLeaf::Graphics::DX12
 
 		globalRenderDataRef.device = std::make_shared<blDevice>();
 		globalRenderDataRef.commandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
+		globalRenderDataRef.commandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator, L"Default");
+		globalRenderDataRef.commandListAllocator2 = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
+		globalRenderDataRef.imguiCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Imgui");
+		globalRenderDataRef.commandList2 = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator2, L"Default");
+		globalRenderDataRef.imgguiCommandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->imguiCommandListAllocator, L"Imgui");
 		globalRenderDataRef.commandQueue = std::make_shared<blCommandQueue>(globalRenderDataRef.device, L"Global");
 		globalRenderDataRef.factory = std::make_shared<blFactory>();
 
@@ -104,15 +99,20 @@ namespace BoulderLeaf::Graphics::DX12
 			globalRenderDataRef.mPSOCache
 		};
 
+		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
+		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
+		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
+
+		//this vector is kind of dumb. Does not scale. And holds raw pointers to components that are owned by unique_ptrs. But it is what it is for now. We can optimize this later if we need to.
+		mRenderComponents = std::vector<blRenderComponentBase*>
+		{
+			mMeshRenderComponent.get(),
+			mMeshInstancedRenderComponent.get(),
+			mMeshInstancedRenderComponent.get()
+		};
+
 		// Wait until initialization is complete.
 		FlushCommandQueue();
-
-		/*mCommandList = std::make_shared<blCommandList>(mGlobalRenderDataPtr->commandListAllocator);
-
-		//When should I do this? it was not in the example
-		//You cannot call Reset unless it is in a closed state
-		DX12_API_CALL(mCommandList->GetCommandListPtr()->Close());
-		DX12_API_CALL(mCommandList->GetCommandListPtr()->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr));*/
 	}
 
 	blDX12::~blDX12()
@@ -135,6 +135,36 @@ namespace BoulderLeaf::Graphics::DX12
 
 	}
 
+	void blDX12::InitializeInternal()
+	{
+		if (imguiEnabled)
+		{
+			mDX12Imgui->Initialize();
+		}
+
+		// Execute the initialization commands.
+		//m_dx12->mCommandList->Close(); //I am assuming that I don't need to do this, beause I am doing it above. 
+		std::vector<ID3D12CommandList*> cmdsLists;
+
+		mGlobalRenderDataPtr->commandList->Close();
+		mGlobalRenderDataPtr->commandList2->Close();
+		mGlobalRenderDataPtr->imgguiCommandList->Close();
+		mMeshInstancedRenderComponent->GetCommandList()->Close();
+
+		// Wait until initialization is complete.
+		FlushCommandQueue();
+
+		mGlobalRenderDataPtr->meshDataDeviceCache = std::make_shared<blDX12MeshDataDeviceCache>(
+			mGlobalRenderDataPtr->device,
+			mGlobalRenderDataPtr->commandList,
+			mGlobalRenderDataPtr->meshStorageCache);
+
+		mGlobalRenderDataPtr->compositeMeshStorageCache = std::make_shared<blCompositeMeshDataCache>(
+			mGlobalRenderDataPtr->device,
+			mGlobalRenderDataPtr->commandList,
+			mGlobalRenderDataPtr->meshStorageCache);
+	}
+
 	void blDX12::StartFrameInternal()
 	{
 		// TODO: We can optimize this by only updating the caches that are associated with the dirty resources.
@@ -151,25 +181,55 @@ namespace BoulderLeaf::Graphics::DX12
 
 		mDirtyResources.clear();
 
-		// Reuse the memory associated with command recording.
-		// We can only reset when the associated command lists have finished
-		// execution on the GPU.
-		//mGlobalRenderDataPtr->commandListAllocator->Reset();
-
-		for (blRenderGroupId group : blRenderGroups::Iterator())
-		{
-			GroupStartFrame(group);
-		}
-
 		for (blRenderComponentBase* renderComponent : mRenderComponents)
 		{
-			renderComponent->StartFrame();
+			//renderComponent->StartFrame();
 		}
+		mGlobalRenderDataPtr->imguiCommandListAllocator->Reset();
+		mGlobalRenderDataPtr->imgguiCommandList->Reset();
+
+		mMeshInstancedRenderComponent->GetCommandListAllocator()->Reset();
+		mMeshInstancedRenderComponent->GetCommandList()->Reset();
+
+		mGlobalRenderDataPtr->commandListAllocator->Reset();
+		mGlobalRenderDataPtr->commandList->Reset();
+
+		mGlobalRenderDataPtr->commandListAllocator2->Reset();
+		mGlobalRenderDataPtr->commandList2->Reset();
 
 		if (imguiEnabled)
 		{
 			mDX12Imgui->StartFrame();
 		}
+
+		//TODO make sure we are setting up viewPort correctly. 
+		mGlobalRenderDataPtr->commandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
+		mGlobalRenderDataPtr->commandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
+
+		mGlobalRenderDataPtr->commandList2->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
+		mGlobalRenderDataPtr->commandList2->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
+		mMeshInstancedRenderComponent->GetCommandList()->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
+		mMeshInstancedRenderComponent->GetCommandList()->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
+		mGlobalRenderDataPtr->imgguiCommandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
+		mGlobalRenderDataPtr->imgguiCommandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
+
+		// Indicate a state transition on the resource usage.
+		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
+
+		D3D12_RESOURCE_BARRIER resourceBarrier = {};
+		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		resourceBarrier.Transition.pResource = currentBackBuffer;
+		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+		mGlobalRenderDataPtr->commandList->ResourceBarrier(1, &resourceBarrier);
+		mGlobalRenderDataPtr->commandList->ClearRenderTargetView(mGlobalRenderDataPtr->swapChain->CurrentBackBufferView(),
+			Colors::LightSteelBlue, 0, nullptr);
+		mGlobalRenderDataPtr->commandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+			1.0f, 0, 0, nullptr);
 	}
 
 	void blDX12::EndFrameInternal()
@@ -178,20 +238,36 @@ namespace BoulderLeaf::Graphics::DX12
 		{
 			mDX12Imgui->EndFrame();
 		}
+
+		mMeshInstancedRenderComponent->GetCommandList()->Close();
+		// Done recording commands.
 		
-		std::vector<ID3D12CommandList*> cmdsLists;
-		cmdsLists.reserve(blRenderGroups::GetCount());
 
-		for (blRenderGroupId group : blRenderGroups::Iterator())
-		{
-			GroupEndFrame(group);	
-			blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
-			cmdsLists.push_back(groupData.commandList->GetCommandListPtr().Get());
-		}
+		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
+		std::shared_ptr<blCommandList> commandList = mGlobalRenderDataPtr->commandList2;
+		// TODO present and wait for GPU
+		CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		commandList->ResourceBarrier(1,
+			&resourceBarrier);
 
-		mGlobalRenderDataPtr->commandQueue->GetDX12CommandQueue()->ExecuteCommandLists(
-			static_cast<UINT>(cmdsLists.size()), 
-			reinterpret_cast<ID3D12CommandList* const*>(cmdsLists.data()) // will this work? took it from LLM. 
+		// Done recording commands.
+		mGlobalRenderDataPtr->commandList->Close();
+		mGlobalRenderDataPtr->commandList2->Close();
+		mGlobalRenderDataPtr->imgguiCommandList->Close();
+
+		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
+			std::vector<std::shared_ptr<blCommandList>> {mGlobalRenderDataPtr->commandList}
+		);
+
+		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
+			std::vector<std::shared_ptr<blCommandList>> {
+				mMeshInstancedRenderComponent->GetCommandList(),
+				mGlobalRenderDataPtr->imgguiCommandList}
+		);
+
+		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
+			std::vector<std::shared_ptr<blCommandList>> {mGlobalRenderDataPtr->commandList2}
 		);
 
 		mGlobalRenderDataPtr->swapChain->Present();
@@ -216,125 +292,6 @@ namespace BoulderLeaf::Graphics::DX12
 	void blDX12::MarkResourceDirty(const blResourceId resourceId)
 	{
 		mDirtyResources.insert(resourceId);
-	}
-
-	void blDX12::InitializeGroupInternal(const blRenderGroupId& group)
-	{
-		blRenderGroupData& dx12GroupData = mGlobalRenderDataPtr->renderGroupData[group];
-		BoulderLeaf::Graphics::blRenderGroupData& groupData = blRenderGroups::GetRenderGroupData(group);
-		dx12GroupData.commandListAllocator = std::make_shared<blCommandListAllocator>(
-			mGlobalRenderDataPtr->device,
-			groupData.NameWide);
-
-		dx12GroupData.commandList = std::make_shared<blCommandList>(dx12GroupData.commandListAllocator, groupData.NameWide);
-
-		dx12GroupData.meshDataDeviceCache = std::make_shared<blDX12MeshDataDeviceCache>(
-			mGlobalRenderDataPtr->device,
-			dx12GroupData.commandList,
-			mGlobalRenderDataPtr->meshStorageCache);
-
-		dx12GroupData.compositeMeshStorageCache = std::make_shared<blCompositeMeshDataCache>(
-			mGlobalRenderDataPtr->device,
-			dx12GroupData.commandList,
-			mGlobalRenderDataPtr->meshStorageCache);
-
-		ComPtr<ID3D12GraphicsCommandList> commandList = dx12GroupData.commandList->GetCommandListPtr();
-
-
-		//When should I do this? it was not in the example
-		//You cannot call Reset unless it is in a closed state
-		DX12_API_CALL(commandList->Close());
-		DX12_API_CALL(commandList->Reset(dx12GroupData.commandListAllocator->GetAllocatorPtr().Get(), nullptr));
-		//DX12_API_CALL(commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr));
-	}
-
-	void blDX12::InitializeBegin()
-	{
-		if (imguiEnabled)
-		{
-			mDX12Imgui->Initialize();
-		}
-	}
-
-	void blDX12::InitializeFinish()
-	{
-		// Execute the initialization commands.
-		//m_dx12->mCommandList->Close(); //I am assuming that I don't need to do this, beause I am doing it above. 
-		std::vector<ID3D12CommandList*> cmdsLists;
-		cmdsLists.reserve(blRenderGroups::GetCount());
-
-		for (blRenderGroupId group : blRenderGroups::Iterator())
-		{
-			blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
-
-			//again. Why do do Need to do this? I got an error.
-			//Command lists must be closed before execution.
-			groupData.commandList->GetCommandListPtr()->Close();
-			cmdsLists.push_back(groupData.commandList->GetCommandListPtr().Get());
-		}
-
-		mGlobalRenderDataPtr->commandQueue->GetDX12CommandQueue()->ExecuteCommandLists(
-			static_cast<UINT>(cmdsLists.size()),
-			reinterpret_cast<ID3D12CommandList* const*>(cmdsLists.data()) // will this work? took it from LLM. 
-		);
-
-		// Wait until initialization is complete.
-		FlushCommandQueue();
-	}
-
-	void blDX12::GroupStartFrame(blRenderGroupId group)
-	{
-		blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
-		ComPtr<ID3D12GraphicsCommandList> commandList = groupData.commandList->GetCommandListPtr();
-		groupData.commandListAllocator->GetAllocatorPtr().Get()->Reset();
-		commandList->Reset(groupData.commandListAllocator->GetAllocatorPtr().Get(), nullptr);
-		//commandList->Reset(mGlobalRenderDataPtr->commandListAllocator->GetAllocatorPtr().Get(), nullptr);
-
-		//TODO make sure we are setting up viewPort correctly. 
-		commandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
-		commandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
-
-		// Indicate a state transition on the resource usage.
-		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
-		/*CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
-			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);*/
-
-		//Trying to figure out why Imgui will not render. There is an issue with shader resource views, from what I can tell. 
-		//So I am fooling around with resource states. 
-		D3D12_RESOURCE_BARRIER resourceBarrier = {};
-		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		resourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		resourceBarrier.Transition.pResource = currentBackBuffer;
-		resourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		resourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
-		commandList->ResourceBarrier(1, &resourceBarrier);
-
-		//intresting. if I have multiple command lists, do I need to clear the render target view for each one? That does not sound right. 
-		//maybe you are only supposed to do this for your primary command list?
-		//Yes. If we have 2 groups, then we will clear the render targets multiple times. It is broken. 
-		//Need to rethink groups most likely. They were dumb anyway. Just trying to create structure when I
-		//do not know what I am doing. 
-		commandList->ClearRenderTargetView(mGlobalRenderDataPtr->swapChain->CurrentBackBufferView(),
-			Colors::LightSteelBlue, 0, nullptr);
-		commandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),
-			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
-			1.0f, 0, 0, nullptr);
-	}
-
-	void blDX12::GroupEndFrame(blRenderGroupId group)
-	{
-		blRenderGroupData& groupData = mGlobalRenderDataPtr->renderGroupData[group];
-		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
-		ComPtr<ID3D12GraphicsCommandList> commandList = groupData.commandList->GetCommandListPtr();
-		// TODO present and wait for GPU
-		CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(currentBackBuffer,
-			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		commandList->ResourceBarrier(1,
-			&resourceBarrier);
-		// Done recording commands.
-		commandList->Close();
 	}
 
 	// Wait until frame commands are complete. This waiting is

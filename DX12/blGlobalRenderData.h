@@ -32,6 +32,8 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		std::shared_ptr<blDevice> device;
 		std::shared_ptr<blCommandListAllocator> commandListAllocator;
+		std::shared_ptr<blCommandListAllocator> commandListAllocator2;
+		std::shared_ptr<blCommandListAllocator> imguiCommandListAllocator;
 		std::shared_ptr<blCommandQueue> commandQueue;
 		std::shared_ptr<blFactory> factory;
 		std::shared_ptr<blSwapChain> swapChain;
@@ -43,6 +45,11 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blDepthBuffer> depthBuffer;
 		std::shared_ptr<blFence> fence;
 		std::shared_ptr<blConstantBufferDescriptorHeap> constantBufferDescriptorHeap;
+		std::shared_ptr<blDX12MeshDataDeviceCache> meshDataDeviceCache;
+		std::shared_ptr<blCompositeMeshDataCache> compositeMeshStorageCache;
+		std::shared_ptr<blCommandList> commandList;
+		std::shared_ptr<blCommandList> commandList2;
+		std::shared_ptr<blCommandList> imgguiCommandList;
 
 		blRenderGroupData renderGroupData[blRenderGroups::MaxValue];
 

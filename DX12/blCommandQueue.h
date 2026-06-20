@@ -4,6 +4,7 @@
 #include <d3d12.h>
 #include <memory>
 #include <blDevice.h>
+#include <blCommandList.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -23,6 +24,21 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blDevice> GetDevice()
 		{
 			return mDevice;
+		}
+
+		void ExecuteCommandLists(const std::vector<std::shared_ptr<blCommandList>>& commandLists) const
+		{
+			const UINT numCommandLists = (UINT) commandLists.size();
+
+			std::vector<ID3D12CommandList*> commandListsVector;
+			commandListsVector.reserve(numCommandLists);
+
+			for (const std::shared_ptr<blCommandList>& commandList : commandLists)
+			{
+				commandListsVector.push_back(commandList->GetCommandListPtr().Get());
+			}
+
+			mCommandQueue->ExecuteCommandLists(numCommandLists, commandListsVector.data());
 		}
 	};
 }
