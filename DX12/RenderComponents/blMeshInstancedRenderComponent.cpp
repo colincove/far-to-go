@@ -48,7 +48,10 @@ namespace BoulderLeaf::Graphics::DX12
 		mCommandList->SetPipelineState(psoCacheData.PSO->GetDX12PSO().Get());
 		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
 
-		for (int i = 0; i < renderData.constantBuffer->GetData().size(); ++i)
+		const size_t count = renderData.constantBuffer->GetData().size();
+		cbvHandle.Offset((globalRenderData.device->GetCbvSrvDescriptorSize() * count) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource());
+
+		for (int i = 0; i < count; ++i)
 		{
 			mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
 			mCommandList->DrawIndexedInstanced(

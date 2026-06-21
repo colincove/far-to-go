@@ -9,6 +9,8 @@ add_library(
 	blConstantBuffer.h
 	blConstantBuffer.cpp
 	blGlobalRenderData.h
+	blGlobalRenderFrameContext.h
+	blGlobalRenderFrameContext.cpp
 	blDX12Buffer.cpp
 	blDX12Buffer.h
 	blDX12Core.h

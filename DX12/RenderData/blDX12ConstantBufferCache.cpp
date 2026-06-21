@@ -6,10 +6,12 @@ namespace BoulderLeaf::Graphics::DX12
 	blDX12ConstantBufferCache::blDX12ConstantBufferCache(
 		std::shared_ptr<blDevice> device,
 		std::shared_ptr<blConstantBufferDescriptorHeap> cbvHeap,
-		std::shared_ptr<blDX12BufferDataCache> bufferCache) : 
+		std::shared_ptr<blDX12BufferDataCache> bufferCache,
+		std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext) :
 		mDevice(device), 
 		mBufferCache(bufferCache),
-		mCbvHeap(cbvHeap)
+		mCbvHeap(cbvHeap),
+		mGlobalRenderFrameContext(globalRenderFrameContext)
 	{
 	}
 
@@ -24,16 +26,21 @@ namespace BoulderLeaf::Graphics::DX12
 		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = bufferData.uploadBuffer->Resource()->GetGPUVirtualAddress();
 		auto cbvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(mCbvHeap->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
-		for (int i = 0; i < resource.GetData().Count(); ++i)
+		const size_t count = resource.GetData().Count();
+		for (int frameResource = 0; frameResource < Constants::FrameResourceCount; ++frameResource)
 		{
-			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-			cbvDesc.BufferLocation = cbAddress + i * objCBByteSize;
-			cbvDesc.SizeInBytes = objCBByteSize;
-			mDevice->GetDX12Device()->CreateConstantBufferView(
-				&cbvDesc,
-				cbvHandle);
-			cbvHandle.Offset(mDevice->GetCbvSrvDescriptorSize());
+			for (int i = 0; i < count; ++i)
+			{
+				D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 
+				//this is ugly. probably need to figure out a cleaner way to calculate and share
+				cbvDesc.BufferLocation = (cbAddress + ((objCBByteSize * count) * frameResource)) + (i * objCBByteSize);
+				cbvDesc.SizeInBytes = objCBByteSize;
+				mDevice->GetDX12Device()->CreateConstantBufferView(
+					&cbvDesc,
+					cbvHandle);
+				cbvHandle.Offset(mDevice->GetCbvSrvDescriptorSize());
+			}
 		}
 	}
 }

@@ -38,5 +38,6 @@ namespace BoulderLeaf::Graphics::DX12
 		const static DXGI_FORMAT DepthStencilFormat;
 		const static int SwapChainBufferCount;
 		const static int SrvHeapSize;
+		const static int FrameResourceCount;
 	};
 }

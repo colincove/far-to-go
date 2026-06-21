@@ -9,7 +9,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 	const int Constants::SwapChainBufferCount = 2;
 	const int Constants::SrvHeapSize = 64;
-
+	const int Constants::FrameResourceCount = 3;
+	
 	DXGI_FORMAT ConvertImageFormatToDXGIFormat(eImageFormat format)
 	{
 		return (DXGI_FORMAT) format;

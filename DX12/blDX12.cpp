@@ -13,8 +13,6 @@
 
 namespace
 {
-	bool imguiEnabled = true;
-
 	#define RENDER_COMPONENT_FUNCTION_CALL(functionName) \
 	for (blRenderComponentBase* renderComponent : mRenderComponents) \
 	{ \
@@ -52,6 +50,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 		blGlobalRenderData& globalRenderDataRef = *mGlobalRenderDataPtr.get();
 
+		globalRenderDataRef.globalRenderFrameContext = std::make_shared<blGlobalRenderFrameContext>();
+
 		globalRenderDataRef.viewPort.TopLeftX = 0;
 		globalRenderDataRef.viewPort.TopLeftY = 0;
 		globalRenderDataRef.viewPort.Width = static_cast<float>(window->GetWidth());
@@ -78,7 +78,9 @@ namespace BoulderLeaf::Graphics::DX12
 		globalRenderDataRef.mPSOCache = std::make_shared<blPSOCache>(
 			globalRenderDataRef.device,
 			globalRenderDataRef.shaderCache);
-		globalRenderDataRef.bufferCache = std::make_shared<blDX12BufferDataCache>(globalRenderDataRef.device);
+		globalRenderDataRef.bufferCache = std::make_shared<blDX12BufferDataCache>(
+			globalRenderDataRef.device, 
+			globalRenderDataRef.globalRenderFrameContext);
 		
 		globalRenderDataRef.depthBuffer = std::make_shared<blDepthBuffer>(globalRenderDataRef.device, window);
 		globalRenderDataRef.fence = std::make_shared<blFence>(globalRenderDataRef.device, L"Global");
@@ -89,7 +91,8 @@ namespace BoulderLeaf::Graphics::DX12
 		globalRenderDataRef.constantBufferCache = std::make_shared<blDX12ConstantBufferCache>(
 			globalRenderDataRef.device,
 			globalRenderDataRef.constantBufferDescriptorHeap,
-			globalRenderDataRef.bufferCache);
+			globalRenderDataRef.bufferCache,
+			globalRenderDataRef.globalRenderFrameContext);
 
 		mResourceCaches = {
 			globalRenderDataRef.shaderCache,
@@ -101,8 +104,6 @@ namespace BoulderLeaf::Graphics::DX12
 
 		mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
 		mCommandList = std::make_shared<blCommandList>(mCommandListAllocator, L"Default");
-		mEndCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global End");
-		mEndCommandList = std::make_shared<blCommandList>(mEndCommandListAllocator, L"Global End");
 
 		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
 		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
@@ -146,15 +147,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		RENDER_COMPONENT_FUNCTION_CALL(Initialize)
 
-		// Execute the initialization commands.
-		//m_dx12->mCommandList->Close(); //I am assuming that I don't need to do this, beause I am doing it above. 
-		std::vector<ID3D12CommandList*> cmdsLists;
-
 		mCommandList->Close();
-		mEndCommandList->Close();
-
-		// Wait until initialization is complete.
-		FlushCommandQueue();
 
 		mGlobalRenderDataPtr->meshDataDeviceCache = std::make_shared<blDX12MeshDataDeviceCache>(
 			mGlobalRenderDataPtr->device,
@@ -165,6 +158,12 @@ namespace BoulderLeaf::Graphics::DX12
 			mGlobalRenderDataPtr->device,
 			mCommandList, //this should work. Buuuuuut. I need to figure out more about how the command list is related to this cache. I might be missing something. 
 			mGlobalRenderDataPtr->meshStorageCache);
+	}
+
+	void blDX12::UpdateInternal(const Metrics::blTime& time)
+	{
+		mGlobalRenderDataPtr->globalRenderFrameContext->currentGameTime = time;
+		mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource = (Constants::FrameResourceCount + time.Tick()) % Constants::FrameResourceCount;
 	}
 
 	void blDX12::StartFrameInternal()
@@ -186,9 +185,7 @@ namespace BoulderLeaf::Graphics::DX12
 		RENDER_COMPONENT_FUNCTION_CALL(StartFrame)
 
 		mCommandListAllocator->Reset();
-		mCommandList->Reset();
-		mEndCommandListAllocator->Reset();
-		mEndCommandList->Reset();
+		mCommandList->Reset(mCommandListAllocator);
 
 		//TODO make sure we are setting up viewPort correctly. 
 		mCommandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
@@ -211,13 +208,6 @@ namespace BoulderLeaf::Graphics::DX12
 		mCommandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
 			1.0f, 0, 0, nullptr);
-
-		// Record command for ending the frame
-		resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer(),
-			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-		mEndCommandList->ResourceBarrier(1,
-			&resourceBarrier);
 	}
 
 	void blDX12::EndFrameInternal()
@@ -226,7 +216,6 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Done recording commands.
 		mCommandList->Close();
-		mEndCommandList->Close();
 
 		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
 			std::vector<std::shared_ptr<blCommandList>> {mCommandList}
@@ -239,8 +228,18 @@ namespace BoulderLeaf::Graphics::DX12
 			}
 		);
 
+		mCommandList->Reset(mCommandListAllocator);
+
+		D3D12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		mCommandList->ResourceBarrier(1,
+			&resourceBarrier);
+
+		mCommandList->Close();
+
 		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
-			std::vector<std::shared_ptr<blCommandList>> {mEndCommandList}
+			std::vector<std::shared_ptr<blCommandList>> {mCommandList}
 		);
 
 		mGlobalRenderDataPtr->swapChain->Present();

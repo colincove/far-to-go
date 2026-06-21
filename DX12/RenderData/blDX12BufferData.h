@@ -8,6 +8,7 @@
 #include <blDX12Math.inl>
 #include "../DirectX-Headers/include/directx/d3dx12.h"
 #include <blBufferTypes.h>
+#include <blGlobalRenderFrameContext.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -33,7 +34,11 @@ namespace BoulderLeaf::Graphics::DX12
 			const UINT elementBySizeToUse = isConstantBuffer ? mConstantBufferElementByteSize : elementByteSize;
 
 			auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-			auto desc = CD3DX12_RESOURCE_DESC::Buffer(elementBySizeToUse * elementCount);
+
+			auto size = elementBySizeToUse * elementCount
+				* (isConstantBuffer ? Constants::FrameResourceCount : 1);
+
+			auto desc = CD3DX12_RESOURCE_DESC::Buffer(size);
 
 			device->CreateCommittedResource(
 				&heapProp,
@@ -70,16 +75,11 @@ namespace BoulderLeaf::Graphics::DX12
 			memcpy(&mMappedData[elementIndex * mElementByteSize], &data, mElementByteSize);
 		}
 
-		void CopyInstanedData(int startIndex, int numElements, const byte& data)
+		void CopyInstanedData(int startIndex, int numElements, const byte& data, const int currentFrameResource)
 		{
 			const UINT elementBySizeToUse = mIsConstantBuffer ? mConstantBufferElementByteSize : mElementByteSize;
-			// ignore startIndex right now. support later, in a different way
-			memcpy(&mMappedData[0], &data, numElements * elementBySizeToUse);
-
-			/*for (int i = 0; i < numElements; ++i)
-			{
-				memcpy(&mMappedData[i * elementBySizeToUse], &data, mElementByteSize * i);
-			}*/
+			auto offset = (currentFrameResource * (numElements * elementBySizeToUse) * mIsConstantBuffer);
+			memcpy(&mMappedData[0] + offset, &data, numElements * elementBySizeToUse);
 		}
 
 		ComPtr<ID3D12Resource> mUploadBuffer;
@@ -101,8 +101,10 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	private:
 		std::shared_ptr<blDevice> mDevice;
+		std::shared_ptr<blGlobalRenderFrameContext> mGlobalRenderFrameContext;
 	public:
-		blDX12BufferDataCache(std::shared_ptr<blDevice> device);
+		blDX12BufferDataCache(std::shared_ptr<blDevice> device, 
+			std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext);
 		virtual void UpdateCache(const blResourceId& resourceId) override;
 	protected:
 		virtual void InitializeCache(

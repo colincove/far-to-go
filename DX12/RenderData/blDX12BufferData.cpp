@@ -7,8 +7,10 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blDX12BufferDataCache::blDX12BufferDataCache(std::shared_ptr<blDevice> device)
-		: mDevice(device), blDX12ResourceDataCache()
+	blDX12BufferDataCache::blDX12BufferDataCache(
+		std::shared_ptr<blDevice> device, 
+		std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext)
+		: mDevice(device), blDX12ResourceDataCache(), mGlobalRenderFrameContext(globalRenderFrameContext)
 	{
 
 	}
@@ -20,11 +22,14 @@ namespace BoulderLeaf::Graphics::DX12
 		using namespace DirectX;
 
 		const blStandardObjectConstantsBuffer& resourceData = resource.GetData();
+		const UINT enforceConstanceBufferStride = Math::CalcConstantBufferByteSize(
+			GetBufferElementSize(resourceData.GetDataElementDescriptions(), DX12::DX12BufferAdapter::Get())
+		);
 
 		cache.dataBuffer = blBasicDataBuffer(
 			reinterpret_cast<const blDataBufferInterface&>(resourceData),
 			DX12::DX12BufferAdapter::Get(),
-			256);
+			enforceConstanceBufferStride);
 
 		cache.uploadBuffer = std::make_shared<blUploadBuffer>(
 			mDevice.get()->GetDX12Device().Get(),
@@ -33,7 +38,11 @@ namespace BoulderLeaf::Graphics::DX12
 			true);
 
 		cache.uploadBuffer->Resource()->SetName(resourceData.GetName().c_str());
-		cache.uploadBuffer->CopyInstanedData(0, (int) resourceData.Count(), cache.dataBuffer.Get(0));
+		cache.uploadBuffer->CopyInstanedData(
+			0, 
+			(int) resourceData.Count(), 
+			cache.dataBuffer.Get(0),
+			mGlobalRenderFrameContext->GetCurrentFrameResource());
 	}
 
 	void blDX12BufferDataCache::UpdateCache(const blResourceId& resourceId)
@@ -53,7 +62,14 @@ namespace BoulderLeaf::Graphics::DX12
 			DX12::DX12BufferAdapter::Get(),
 			enforceConstanceBufferStride);
 
-		cache.uploadBuffer->CopyInstanedData(0, (int) resourceData.Count(), cache.dataBuffer.Get(0));
-		//cache.uploadBuffer->CopyData(0, cache.dataBuffer.Get(0));
+		// NOTE: I just added mGlobalRenderFrameContext->GetCurrentFrameResource()
+		// for data that changes every frame (as my current test does), this works. 
+		// but right now, if the frame resource moves, and we do NOT mark it dirty, 
+		// we would NOT upload the previous frame data to the new location. 
+		// if we dirty ONE frame resource, we basicaly need to dirty all 3. And upload for every resource. 
+		cache.uploadBuffer->CopyInstanedData(
+			0, (int) resourceData.Count(), 
+			cache.dataBuffer.Get(0), 
+			mGlobalRenderFrameContext->GetCurrentFrameResource());
 	}
 }
