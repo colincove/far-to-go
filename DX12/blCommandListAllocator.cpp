@@ -15,6 +15,11 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blCommandListAllocator::Reset()
 	{
-		DX12_API_CALL(mCommandListAllocator->Reset());
+		HRESULT result = mCommandListAllocator->Reset();
+
+		if (FAILED(result))
+		{
+			bool wtf = false;
+		}
 	}
 }

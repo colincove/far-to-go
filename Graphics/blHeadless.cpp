@@ -28,4 +28,8 @@ namespace BoulderLeaf::Graphics
 
 	}
 
+	void Headless::DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene) 
+	{
+
+	}
 }

@@ -40,5 +40,11 @@ namespace BoulderLeaf::Graphics::DX12
 
 			mCommandQueue->ExecuteCommandLists(numCommandLists, commandListsVector.data());
 		}
+
+		template<typename... Args>
+		void Signal(Args&&... args)
+		{
+			mCommandQueue->Signal(std::forward<Args>(args)...);
+		}
 	};
 }

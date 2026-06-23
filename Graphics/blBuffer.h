@@ -19,6 +19,12 @@
 
 namespace BoulderLeaf::Graphics
 {
+	enum class BufferFormat
+	{
+		BoulderLeaf,
+		DX12
+	};
+
 	enum class BufferElementType : byte
 	{
 		Float2,
@@ -26,7 +32,6 @@ namespace BoulderLeaf::Graphics
 		Float4,
 		Matrix3x3,
 		Matrix4x4,
-
 	};
 
 	struct BufferElementDescription
@@ -35,9 +40,10 @@ namespace BoulderLeaf::Graphics
 		BufferElementType ElementType;
 	};
 
-	template<typename TElement>
+	template<typename TElement, BufferFormat TFormat>
 	struct BufferDefinition
 	{
+		constexpr static BufferFormat Format = TFormat;
 		using ElementType = TElement;
 		static const std::vector<BufferElementDescription> Description;
 	};
@@ -51,6 +57,7 @@ namespace BoulderLeaf::Graphics
 		virtual void MarshalVector4(const Math::Vector4& srcElement, byte* destElement) const = 0;
 		virtual void MarshalMatrix3x3(const Math::Matrix3x3& srcElement, byte* destElement) const = 0;
 		virtual void MarshalMatrix4x4(const Math::Matrix4x4& srcElement, byte* destElement) const = 0;
+		virtual BufferFormat GetFormat() const = 0;
 
 		size_t SizeOf(const std::vector<BufferElementDescription>& elementDescriptions) const;
 	};
@@ -71,6 +78,23 @@ namespace BoulderLeaf::Graphics
 	size_t GetBufferElementSize(
 		const std::vector<BufferElementDescription>& elementDescriptions,
 		const blBufferElementAdapter& adapter);
+
+	class blDataElementBuffer
+	{
+	private:
+		BufferFormat mFormat;
+		std::vector<BufferElementDescription> mElementDescriptions;
+		std::unique_ptr<byte[]> mData;
+	public:
+		blDataElementBuffer(BufferFormat format,
+			std::vector<BufferElementDescription> elementDescriptions,
+			std::unique_ptr<byte[]> data);
+
+		BufferFormat GetFormat() const { return mFormat; }
+		const std::vector<BufferElementDescription>& GetElementDescriptions() const { return mElementDescriptions; }
+		const byte* GetData() const { return mData.get(); };
+		byte* GetDataMutable() const { return mData.get(); };
+	};
 
 	class blDataBufferInterface
 	{
@@ -237,3 +261,23 @@ namespace BoulderLeaf::Graphics
 }
 
 BL_RESOURCE(blDataBufferInterface, eResourceType::DataBuffer);
+BL_RESOURCE(blDataElementBuffer, eResourceType::DataBuffer);
+
+namespace BoulderLeaf::Graphics
+{
+	class blVertexBufferWithPassBuffer
+	{
+	private:
+		blDataElementBufferResourcePtr mPassElementBuffer;
+		blDataBufferInterfaceResourcePtr mVertexBuffer;
+	public:
+		blVertexBufferWithPassBuffer(
+			blDataElementBufferResourcePtr passElementBuffer,
+			blDataBufferInterfaceResourcePtr vertexBuffer);
+
+		const blDataElementBufferResourcePtr GetPassElementBuffer() const { return mPassElementBuffer; }
+		const blDataBufferInterfaceResourcePtr GetVertexBuffer() const { return mVertexBuffer; }
+	};
+}
+
+BL_RESOURCE(blVertexBufferWithPassBuffer, eResourceType::DataBuffer)

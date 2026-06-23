@@ -1,16 +1,7 @@
 #include <blDX12Core.h>
 
 namespace BoulderLeaf::Graphics::DX12
-{
-
-	//NOTE: This format was randomly chosen. Verify correct value later
-	const DXGI_FORMAT Constants::BackbufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	const DXGI_FORMAT Constants::DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-	const int Constants::SwapChainBufferCount = 2;
-	const int Constants::SrvHeapSize = 64;
-	const int Constants::FrameResourceCount = 3;
-	
+{	
 	DXGI_FORMAT ConvertImageFormatToDXGIFormat(eImageFormat format)
 	{
 		return (DXGI_FORMAT) format;

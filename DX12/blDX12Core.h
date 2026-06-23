@@ -34,10 +34,12 @@ namespace BoulderLeaf::Graphics::DX12
 
 	struct Constants
 	{
-		const static DXGI_FORMAT BackbufferFormat;
-		const static DXGI_FORMAT DepthStencilFormat;
-		const static int SwapChainBufferCount;
-		const static int SrvHeapSize;
-		const static int FrameResourceCount;
+		//NOTE: This format was randomly chosen. Verify correct value later
+		static constexpr  DXGI_FORMAT BackbufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		static constexpr  DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		static constexpr  int SwapChainBufferCount = 2;
+		static constexpr  int SrvHeapSize = 64; //this will likely not remain a constant. not appropriate.
+		static constexpr int FrameResourceCount = 3;
 	};
 }

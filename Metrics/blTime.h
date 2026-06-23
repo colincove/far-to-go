@@ -61,5 +61,15 @@ namespace BoulderLeaf::Metrics
 		{
 			return mBegin;
 		}
+
+		static duration Seconds(long seconds)
+		{
+			return std::chrono::seconds(seconds);
+		}
+
+		static duration Milliseconds(long milliseconds)
+		{
+			return std::chrono::milliseconds(milliseconds);
+		}
 	};
 }

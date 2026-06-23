@@ -11,17 +11,17 @@
 #include <blVirtualCamera.h>
 #include <blWindow.h>
 #include <blTime.h>
+#include <DemoScene.h>
 
 namespace BoulderLeaf::Graphics
 {
-	class blDemoScene01
+	class blCylinderDemoScene : public blDemoScene
 	{
 	private:
 		blMeshBaseResourcePtr mBoxMeshResource;
 		blSceneResourcePtr mSceneResource;
 		blShaderResourcePtr mShaderResource;
 		blMaterialResourcePtr mMaterialResource;
-		std::shared_ptr<API> mGraphicsAPI;
 		blStandardObjectConstantsBufferResourcePtr mObjectConstantBufferResource;
 		blStandardObjectConstantsBufferPtr mInstanceDataResource;
 		RenderMeshDataInstanced mDrawData;
@@ -32,8 +32,8 @@ namespace BoulderLeaf::Graphics
 		float mRadius = 5.0f;
 		VirtualCamera mCamera;
 	public:
-		blDemoScene01(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window);
-		void Draw();
-		void Update(const Metrics::blTime& gameTime);
+		blCylinderDemoScene(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window);
+		virtual void Draw() override;
+		virtual void Update(const Metrics::blTime& gameTime) override;
 	};
 }

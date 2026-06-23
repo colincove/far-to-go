@@ -14,6 +14,21 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12Fence> mFence;
 	public:
 		blFence(std::shared_ptr<blDevice> device, std::wstring name = L"Default");
-		ComPtr<ID3D12Fence> GetFence() { return mFence; }
+		ID3D12Fence* Get() { return mFence.Get(); }
+
+		UINT64 GetCompletedValue();
+
+		HRESULT SetEventOnCompletion(
+			UINT64 Value,
+			HANDLE hEvent);
+
+		HRESULT Signal(
+			UINT64 Value);
+
+		template<typename... Args>
+		HRESULT SetEventOnCompletion(Args&&... args)
+		{
+			return mFence->SetEventOnCompletion(std::forward<Args>(args)...);
+		}
 	};
 }

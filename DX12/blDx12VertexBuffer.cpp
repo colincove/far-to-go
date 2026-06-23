@@ -116,6 +116,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blDX12Mesh& meshGeometry,
 		SubmeshGeometry& submesh)
 	{
+		assert(storage.GetFormat() == BufferFormat::DX12);
 		const blMeshStorage::Header& header = storage.GetHeader();
 
 		DX12_API_CALL(D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.VertexBufferCPU));
@@ -134,7 +135,7 @@ namespace BoulderLeaf::Graphics::DX12
 			device,
 			commandList,
 			storage.IndexBegin(),
-			header.GetVertexBufferSize(),
+			header.GetIndexBufferSize(),
 			meshGeometry.IndexBufferUploader);
 
 		meshGeometry.VertexByteStride = (UINT)header.mVertexSize;

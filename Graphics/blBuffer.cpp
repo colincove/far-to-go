@@ -90,4 +90,22 @@ namespace BoulderLeaf::Graphics
 
 		return elementSize;
 	}
+
+	blDataElementBuffer::blDataElementBuffer(BufferFormat format,
+		std::vector<BufferElementDescription> elementDescriptions,
+		std::unique_ptr<byte[]> data)
+		: mFormat(format),
+		mElementDescriptions(elementDescriptions),
+		mData(std::move(data))
+	{
+
+	}
+
+	blVertexBufferWithPassBuffer::blVertexBufferWithPassBuffer(
+		blDataElementBufferResourcePtr passElementBuffer,
+		blDataBufferInterfaceResourcePtr vertexBuffer)
+		: mPassElementBuffer(passElementBuffer),
+		mVertexBuffer(vertexBuffer)
+	{
+	}
 }

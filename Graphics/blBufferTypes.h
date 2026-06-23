@@ -11,7 +11,7 @@ namespace BoulderLeaf::Graphics
 		Math::Matrix4x4 WorldViewProj = Math::Matrix4x4::Identity();
 	};
 
-	struct blStandardObjectConstantsDefinition : public BufferDefinition<blStandardObjectConstants>
+	struct blStandardObjectConstantsDefinition : public BufferDefinition<blStandardObjectConstants, BufferFormat::BoulderLeaf>
 	{
 
 	};

@@ -1,11 +1,11 @@
-#include <blCompositeMeshRenderComponent.h>
+#include <blCompositeMeshRenderWithPassConstantsRenderComponent.h>
 
 #include <RenderData/blDX12CompositeMeshDataCache.h>
 #include <blDX12Buffer.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blCompositeMeshRenderComponent::blCompositeMeshRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr) :
+	blCompositeMeshRenderWithPassConstantsRenderComponent::blCompositeMeshRenderWithPassConstantsRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr) :
 		blRenderComponent(globalRenderDataPtr),
 		mCompositeMeshStorageCache(std::make_shared<blCompositeMeshDataCache>(
 			globalRenderDataPtr->device,
@@ -18,7 +18,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	}
 
-	void blCompositeMeshRenderComponent::Render(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	void blCompositeMeshRenderWithPassConstantsRenderComponent::Render(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene)
 	{
 		if (!renderData.compositeMesh)
 		{
@@ -51,7 +51,7 @@ namespace BoulderLeaf::Graphics::DX12
 		// Specify the buffers we are going to render to.
 		mCommandList->OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
 		ID3D12DescriptorHeap* descriptorHeaps[] = { constantBufferCache.descriptorHeap->GetDescriptorHeap().Get() };
-		mCommandList->SetDescriptorHeaps((UINT) _countof(descriptorHeaps), descriptorHeaps);
+		mCommandList->SetDescriptorHeaps((UINT)_countof(descriptorHeaps), descriptorHeaps);
 		mCommandList->SetGraphicsRootSignature(shaderCacheData.RootSignature->GetRootSignature().Get());
 		mCommandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 		mCommandList->IASetIndexBuffer(&indexBufferView);
@@ -61,7 +61,7 @@ namespace BoulderLeaf::Graphics::DX12
 		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferCache.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
 
 		const size_t count = renderData.constantBuffer->GetData().Count();
-		cbvHandle.Offset((UINT) ((globalRenderData.device->GetCbvSrvDescriptorSize() * count) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
+		cbvHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * count) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
 
 		const size_t vertexSize = resourceCache.meshResource->GetData().GetVertexSize();
 
@@ -72,9 +72,9 @@ namespace BoulderLeaf::Graphics::DX12
 
 			mCommandList->DrawIndexedInstanced(
 				(UINT)entry.IndexCount,
-				1, 
+				1,
 				(UINT)entry.IndexOffset,
-				(UINT) entry.VertexOffset,
+				(UINT)entry.VertexOffset,
 				0);
 
 			cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());

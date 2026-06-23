@@ -457,7 +457,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		GeometryDataEntry& entry = mEntries[mEntries.size()-1];
 
-		blMeshIndexedCatalogue::Entry& meshIndexEntry = mMeshIndexedCatalogue.GetEntry(idx);
+		blMeshIndexedCatalogue::Entry& meshIndexEntry = mMeshIndexedCatalogue.GetEntryMutable(idx);
 		SubmeshGeometry& submesh = entry.submesh;
 
 		submesh.IndexCount = static_cast<UINT>(mesh.GetIndexCount());

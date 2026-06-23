@@ -23,19 +23,42 @@ namespace BoulderLeaf::Graphics
 	{
 		const index newIndex = mCurrentIndex;
 		const Entry& lastEntry = GetLastEntry();
+		const blMeshStorage::Header header = mesh.GetHeader();
+
+		size_t vertexBufferSize = header.GetVertexBufferSize();
+		size_t indexBufferSize = header.GetIndexBufferSize();
+
+		size_t vertexCountOffset = 0;
+		size_t indexCountOffset = 0;
+
+		for (const Entry& entry : mEntries)
+		{
+			vertexCountOffset += entry.VertexCount;
+			indexCountOffset += entry.IndexCount;
+		}
 
 		mEntries.push_back(Entry(
-			lastEntry.VertexOffset + lastEntry.VertexBufferSize,
-			mesh.GetHeader().GetVertexBufferSize(),
-			lastEntry.IndexOffset + lastEntry.IndexBufferSize,
-			mesh.GetHeader().GetIndexBufferSize()
+			vertexBufferSize,
+			//lastEntry.VertexOffset + lastEntry.VertexBufferSize, WHICH IS IT. BUGGG
+			vertexCountOffset,
+			header.mVertexCount,
+			indexBufferSize,
+			//lastEntry.IndexOffset + lastEntry.IndexBufferSize, // WHICH IS IT. BUGGGG
+			indexCountOffset,
+			header.mIndexCount
 		));
 
 		mCurrentIndex++;
 		return newIndex;
 	}
 
-	blMeshIndexedCatalogue::Entry& blMeshIndexedCatalogue::GetEntry(index idx)
+	const blMeshIndexedCatalogue::Entry& blMeshIndexedCatalogue::GetEntry(index idx) const
+	{
+		assert(idx < mEntries.size() && "Index out of bounds");
+		return mEntries[idx];
+	}
+
+	blMeshIndexedCatalogue::Entry& blMeshIndexedCatalogue::GetEntryMutable(index idx)
 	{
 		assert(idx < mEntries.size() && "Index out of bounds");
 		return mEntries[idx];

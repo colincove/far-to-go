@@ -11,10 +11,7 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	struct blCompositeMeshDataCacheData
 	{
-		blMeshStorage meshStorage;
-		blDX12Mesh meshGeometry;
-		SubmeshGeometry submesh;
-
+		blMeshBaseResourcePtr meshResource;
 	};
 
 	class blCompositeMeshDataCache : public blDX12ResourceDataCache<blCompositeMeshDataCacheData, blCompositeMeshResource>

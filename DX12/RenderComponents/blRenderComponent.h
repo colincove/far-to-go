@@ -8,10 +8,15 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	class blRenderComponentBase
 	{
+		struct FrameData
+		{
+			std::shared_ptr<blCommandListAllocator> mCommandListAllocator;
+		};
+
 	protected:
 		std::shared_ptr<blGlobalRenderData> mGlobalRenderData;
 		std::shared_ptr<blCommandList> mCommandList;
-		std::shared_ptr<blCommandListAllocator> mCommandListAllocator;
+		std::array<FrameData, Constants::FrameResourceCount> mFrameData;
 	public:
 		blRenderComponentBase() = default;
 		virtual ~blRenderComponentBase() = default;
@@ -20,8 +25,14 @@ namespace BoulderLeaf::Graphics::DX12
 			std::wstring name = L"blRenderComponentBase")
 			: mGlobalRenderData(globalRenderDataPtr)
 		{
-			mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataPtr->device, L"RenderComponent");
-			mCommandList = std::make_shared<blCommandList>(mCommandListAllocator, name);
+			for (FrameData& frameData : mFrameData)
+			{
+				frameData.mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataPtr->device, L"RenderComponent");
+			}
+
+			FrameData& frameData = mFrameData[mGlobalRenderData->globalRenderFrameContext->GetCurrentFrameResource()];
+			std::shared_ptr<blCommandListAllocator> commandListAllocator = frameData.mCommandListAllocator;
+			mCommandList = std::make_shared<blCommandList>(commandListAllocator, name);
 		}
 
 		virtual void Initialize() 
@@ -31,8 +42,10 @@ namespace BoulderLeaf::Graphics::DX12
 
 		virtual void StartFrame() 
 		{
-			mCommandListAllocator->GetAllocatorPtr().Get()->Reset();
-			mCommandList->Reset(mCommandListAllocator);
+			FrameData& frameData = mFrameData[mGlobalRenderData->globalRenderFrameContext->GetCurrentFrameResource()];
+			std::shared_ptr<blCommandListAllocator> commandListAllocator = frameData.mCommandListAllocator;
+			commandListAllocator->GetAllocatorPtr().Get()->Reset();
+			mCommandList->Reset(commandListAllocator);
 			mCommandList->RSSetViewports(1, &mGlobalRenderData->viewPort);
 			mCommandList->RSSetScissorRects(1, &mGlobalRenderData->scissorRect);
 		};
@@ -45,11 +58,6 @@ namespace BoulderLeaf::Graphics::DX12
 		std::shared_ptr<blCommandList> GetCommandList()
 		{
 			return mCommandList;
-		}
-
-		std::shared_ptr<blCommandListAllocator> GetCommandListAllocator()
-		{
-			return mCommandListAllocator;
 		}
 	};
 

@@ -67,6 +67,8 @@ add_library(
 	RenderComponents/blMeshInstancedRenderComponent.h
 	RenderComponents/blCompositeMeshRenderComponent.cpp
 	RenderComponents/blCompositeMeshRenderComponent.h
+	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.cpp
+	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.h
 
 	RenderData/blDX12BufferData.cpp
 	RenderData/blDX12BufferData.h
@@ -91,14 +93,16 @@ source_group("Render Components/Headers Files"
 	RenderComponents/blRenderComponent.h
 	RenderComponents/blMeshRenderComponent.h
 	RenderComponents/blMeshInstancedRenderComponent.h
-	RenderComponents/blCompositeMeshRenderComponent.h)
+	RenderComponents/blCompositeMeshRenderComponent.h
+	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.h)
 
 source_group("Render Components/Source Files"
 	FILES 
 	RenderComponents/blRenderComponent.cpp
 	RenderComponents/blMeshRenderComponent.cpp
 	RenderComponents/blMeshInstancedRenderComponent.cpp
-	RenderComponents/blCompositeMeshRenderComponent.cpp)
+	RenderComponents/blCompositeMeshRenderComponent.cpp
+	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.cpp)
 
 source_group("Render Data/Headers Files"
 	FILES 

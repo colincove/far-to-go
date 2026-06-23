@@ -1,14 +1,16 @@
-#include <DemoScene02.h>
+#include <ShapesWithPassDemoScene.h>
 #include <blMeshLibrary.h>
 #include <blBufferTypes.h>
 
 namespace BoulderLeaf::Graphics
 {
-	blDemoScene02::blDemoScene02(
+	ShapesWithPassDemoScene::ShapesWithPassDemoScene(
 		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window)
-		: mGraphicsAPI(graphicsAPI),
+		: blDemoScene(graphicsAPI, window),
 		mTheta(1.5f * PIf),
 		mPhi(PIfDIV4),
+		mCurrentShapeToDraw(0),
+		mTimeSinceLastChange(),
 		mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
 	{
 		mBoxMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
@@ -25,7 +27,7 @@ namespace BoulderLeaf::Graphics
 
 		mGeosphereMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
 			blResourceManager::Get().CreateResource<StandardMeshResource>(CreateGeosphere(
-				2,	//radius
+				1.5f,	//radius
 				4	//numSubdivisions
 			)));
 
@@ -51,30 +53,52 @@ namespace BoulderLeaf::Graphics
 		mObjectConstantBufferResource->GetDataMutable().reserve(1000);
 		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
 
-		mRenderData = std::vector<RenderCompositeMeshDataInstanced>
+		std::unique_ptr<byte[]> passData = std::make_unique<byte[]>(sizeof(Math::Matrix4x4));
+		memcpy(passData.get(), &mProjMatrix, sizeof(Math::Matrix4x4));
+		mConstantBufferPassResource = blResourceManager::Get().CreateResource<blDataElementBufferResource>(
+			BufferFormat::BoulderLeaf,
+			std::vector<BufferElementDescription> 
 		{
-			RenderCompositeMeshDataInstanced
+				{
+					"",
+						BufferElementType::Matrix4x4
+				}
+		},
+			std::move(passData)
+		);
+
+		mConstantBufferResource = blResourceManager::Get().CreateResource<blVertexBufferWithPassBufferResource>(
+			mConstantBufferPassResource,
+			std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource)
+		);
+
+		mRenderData = std::vector<RenderCompositeMeshDataWithPassConstants>
+		{
+			RenderCompositeMeshDataWithPassConstants
 			{
 				blRenderGroups::Default,
-				mObjectConstantBufferResource,
+				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
+				mConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
 				mBoxMeshResource->GetId(), //submeshId
 				0
 			},
-			RenderCompositeMeshDataInstanced
+			RenderCompositeMeshDataWithPassConstants
 			{
 				blRenderGroups::Default,
-				mObjectConstantBufferResource,
+				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
+				mConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
-				mBoxMeshResource->GetId(), //submeshId
+				mCylinderMeshResource->GetId(), //submeshId
 				1
 			},
-			RenderCompositeMeshDataInstanced
+			RenderCompositeMeshDataWithPassConstants
 			{
 				blRenderGroups::Default,
-				mObjectConstantBufferResource,
+				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
+				mConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
 				mGeosphereMeshResource->GetId(), //submeshId
@@ -83,16 +107,19 @@ namespace BoulderLeaf::Graphics
 		};
 	}
 
-	void blDemoScene02::Draw()
+	void ShapesWithPassDemoScene::Draw()
 	{
-		for (const RenderCompositeMeshDataInstanced& renderData : mRenderData)
-		{
-			mGraphicsAPI->DrawCompositeMeshInstanced(renderData, mSceneResource);
-		}
+		mGraphicsAPI->DrawCompositeMeshWithPass(mRenderData[mCurrentShapeToDraw], mSceneResource);
 	}
 
-	void blDemoScene02::Update(const Metrics::blTime& gameTime)
+	void ShapesWithPassDemoScene::Update(const Metrics::blTime& gameTime)
 	{
+		if (gameTime.Current() - mTimeSinceLastChange > Metrics::blTime::Seconds(3))
+		{
+			mCurrentShapeToDraw = mCurrentShapeToDraw >= mRenderData.size() - 1 ? 0 : mCurrentShapeToDraw + 1;
+			mTimeSinceLastChange = gameTime.Current();
+		}
+
 		using namespace Math;
 		static float rotationSpeed = 0.5f; // radians per second
 		float deltaSeconds = gameTime.DeltaSeconds();

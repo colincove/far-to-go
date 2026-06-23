@@ -15,6 +15,7 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual void MarshalVector4(const BoulderLeaf::Math::Vector4& srcElement, byte* destElement) const override;
 		virtual void MarshalMatrix3x3(const BoulderLeaf::Math::Matrix3x3& srcElement, byte* destElement) const override;
 		virtual void MarshalMatrix4x4(const BoulderLeaf::Math::Matrix4x4& srcElement, byte* destElement) const override;
+		virtual BufferFormat GetFormat() const override;
 	};
 
 	std::vector<D3D12_INPUT_ELEMENT_DESC> BuildInputLayoutDesc(

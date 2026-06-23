@@ -20,8 +20,8 @@ namespace BoulderLeaf::Graphics
 	using VertexElementType = BufferElementType;
 	using VertexElementDescription = BufferElementDescription;
 
-	template<typename TVertex>
-	struct VertexDefinition : public BufferDefinition<TVertex>
+	template<typename TVertex, BufferFormat TFormat>
+	struct VertexDefinition : public BufferDefinition<TVertex, TFormat>
 	{
 		using VertexType = TVertex;
 	};
@@ -53,15 +53,18 @@ namespace BoulderLeaf::Graphics
 			Header(
 				size_t vertexCount,
 				size_t indexCount,
-				size_t vertexSize)
+				size_t vertexSize,
+				BufferFormat format)
 				: mVersion(Version::Initial),
 				mVertexCount(vertexCount),
 				mIndexCount(indexCount),
-				mVertexSize(vertexSize)
+				mVertexSize(vertexSize),
+				mFormat(format)
 			{
 
 			}
 
+			BufferFormat mFormat = BufferFormat::BoulderLeaf;
 			Version mVersion = Version::Initial;
 			size_t mVertexCount;
 			size_t mVertexSize;
@@ -91,18 +94,21 @@ namespace BoulderLeaf::Graphics
 		blMeshStorage(
 			size_t vertexCount,
 			size_t indexCount,
-			size_t vertexSize);
+			size_t vertexSize,
+			BufferFormat format);
 
 		blMeshStorage(
 			byte vertices[],
-			size_t vertexSize);
+			size_t vertexSize,
+			BufferFormat format);
 
 		blMeshStorage(
 			const byte* vertices,
 			const size_t vertexCount,
 			const index* indices,
 			const size_t indexCount,
-			const size_t vertexSize);
+			const size_t vertexSize,
+			BufferFormat format);
 
 		blMeshStorage(const blMeshStorage& other);
 		blMeshStorage(blMeshStorage&& other) noexcept;
@@ -120,7 +126,7 @@ namespace BoulderLeaf::Graphics
 		template<typename TVertexFrom, typename TVertexTo>
 		static blMeshStorage To(const blMeshStorage& from)
 		{
-			blMeshStorage result(from.GetVertexCount(), from.GetIndexCount(), sizeof(TVertexTo));
+			blMeshStorage result(from.GetVertexCount(), from.GetIndexCount(), sizeof(TVertexTo), from.GetFormat());
 			memcpy(static_cast<void*>(result.mIndexDataStart), static_cast<const void*>(from.mIndexDataStart), from.GetIndexCount() * sizeof(index));
 			
 			for (int i = 0; i < from.GetVertexCount(); ++i)
@@ -139,6 +145,7 @@ namespace BoulderLeaf::Graphics
 		const size_t& GetVertexCount() const;
 		const size_t& GetVertexSize() const;
 		const size_t& GetIndexCount() const;
+		const BufferFormat& GetFormat() const;
 
 		const void* GetVertex(size_t index) const;
 		void* GetVertexMutable(size_t index);
@@ -179,7 +186,7 @@ namespace BoulderLeaf::Graphics
 			InitializeIndexingPointers();
 		}
 
-		void GraftMeshData(const blMeshStorage& other, const size_t index, const size_t vertex);
+		void GraftMeshData(const blMeshStorage& other, const size_t index, const size_t vertex, bool offsetVertexIndices);
 	};
 
 	class blMeshBase
@@ -190,16 +197,18 @@ namespace BoulderLeaf::Graphics
 		blMeshBase() : mStorage() {}
 		blMeshBase(const blMeshStorage& storage) : mStorage(storage) {}
 		blMeshBase(blMeshStorage&& storage) : mStorage(std::move(storage)) {}
-		blMeshBase(size_t vertexCount, size_t indexCount, const size_t vertexSize)
+		blMeshBase(size_t vertexCount, size_t indexCount, const size_t vertexSize, BufferFormat format)
 			:mStorage(
 				vertexCount,
 				indexCount,
-				vertexSize) {
+				vertexSize,
+				format) {
 		}
 
 		blMeshBase(
 			byte vertices[],
-			const size_t vertexSize) : mStorage(vertices, vertexSize)
+			const size_t vertexSize,
+			BufferFormat format) : mStorage(vertices, vertexSize, format)
 		{
 		}
 
@@ -208,7 +217,8 @@ namespace BoulderLeaf::Graphics
 			const size_t vertexCount,
 			const blMeshStorage::index* indices,
 			const size_t indexCount,
-			const size_t vertexSize) : mStorage(vertices, vertexCount, indices, indexCount, vertexSize)
+			const size_t vertexSize,
+			BufferFormat format) : mStorage(vertices, vertexCount, indices, indexCount, vertexSize, format)
 		{
 
 		}
@@ -218,9 +228,7 @@ namespace BoulderLeaf::Graphics
 
 		virtual const std::vector<VertexElementDescription>& GetVertexElementDescriptions() const 
 		{
-			static std::vector<VertexElementDescription> defaultDescriptions;
-			//dumb. no need for this. just nonsense complexity with resources
-			return defaultDescriptions;
+			return VertexElementDescriptions;
 		};
 	public:
 		bool IsValid() const { return mStorage.IsValid(); }
@@ -230,9 +238,12 @@ namespace BoulderLeaf::Graphics
 		const size_t& GetVertexCount() const { return mStorage.GetVertexCount(); }
 		const size_t& GetVertexSize() const { return mStorage.GetVertexSize(); }
 		const size_t& GetIndexCount() const { return mStorage.GetIndexCount(); }
+		const BufferFormat& GetFormat() const { return mStorage.GetFormat(); }
 
 		const blMeshStorage::index& GetIndex(size_t index) const { return mStorage.GetIndex(index); }
 		blMeshStorage::index& GetIndexMutable(size_t index) { return mStorage.GetIndexMutable(index); }
+
+		std::vector<VertexElementDescription> VertexElementDescriptions;
 	};
 
 	template<typename TVertexDefinition>
@@ -241,6 +252,8 @@ namespace BoulderLeaf::Graphics
 	public:
 		using TVertexDef = TVertexDefinition;
 		using TVertex = TVertexDefinition::VertexType;
+		constexpr static BufferFormat Format = TVertexDef::Format;
+
 		struct Prototype
 		{
 			std::vector<TVertex> vertices;
@@ -264,10 +277,11 @@ namespace BoulderLeaf::Graphics
 			:blMeshBase(
 				vertexCount,
 				indexCount,
-				sizeof(TVertex)){}
+				sizeof(TVertex),
+				Format){}
 
 		blMesh(
-			TVertex vertices[]) : blMeshBase(static_cast<byte[]>(vertices), sizeof(TVertex))
+			TVertex vertices[]) : blMeshBase(static_cast<byte[]>(vertices), sizeof(TVertex), Format)
 		{
 		}
 
@@ -275,7 +289,7 @@ namespace BoulderLeaf::Graphics
 			const TVertex* vertices,
 			const size_t vertexCount,
 			const blMeshStorage::index* indices,
-			const size_t indexCount) : blMeshBase(reinterpret_cast<const byte*>(vertices), vertexCount, indices, indexCount, sizeof(TVertex))
+			const size_t indexCount) : blMeshBase(reinterpret_cast<const byte*>(vertices), vertexCount, indices, indexCount, sizeof(TVertex), Format)
 		{
 
 		}
@@ -369,7 +383,7 @@ namespace BoulderLeaf::Graphics
 		}
 	};
 
-	using StandardVertexDefinition = VertexDefinition<StandardVertex>;
+	using StandardVertexDefinition = VertexDefinition<StandardVertex, BufferFormat::BoulderLeaf>;
 
 	inline bool operator==(const StandardVertex& lhs, const StandardVertex& rhs)
 	{

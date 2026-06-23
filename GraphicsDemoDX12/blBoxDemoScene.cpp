@@ -1,12 +1,12 @@
-#include <DemoScene01.h>
+#include <blBoxDemoScene.h>
 #include <blMeshLibrary.h>
 #include <blBufferTypes.h>
 
 namespace BoulderLeaf::Graphics
 {
-	blDemoScene01::blDemoScene01(
+	blBoxScene::blBoxScene(
 		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window)
-		: mGraphicsAPI(graphicsAPI), 
+		: blDemoScene(graphicsAPI, window),
 		mTheta(1.5f * PIf), 
 		mPhi(PIfDIV4),
 		mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
@@ -33,24 +33,18 @@ namespace BoulderLeaf::Graphics
 		mObjectConstantBufferResource->GetDataMutable().push_back({Math::Matrix4x4::Identity()});
 		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
 
-		// this reinterpret_pointer_cast is not working right. Review.
-		// It is likely due to how resources are designed. It is bad. THe "data" might be compatible,
-		// but the memory layout and class structure of the reousrces themselves are completely different. 
-		// another issue likely due to how resources actually own data. yuck. 
-		//mDrawData.constantBuffer = std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource);
-
-		mDrawData.constantBuffer = mObjectConstantBufferResource;
+		mDrawData.constantBuffer = std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource);
 		mDrawData.group = blRenderGroups::Default;
 		mDrawData.material = mMaterialResource;
 		mDrawData.mesh = mBoxMeshResource;
 	}
 
-	void blDemoScene01::Draw()
+	void blBoxScene::Draw()
 	{
 		mGraphicsAPI->DrawMeshInstanced(mDrawData, mSceneResource);
 	}
 
-	void blDemoScene01::Update(const Metrics::blTime& gameTime)
+	void blBoxScene::Update(const Metrics::blTime& gameTime)
 	{
 		using namespace Math;
 		static float rotationSpeed = 0.5f; // radians per second
@@ -84,7 +78,6 @@ namespace BoulderLeaf::Graphics
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
 		mObjectConstantBufferResource->GetDataMutable()[1].WorldViewProj = worldViewProj2.Transpose();
-
 		mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
 	}
 }

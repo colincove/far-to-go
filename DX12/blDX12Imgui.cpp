@@ -14,8 +14,6 @@ namespace
 	using namespace BoulderLeaf::Graphics;
 	using namespace BoulderLeaf::Graphics::DX12;
 
-	bool showDemoWindow = true;
-
 	//static blRenderGroupId ImguiRenderGroup = blRenderGroups::Default;
 
 	// Config for example app
@@ -93,6 +91,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blRenderComponentBase::Initialize();
 		mConstantBufferDescriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(
 			mGlobalRenderData->device,
+			1024, //uuuuuuh. how 
 			L"DX12Imgui");
 
 		//ImguiRenderGroup = BoulderLeaf::Graphics::blRenderGroups::RegisterExternal("Imgui");
@@ -137,11 +136,6 @@ namespace BoulderLeaf::Graphics::DX12
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-
-		if (showDemoWindow)
-		{
-			ImGui::ShowDemoWindow(&showDemoWindow);
-		}
 	}
 
 	void blDX12Imgui::EndFrame()

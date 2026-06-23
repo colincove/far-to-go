@@ -9,6 +9,7 @@
 #include "../DirectX-Headers/include/directx/d3dx12.h"
 #include <blBufferTypes.h>
 #include <blGlobalRenderFrameContext.h>
+#include <blConstantBufferDescriptorHeap.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -86,7 +87,7 @@ namespace BoulderLeaf::Graphics::DX12
 		BYTE* mMappedData = nullptr;
 		UINT mElementByteSize = 0;
 		UINT mConstantBufferElementByteSize = 0;
-		bool mIsConstantBuffer = false;		
+		bool mIsConstantBuffer = false;
 	};
 
 	struct blDX12BufferData
@@ -96,8 +97,7 @@ namespace BoulderLeaf::Graphics::DX12
 	};
 
 	class blDX12BufferDataCache : 
-		//public blDX12ResourceDataCache<blDX12BufferData, blDataBufferInterfaceResource>
-		public blDX12ResourceDataCache<blDX12BufferData, blStandardObjectConstantsBufferResource>
+		public blDX12ResourceDataCache<blDX12BufferData, blDataBufferInterfaceResource>
 	{
 	private:
 		std::shared_ptr<blDevice> mDevice;
@@ -108,7 +108,7 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual void UpdateCache(const blResourceId& resourceId) override;
 	protected:
 		virtual void InitializeCache(
-			const blStandardObjectConstantsBufferResource& resource,
+			const blDataBufferInterfaceResource& resource,
 			blDX12BufferData& cache) override;
 	};
 }

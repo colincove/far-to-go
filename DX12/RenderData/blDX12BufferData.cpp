@@ -16,14 +16,14 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 
 	void blDX12BufferDataCache::InitializeCache(
-		const blStandardObjectConstantsBufferResource& resource,
+		const blDataBufferInterfaceResource& resource,
 		blDX12BufferData& cache)
 	{
 		using namespace DirectX;
 
-		const blStandardObjectConstantsBuffer& resourceData = resource.GetData();
+		const blDataBufferInterface& resourceData = resource.GetData();
 		const UINT enforceConstanceBufferStride = Math::CalcConstantBufferByteSize(
-			GetBufferElementSize(resourceData.GetDataElementDescriptions(), DX12::DX12BufferAdapter::Get())
+			(UINT) GetBufferElementSize(resourceData.GetDataElementDescriptions(), DX12::DX12BufferAdapter::Get())
 		);
 
 		cache.dataBuffer = blBasicDataBuffer(
@@ -49,9 +49,9 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		blDX12BufferData& cache = GetByIdNoInit(resourceId);
 
-		const blStandardObjectConstantsBufferResourcePtr resourcePtr = blResourceManager::Get()
-			.GetResource<blStandardObjectConstantsBufferResource>(resourceId);
-		const blStandardObjectConstantsBuffer& resourceData = resourcePtr->GetData();
+		const blDataBufferInterfaceResourcePtr resourcePtr = blResourceManager::Get()
+			.GetResource<blDataBufferInterfaceResource>(resourceId);
+		const blDataBufferInterface& resourceData = resourcePtr->GetData();
 
 		const UINT enforceConstanceBufferStride = Math::CalcConstantBufferByteSize(
 			GetBufferElementSize(resourceData.GetDataElementDescriptions(), DX12::DX12BufferAdapter::Get())

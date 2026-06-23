@@ -40,6 +40,12 @@ namespace BoulderLeaf::Graphics::DX12
 		destElement = DirectX::XMFLOAT4X4(srcElement.elements);
 	}
 
+	BufferFormat DX12BufferAdapter::GetFormat() const 
+	{
+		return BufferFormat::DX12;
+	}
+
+
 	size_t DX12BufferAdapter::SizeOfElement(BufferElementType type) const
 	{
 		switch (type)

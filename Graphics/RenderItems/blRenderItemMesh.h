@@ -24,7 +24,7 @@ namespace BoulderLeaf::Graphics
 	struct RenderMeshDataInstanced : public RenderData
 	{
 		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
-		blStandardObjectConstantsBufferResourcePtr constantBuffer;
+		blDataBufferInterfaceResourcePtr constantBuffer;
 		blMeshBaseResourcePtr mesh;
 		blMaterialResourcePtr material;
 	};
@@ -32,7 +32,19 @@ namespace BoulderLeaf::Graphics
 	struct RenderCompositeMeshDataInstanced : public RenderData
 	{
 		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
-		blStandardObjectConstantsBufferResourcePtr constantBuffer;
+		blDataBufferInterfaceResourcePtr constantBuffer;
+		blCompositeMeshResourcePtr compositeMesh;
+		blMaterialResourcePtr material;
+		blResourceId submeshId;
+		size_t instance;
+	};
+
+	struct RenderCompositeMeshDataWithPassConstants : public RenderData
+	{
+		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
+		blDataBufferInterfaceResourcePtr constantBuffer;//TEMP DURING RENDER COMPONENT TRANSITION
+		blVertexBufferWithPassBufferResourcePtr constantBufferWithPass;
+
 		blCompositeMeshResourcePtr compositeMesh;
 		blMaterialResourcePtr material;
 		blResourceId submeshId;

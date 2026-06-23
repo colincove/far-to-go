@@ -260,7 +260,8 @@ namespace BoulderLeaf::Graphics::DX12
 		Mesh meshBuffer = Mesh(blMeshStorage(
 			cubeStorage.GetHeader().mVertexCount,
 			cubeStorage.GetHeader().mIndexCount,
-			vertexSize
+			vertexSize,
+			BufferFormat::DX12
 		));
 
 		blMeshStorage& meshBufferStorage = meshBuffer.GetStorageMutable();

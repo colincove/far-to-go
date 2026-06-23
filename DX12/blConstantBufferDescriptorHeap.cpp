@@ -9,10 +9,11 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	blConstantBufferDescriptorHeap::blConstantBufferDescriptorHeap(
 		const std::shared_ptr<blDevice> device,
+		UINT numDescriptors,
 		std::wstring name)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-		cbvHeapDesc.NumDescriptors = Constants::SrvHeapSize;
+		cbvHeapDesc.NumDescriptors = numDescriptors;
 		cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		cbvHeapDesc.NodeMask = 0;

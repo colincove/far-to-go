@@ -29,6 +29,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mMeshRenderComponent(),
 		mMeshInstancedRenderComponent(),
 		mCompositeMeshRenderComponent(),
+		mCompositeMeshRenderWithPassConstantsRenderComponent(),
 		mCurrentFence(0)
 	{
 		//this is not working for me right now. not sure why. some build issues. 
@@ -83,14 +84,9 @@ namespace BoulderLeaf::Graphics::DX12
 			globalRenderDataRef.globalRenderFrameContext);
 		
 		globalRenderDataRef.depthBuffer = std::make_shared<blDepthBuffer>(globalRenderDataRef.device, window);
-		globalRenderDataRef.fence = std::make_shared<blFence>(globalRenderDataRef.device, L"Global");
-		globalRenderDataRef.constantBufferDescriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(
-			globalRenderDataRef.device,
-			L"Global");
 
 		globalRenderDataRef.constantBufferCache = std::make_shared<blDX12ConstantBufferCache>(
 			globalRenderDataRef.device,
-			globalRenderDataRef.constantBufferDescriptorHeap,
 			globalRenderDataRef.bufferCache,
 			globalRenderDataRef.globalRenderFrameContext);
 
@@ -102,13 +98,20 @@ namespace BoulderLeaf::Graphics::DX12
 			globalRenderDataRef.mPSOCache
 		};
 
-		mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
-		mCommandList = std::make_shared<blCommandList>(mCommandListAllocator, L"Default");
+		for (FrameData& frameData : mFrameData)
+		{
+			frameData.mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
+		}
+
+		mFence = std::make_shared<blFence>(globalRenderDataRef.device, L"Global");
+		mCommandList = std::make_shared<blCommandList>(
+			mFrameData[globalRenderDataRef.globalRenderFrameContext->currentFrameResource].mCommandListAllocator, L"Default");
 
 		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
 		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
 		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
 		mDX12ImguiRenderComponent = std::make_shared<blDX12Imgui>(mGlobalRenderDataPtr, mWindow);
+		mCompositeMeshRenderWithPassConstantsRenderComponent = std::make_unique<blCompositeMeshRenderWithPassConstantsRenderComponent>(mGlobalRenderDataPtr);
 
 		//this vector is kind of dumb. Does not scale. And holds raw pointers to components that are owned by unique_ptrs. But it is what it is for now. We can optimize this later if we need to.
 		mRenderComponents = std::vector<blRenderComponentBase*>
@@ -116,11 +119,9 @@ namespace BoulderLeaf::Graphics::DX12
 			//mMeshRenderComponent.get(), //not functioning right now. 
 			mMeshInstancedRenderComponent.get(),
 			mDX12ImguiRenderComponent.get(),
-			mCompositeMeshRenderComponent.get()
+			mCompositeMeshRenderComponent.get(),
+			mCompositeMeshRenderWithPassConstantsRenderComponent.get()
 		};
-
-		// Wait until initialization is complete.
-		FlushCommandQueue();
 	}
 
 	blDX12::~blDX12()
@@ -164,6 +165,24 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		mGlobalRenderDataPtr->globalRenderFrameContext->currentGameTime = time;
 		mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource = (Constants::FrameResourceCount + time.Tick()) % Constants::FrameResourceCount;
+
+		FrameData& frameData = mFrameData[mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource];
+
+		// Has the GPU finished processing the commands of the current frame
+		// resource. If not, wait until the GPU has completed commands up to
+		// this fence point.
+		if (frameData.mFence != 0 &&
+			mFence->GetCompletedValue() < frameData.mFence)
+			//mCommandQueue->GetLastCompletedFence() < mCurrFrameResource->Fence)
+			//book had this. but the function does not exist. I did find it documented...somewhere on the internet. 
+			//https://learn.microsoft.com/en-us/previous-versions/dn788633(v=vs.85)
+			//but it appears to be old. 
+		{
+			HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
+			mFence->SetEventOnCompletion(frameData.mFence, eventHandle);
+			WaitForSingleObject(eventHandle, INFINITE);
+			CloseHandle(eventHandle);
+		}
 	}
 
 	void blDX12::StartFrameInternal()
@@ -184,8 +203,9 @@ namespace BoulderLeaf::Graphics::DX12
 
 		RENDER_COMPONENT_FUNCTION_CALL(StartFrame)
 
-		mCommandListAllocator->Reset();
-		mCommandList->Reset(mCommandListAllocator);
+		FrameData& frameData = mFrameData[mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource];
+		frameData.mCommandListAllocator->Reset();
+		mCommandList->Reset(frameData.mCommandListAllocator);
 
 		//TODO make sure we are setting up viewPort correctly. 
 		mCommandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
@@ -224,11 +244,14 @@ namespace BoulderLeaf::Graphics::DX12
 		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
 			std::vector<std::shared_ptr<blCommandList>> {
 				mMeshInstancedRenderComponent->GetCommandList(),
-				mDX12ImguiRenderComponent->GetCommandList()
+				mDX12ImguiRenderComponent->GetCommandList(),
+				mCompositeMeshRenderComponent->GetCommandList(),
+				mCompositeMeshRenderWithPassConstantsRenderComponent->GetCommandList()
 			}
 		);
 
-		mCommandList->Reset(mCommandListAllocator);
+		FrameData& frameData = mFrameData[mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource];
+		mCommandList->Reset(frameData.mCommandListAllocator);
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
 			mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer(),
@@ -243,7 +266,16 @@ namespace BoulderLeaf::Graphics::DX12
 		);
 
 		mGlobalRenderDataPtr->swapChain->Present();
-		FlushCommandQueue();
+
+		// Advance the fence value to mark commands up to this fence point.
+		frameData.mFence = ++mCurrentFence;
+		// Add an instruction to the command queue to set a new fence point.
+		// Because we are on the GPU timeline, the new fence point won’t be
+		// set until the GPU finishes processing all the commands prior to
+		// this Signal().
+		mGlobalRenderDataPtr->commandQueue->GetDX12CommandQueue()->Signal(
+			mFence->Get(), mCurrentFence);
+		//FlushCommandQueue();
 	}
 
 	void blDX12::DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene)
@@ -259,6 +291,11 @@ namespace BoulderLeaf::Graphics::DX12
 	void blDX12::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene)
 	{
 		mCompositeMeshRenderComponent->Render(renderData, scene);
+	}
+
+	void blDX12::DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene)
+	{
+		mCompositeMeshRenderWithPassConstantsRenderComponent->Render(renderData, scene);
 	}
 
 	void blDX12::MarkResourceDirty(const blResourceId resourceId)
@@ -277,14 +314,15 @@ namespace BoulderLeaf::Graphics::DX12
 		// Because we are on the GPU timeline, the new fence point won’t be
 		// set until the GPU finishes processing all the commands prior to
 		// this Signal().
-		mGlobalRenderDataPtr->commandQueue->GetDX12CommandQueue()->Signal(
-			mGlobalRenderDataPtr->fence->GetFence().Get(), mCurrentFence);
+		mGlobalRenderDataPtr->commandQueue->Signal(
+			mFence->Get(), mCurrentFence);
+
 		// Wait until the GPU has completed commands up to this fence point.
-		if (mGlobalRenderDataPtr->fence->GetFence()->GetCompletedValue() < mCurrentFence)
+		if (mFence->GetCompletedValue() < mCurrentFence)
 		{
 			HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
 			// Fire event when GPU hits current fence.
-			mGlobalRenderDataPtr->fence->GetFence()->SetEventOnCompletion(mCurrentFence, eventHandle);
+			mFence->SetEventOnCompletion(mCurrentFence, eventHandle);
 			// Wait until the GPU hits current fence event is fired.
 			WaitForSingleObject(eventHandle, INFINITE);
 			CloseHandle(eventHandle);

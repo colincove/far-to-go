@@ -27,13 +27,21 @@ namespace BoulderLeaf::Graphics
 
 		const blMeshIndexedCatalogue& GetCatalogue() const { return mCatalogue; }
 
-		const blMeshBaseResourcePtr& GetMeshEntry(blMeshIndexedCatalogue::index index) const
+		blMeshIndexedCatalogue::Entry GetMeshEntry(blResourceId id) const
 		{
-			return mInternalIdToMeshEntryMap.at(index);
+			if (auto entry = mExternalIdToMeshInternalIdMap.find(id); entry != mExternalIdToMeshInternalIdMap.end())
+			{
+				return mCatalogue.GetEntry(entry->second);
+			}
+
+			assert(false);
+			return blMeshIndexedCatalogue::Entry();
 		}
 
 		size_t GetIndexBufferSize() const;
 		size_t GetVertexBufferSize() const;
+		BufferFormat GetFormat() const { return mInternalIdToMeshEntryMap.begin()->second->GetData().GetFormat(); }
+
 	};
 }
 

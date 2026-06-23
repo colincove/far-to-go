@@ -1,10 +1,20 @@
 add_executable(
 	GraphicsDemoDX12
 	main.cpp
-	DemoScene01.cpp
-	DemoScene01.h
-	DemoScene02.cpp
-	DemoScene02.h
+	blBoxDemoScene.h
+	blBoxDemoScene.cpp
+	blShapesDemoScene.cpp
+	blShapesDemoScene.h
+	ShapesWithPassDemoScene.cpp
+	ShapesWithPassDemoScene.h
+	CylinderDemoScene.cpp
+	CylinderDemoScene.h
+	GeosphereDemoScene.cpp
+	GeosphereDemoScene.h
+	DemoScene.cpp
+	DemoScene.h
+	DemoImgui.h
+	DemoImgui.cpp
 	Config/resourceManager.xml
 	)
 

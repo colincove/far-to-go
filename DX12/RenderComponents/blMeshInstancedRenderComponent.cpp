@@ -38,24 +38,24 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Specify the buffers we are going to render to.
 		mCommandList->OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
-		ID3D12DescriptorHeap* descriptorHeaps[] = { globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()};
-		mCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+		ID3D12DescriptorHeap* descriptorHeaps[] = { constantBufferCache.descriptorHeap->GetDescriptorHeap().Get()};
+		mCommandList->SetDescriptorHeaps((UINT) _countof(descriptorHeaps), descriptorHeaps);
 		mCommandList->SetGraphicsRootSignature(shaderCacheData.RootSignature->GetRootSignature().Get());
 		mCommandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 		mCommandList->IASetIndexBuffer(&indexBufferView);
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
 		mCommandList->SetPipelineState(psoCacheData.PSO->GetDX12PSO().Get());
-		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(globalRenderData.constantBufferDescriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferCache.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
 
-		const size_t count = renderData.constantBuffer->GetData().size();
-		cbvHandle.Offset((globalRenderData.device->GetCbvSrvDescriptorSize() * count) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource());
+		const size_t count = renderData.constantBuffer->GetData().Count();
+		cbvHandle.Offset((UINT) ((globalRenderData.device->GetCbvSrvDescriptorSize() * count) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
 
 		for (int i = 0; i < count; ++i)
 		{
 			mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
 			mCommandList->DrawIndexedInstanced(
-				(int) meshCacheData.meshStorage.GetIndexCount(),
+				(UINT) meshCacheData.meshStorage.GetIndexCount(),
 				1, 0, 0, 0);
 			cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());
 		}

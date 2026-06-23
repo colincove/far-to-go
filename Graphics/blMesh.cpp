@@ -66,9 +66,10 @@ namespace BoulderLeaf::Graphics
 	blMeshStorage::blMeshStorage(
 		size_t vertexCount,
 		size_t indexCount,
-		size_t vertexSize) : blMeshStorage()
+		size_t vertexSize,
+		BufferFormat format) : blMeshStorage()
 	{
-		const Header header = Header(vertexCount, indexCount, vertexSize);
+		const Header header = Header(vertexCount, indexCount, vertexSize, format);
 		const size_t bufferSize = GetBufferSize(header);
 		mBuffer = std::make_unique<byte[]>(bufferSize);
 		GetHeaderMutable() = header;
@@ -77,7 +78,8 @@ namespace BoulderLeaf::Graphics
 
 	blMeshStorage::blMeshStorage(
 		byte vertices[],
-		size_t vertexSize) : blMeshStorage((size_t)(sizeof(vertices) / vertexSize), 0, vertexSize)
+		size_t vertexSize,
+		BufferFormat format) : blMeshStorage((size_t)(sizeof(vertices) / vertexSize), 0, vertexSize, format)
 	{
 		memcpy(mVertexDataStart, vertices, sizeof(vertices));
 	}
@@ -87,10 +89,12 @@ namespace BoulderLeaf::Graphics
 		const size_t vertexCount,
 		const index* indices,
 		const size_t indexCount,
-		const size_t vertexSize) : blMeshStorage(
+		const size_t vertexSize,
+		BufferFormat format) : blMeshStorage(
 			vertexCount,
 			indexCount,
-			vertexSize)
+			vertexSize,
+			format)
 	{
 		memcpy(mVertexDataStart, vertices, vertexCount * vertexSize);
 		memcpy(mIndexDataStart, indices, indexCount * sizeof(index));
@@ -143,14 +147,19 @@ namespace BoulderLeaf::Graphics
 		return GetHeader().mIndexCount;
 	}
 
+	const BufferFormat& blMeshStorage::GetFormat() const
+	{
+		return GetHeader().mFormat;
+	}
+
 	const void* blMeshStorage::GetVertex(size_t index) const
 	{
 		return mVertexDataStart + index * GetHeader().mVertexSize;
 	}
 
-	void* blMeshStorage::GetVertexMutable(size_t index)
+	void* blMeshStorage::GetVertexMutable(size_t vertex)
 	{
-		return mVertexDataStart + index * GetHeader().mVertexSize;
+		return mVertexDataStart + vertex * GetHeader().mVertexSize;
 	}
 
 	const blMeshStorage::index& blMeshStorage::GetIndex(size_t index) const
@@ -175,15 +184,36 @@ namespace BoulderLeaf::Graphics
 
 	bool blMeshStorage::IsValid() const { return mBuffer != nullptr; }
 
-	void blMeshStorage::GraftMeshData(const blMeshStorage& other, const size_t index, const size_t vertex)
+	void blMeshStorage::GraftMeshData(
+		const blMeshStorage& other, const size_t index, const size_t vertex, bool offsetVertexIndices)
 	{
 		if (index + other.GetIndexCount() > GetIndexCount() || vertex + other.GetVertexCount() > GetVertexCount())
 		{
 			throw std::out_of_range("GraftMeshData: The provided index and vertex offsets exceed the bounds of the current mesh storage.");
 		}
 
-		memcpy(&GetIndexMutable(index), other.mIndexDataStart, other.GetIndexCount() * sizeof(index));
-		memcpy(GetVertexMutable(vertex), other.mVertexDataStart, other.GetVertexCount() * GetVertexSize());
+		memcpy(
+			&GetIndexMutable(index), 
+			other.mIndexDataStart,
+			other.GetIndexCount() * sizeof(blMeshStorage::index));
+
+		memcpy(
+			GetVertexMutable(vertex), 
+			other.mVertexDataStart,
+			other.GetVertexCount() * GetVertexSize());
+
+		//I thought I needed to do this. but the vertex buffer view is already offset. So the indices don't need to be. 
+		//but maybe there are other render scenarios where we do want these offset? let's keep the option here. 
+		if (offsetVertexIndices)
+		{
+			for (blMeshStorage::index* i = &GetIndexMutable(index);
+				i != &GetIndexMutable(index + other.GetIndexCount());
+				++i)
+			{
+				//after the graft is complete, we need to shift over all of the indices
+				*i += vertex;
+			}
+		}
 	}
 
 	const std::vector<VertexElementDescription> StandardVertexDefinition::Description =
