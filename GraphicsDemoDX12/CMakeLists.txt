@@ -11,6 +11,7 @@ add_executable(
 	CylinderDemoScene.h
 	GeosphereDemoScene.cpp
 	GeosphereDemoScene.h
+	MeshDemoSceneBase.h
 	DemoScene.cpp
 	DemoScene.h
 	DemoImgui.h
