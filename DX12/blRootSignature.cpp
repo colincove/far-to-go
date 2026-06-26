@@ -16,6 +16,9 @@ namespace BoulderLeaf::Graphics::DX12
 		std::vector<CD3DX12_ROOT_PARAMETER> slotRootParameter;
 		slotRootParameter.resize(shader.mParameters.size());
 
+		std::vector<CD3DX12_DESCRIPTOR_RANGE> cbvDescRanges;
+		cbvDescRanges.reserve(shader.mParameters.size());
+
 		for (int i = 0; i < shader.mParameters.size(); ++i)
 		{
 			const blShader::Parameter parameter = shader.mParameters[i];
@@ -24,7 +27,8 @@ namespace BoulderLeaf::Graphics::DX12
 			{
 				case blShader::Parameter::ConstantBuffer:
 				{
-					CD3DX12_DESCRIPTOR_RANGE cbvTable;
+					cbvDescRanges.push_back(CD3DX12_DESCRIPTOR_RANGE());
+					CD3DX12_DESCRIPTOR_RANGE& cbvTable = cbvDescRanges[cbvDescRanges.size()-1];
 					cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, parameter.Count, parameter.Register, parameter.Space);
 					slotRootParameter[i].InitAsDescriptorTable(1, &cbvTable);
 					break;

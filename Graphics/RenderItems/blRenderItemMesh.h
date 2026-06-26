@@ -44,7 +44,7 @@ namespace BoulderLeaf::Graphics
 		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
 		blDataBufferInterfaceResourcePtr constantBuffer;//TEMP DURING RENDER COMPONENT TRANSITION
 		blVertexBufferWithPassBufferResourcePtr constantBufferWithPass;
-
+		blDataElementBufferResourcePtr passElementBufferResourcePtr;
 		blCompositeMeshResourcePtr compositeMesh;
 		blMaterialResourcePtr material;
 		blResourceId submeshId;

@@ -11,6 +11,9 @@
 //Standard
 #include <assert.h>
 
+#include <blDX12ConstantBufferWithPassCache.h>
+#include <blDX12ElementUploadBufferCache.h>
+
 namespace
 {
 	#define RENDER_COMPONENT_FUNCTION_CALL(functionName) \
@@ -82,6 +85,10 @@ namespace BoulderLeaf::Graphics::DX12
 		globalRenderDataRef.bufferCache = std::make_shared<blDX12BufferDataCache>(
 			globalRenderDataRef.device, 
 			globalRenderDataRef.globalRenderFrameContext);
+		globalRenderDataRef.vertexAndPassUploadBufferCache = std::make_shared<blDX12VertexAndPassUploadBufferCache>(
+			globalRenderDataRef.device,
+			globalRenderDataRef.globalRenderFrameContext);
+		globalRenderDataRef.bufferElementCache = std::make_shared<blDX12BufferElementCache>();
 		
 		globalRenderDataRef.depthBuffer = std::make_shared<blDepthBuffer>(globalRenderDataRef.device, window);
 
@@ -90,9 +97,23 @@ namespace BoulderLeaf::Graphics::DX12
 			globalRenderDataRef.bufferCache,
 			globalRenderDataRef.globalRenderFrameContext);
 
+		globalRenderDataRef.elementUploadBufferCache = std::make_shared<blDX12ElementUploadBufferCache>(
+			globalRenderDataRef.device,
+			globalRenderDataRef.globalRenderFrameContext,
+			globalRenderDataRef.bufferElementCache
+		);
+
+		globalRenderDataRef.constantBufferWithPassCache = std::make_shared<blDX12ConstantBufferWithPassCache>(
+			globalRenderDataRef.device,
+			globalRenderDataRef.bufferCache,
+			globalRenderDataRef.bufferElementCache,
+			globalRenderDataRef.globalRenderFrameContext,
+			globalRenderDataRef.elementUploadBufferCache);
+
 		mResourceCaches = {
 			globalRenderDataRef.shaderCache,
 			globalRenderDataRef.meshStorageCache,
+			globalRenderDataRef.bufferElementCache,
 			globalRenderDataRef.constantBufferCache,
 			globalRenderDataRef.bufferCache,
 			globalRenderDataRef.mPSOCache

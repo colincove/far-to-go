@@ -3,6 +3,8 @@
 #include <RenderData/blDX12CompositeMeshDataCache.h>
 #include <blDX12Buffer.h>
 
+#include <blDX12ConstantBufferWithPassCache.h>
+
 namespace BoulderLeaf::Graphics::DX12
 {
 	blCompositeMeshRenderWithPassConstantsRenderComponent::blCompositeMeshRenderWithPassConstantsRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr) :
@@ -41,7 +43,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Do I not do anything with this data? How do constant buffers get bound? I'm confused. 
 		//TODO: Why is this data specific to standard object constants? I want to be able to use this for any type of constant buffer.
-		const blDX12ConstantBufferCacheData& constantBufferCache = globalRenderData.constantBufferCache->Get(*renderData.constantBuffer.get());
+		//const blDX12ConstantBufferCacheData& constantBufferCache = globalRenderData.constantBufferCache->Get(*renderData.constantBuffer.get());
+		const blDX12ConstantBufferCacheData& constantBufferCacheWithPass = globalRenderData.constantBufferWithPassCache->Get(*renderData.constantBufferWithPass.get());
 
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = globalRenderData.depthBuffer->DepthStencilView();
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = globalRenderData.swapChain->CurrentBackBufferView();
@@ -50,7 +53,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Specify the buffers we are going to render to.
 		mCommandList->OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
-		ID3D12DescriptorHeap* descriptorHeaps[] = { constantBufferCache.descriptorHeap->GetDescriptorHeap().Get() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { constantBufferCacheWithPass.descriptorHeap->GetDescriptorHeap().Get() };
 		mCommandList->SetDescriptorHeaps((UINT)_countof(descriptorHeaps), descriptorHeaps);
 		mCommandList->SetGraphicsRootSignature(shaderCacheData.RootSignature->GetRootSignature().Get());
 		mCommandList->IASetVertexBuffers(0, 1, &vertexBufferView);
@@ -58,17 +61,20 @@ namespace BoulderLeaf::Graphics::DX12
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		mCommandList->SetPipelineState(psoCacheData.PSO->GetDX12PSO().Get());
-		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferCache.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferCacheWithPass.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		auto cbvPassConstantsHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferCacheWithPass.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		
 
 		const size_t count = renderData.constantBuffer->GetData().Count();
-		cbvHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * count) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
-
-		const size_t vertexSize = resourceCache.meshResource->GetData().GetVertexSize();
+		cbvHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * (count + 1)) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
+		cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());//the descriptor table starts with the pass constants. Need to offset for the objects
+		cbvPassConstantsHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * (count + 1)) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
 
 		for (int i = 0; i < count; ++i)
 		{
 			blMeshIndexedCatalogue::Entry entry = renderData.compositeMesh->GetData().GetMeshEntry(renderData.submeshId);
 			mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+			mCommandList->SetGraphicsRootDescriptorTable(1, cbvPassConstantsHandle);
 
 			mCommandList->DrawIndexedInstanced(
 				(UINT)entry.IndexCount,

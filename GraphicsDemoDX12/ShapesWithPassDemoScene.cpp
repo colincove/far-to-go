@@ -39,10 +39,11 @@ namespace BoulderLeaf::Graphics
 		);
 
 		mShaderResource = blResourceManager::Get().CreateResource<blShaderResource>(blShader(
-			"graphics_dx12_demoscene01",
+			"graphics_dx12_shapes_demo",
 			std::vector<blShader::Parameter>
 		{
-			{1, 0, 0, blShader::Parameter::ConstantBuffer}
+			{1, 0, 0, blShader::Parameter::ConstantBuffer },
+			{ 1, 1, 0, blShader::Parameter::ConstantBuffer }
 		},
 			StandardVertexDefinition::Description));
 
@@ -53,17 +54,11 @@ namespace BoulderLeaf::Graphics
 		mObjectConstantBufferResource->GetDataMutable().reserve(1000);
 		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
 
-		std::unique_ptr<byte[]> passData = std::make_unique<byte[]>(sizeof(Math::Matrix4x4));
-		memcpy(passData.get(), &mProjMatrix, sizeof(Math::Matrix4x4));
+		std::unique_ptr<byte[]> passData = std::make_unique<byte[]>(sizeof(cbPass));
+		memcpy(passData.get(), &mPassData, sizeof(cbPass));
 		mConstantBufferPassResource = blResourceManager::Get().CreateResource<blDataElementBufferResource>(
 			BufferFormat::BoulderLeaf,
-			std::vector<BufferElementDescription> 
-		{
-				{
-					"",
-						BufferElementType::Matrix4x4
-				}
-		},
+			cbPassDescription,
 			std::move(passData)
 		);
 
@@ -79,6 +74,7 @@ namespace BoulderLeaf::Graphics
 				blRenderGroups::Default,
 				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
 				mConstantBufferResource,
+				mConstantBufferPassResource,
 				mCompositeMeshResource,
 				mMaterialResource,
 				mBoxMeshResource->GetId(), //submeshId
@@ -89,6 +85,7 @@ namespace BoulderLeaf::Graphics
 				blRenderGroups::Default,
 				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
 				mConstantBufferResource,
+				mConstantBufferPassResource,
 				mCompositeMeshResource,
 				mMaterialResource,
 				mCylinderMeshResource->GetId(), //submeshId
@@ -99,6 +96,7 @@ namespace BoulderLeaf::Graphics
 				blRenderGroups::Default,
 				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
 				mConstantBufferResource,
+				mConstantBufferPassResource,
 				mCompositeMeshResource,
 				mMaterialResource,
 				mGeosphereMeshResource->GetId(), //submeshId
@@ -146,5 +144,10 @@ namespace BoulderLeaf::Graphics
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
 		mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
+
+		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
+		cbPass& passData = *reinterpret_cast<cbPass*>(mConstantBufferPassResource->GetData().GetDataMutable());
+		passData.view = worldViewProj.Transpose();
+		mGraphicsAPI->MarkResourceDirty(mConstantBufferPassResource->GetId());
 	}
 }

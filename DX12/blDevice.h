@@ -38,5 +38,11 @@ namespace BoulderLeaf::Graphics::DX12
 		{
 			return mCbvSrvDescriptorSize;
 		}
+
+		template<typename... Args>
+		HRESULT CreateCommittedResource(Args&&... args)
+		{
+			return mDevice->CreateCommittedResource(std::forward<Args>(args)...);
+		}
 	};
 }

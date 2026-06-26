@@ -9,7 +9,7 @@ namespace BoulderLeaf::Graphics::DX12
 	struct blDX12BufferElementCacheData
 	{
 		std::unique_ptr<blDataElementBuffer> data;
-
+		size_t elementSize;
 	};
 
 	class blDX12BufferElementCache : public blDX12ResourceDataCache<blDX12BufferElementCacheData, blDataElementBufferResource>

@@ -35,6 +35,13 @@ namespace BoulderLeaf::Graphics
 		{
 			switch (elementDescription.ElementType)
 			{
+			case BufferElementType::Float:
+			{
+				const float& srcElement = *reinterpret_cast<const float*>(srcVertex + srcOffset);
+				adapter.MarshalFloat(srcElement, destVertex);
+				srcOffset += sizeof(float);
+				break;
+			}
 			case BufferElementType::Float2:
 			{
 				const Math::Vector2& srcElement = *reinterpret_cast<const Math::Vector2*>(srcVertex + srcOffset);

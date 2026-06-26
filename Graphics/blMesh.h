@@ -319,7 +319,6 @@ namespace BoulderLeaf::Graphics
 	template<typename TVertexDefinition>
 	void SubdividePrototype(typename blMesh<TVertexDefinition>::Prototype& prototype)
 	{
-		//using TVertex = typename blMesh<TVertexDefinition>::TVertex;
 		struct Triangle
 		{
 			union
@@ -335,29 +334,31 @@ namespace BoulderLeaf::Graphics
 			};
 		};
 
-		size_t indexCount = prototype.indices.size();
-		for (size_t i = 0; i + 2 < indexCount; i += 3)
-		{
-			Triangle triangle;
-			triangle.data[0] = prototype.indices[i + 0];
-			triangle.data[1] = prototype.indices[i + 1];
-			triangle.data[2] = prototype.indices[i + 2];
+		const size_t indexCount = prototype.indices.size();
 
-			Math::Vector3 newPositions[3] = {
-				prototype.vertices[triangle.i1].Position + (prototype.vertices[triangle.i1].Position - prototype.vertices[triangle.i0].Position) * 0.5f,
-				prototype.vertices[triangle.i2].Position + (prototype.vertices[triangle.i2].Position - prototype.vertices[triangle.i1].Position) * 0.5f,
-				prototype.vertices[triangle.i0].Position + (prototype.vertices[triangle.i0].Position - prototype.vertices[triangle.i2].Position) * 0.5f
+		//we will be adding 9 new indices for every existing triangle. 
+		//reserve the space up-front, so that we do not resize during operation.
+		prototype.indices.reserve(indexCount + (indexCount / 3) * 9);
+
+		for (size_t i = 0; (i + 2) < indexCount; i += 3)
+		{
+			Triangle& triangleToSubdivide = *reinterpret_cast<Triangle*>(prototype.indices.data() + i);
+
+			const std::array<Math::Vector3, 3> newPositions = {
+				prototype.vertices[triangleToSubdivide.i0].Position + (prototype.vertices[triangleToSubdivide.i1].Position - prototype.vertices[triangleToSubdivide.i0].Position) * 0.5f,
+				prototype.vertices[triangleToSubdivide.i1].Position + (prototype.vertices[triangleToSubdivide.i2].Position - prototype.vertices[triangleToSubdivide.i1].Position) * 0.5f,
+				prototype.vertices[triangleToSubdivide.i2].Position + (prototype.vertices[triangleToSubdivide.i0].Position - prototype.vertices[triangleToSubdivide.i2].Position) * 0.5f
 			};
 
 			// Add the new vertices (copies of the existing ones with adjusted positions)
 			for (int np = 0; np < 3; ++np)
 			{
-				prototype.vertices.push_back(prototype.vertices[triangle.data[np]]);
+				prototype.vertices.push_back(prototype.vertices[triangleToSubdivide.data[np]]);
 				prototype.vertices.back().Position = newPositions[np];
 			}
 
 			const size_t newVertexSize = prototype.vertices.size();
-			Triangle newIndices =
+			std::array<blMeshStorage::index, 3> newIndices =
 			{
 				static_cast<blMeshStorage::index>(newVertexSize - 3),
 				static_cast<blMeshStorage::index>(newVertexSize - 2),
@@ -365,21 +366,21 @@ namespace BoulderLeaf::Graphics
 			};
 
 			// Append new triangles (indices) to the indices vector
-			prototype.indices.push_back(newIndices.i0);
-			prototype.indices.push_back(triangle.i1);
-			prototype.indices.push_back(newIndices.i1);
+			prototype.indices.push_back(newIndices[0]);
+			prototype.indices.push_back(triangleToSubdivide.i1);
+			prototype.indices.push_back(newIndices[1]);
 
-			prototype.indices.push_back(newIndices.i1);
-			prototype.indices.push_back(triangle.i2);
-			prototype.indices.push_back(newIndices.i2);
+			prototype.indices.push_back(newIndices[1]);
+			prototype.indices.push_back(triangleToSubdivide.i2);
+			prototype.indices.push_back(newIndices[2]);
 
-			prototype.indices.push_back(newIndices.i2);
-			prototype.indices.push_back(triangle.i0);
-			prototype.indices.push_back(newIndices.i0);
+			prototype.indices.push_back(newIndices[2]);
+			prototype.indices.push_back(newIndices[0]);
+			prototype.indices.push_back(newIndices[1]);
 
 			// Update the original triangle to reference the new vertices
-			prototype.indices[i + 1] = newIndices.i0;
-			prototype.indices[i + 2] = newIndices.i2;
+			triangleToSubdivide.i1 = newIndices[0];
+			triangleToSubdivide.i2 = newIndices[2];
 		}
 	};
 

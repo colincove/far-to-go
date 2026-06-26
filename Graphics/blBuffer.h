@@ -27,6 +27,7 @@ namespace BoulderLeaf::Graphics
 
 	enum class BufferElementType : byte
 	{
+		Float,
 		Float2,
 		Float3,
 		Float4,
@@ -52,6 +53,7 @@ namespace BoulderLeaf::Graphics
 	{
 	public:
 		virtual size_t SizeOfElement(BufferElementType Type) const = 0;
+		virtual void MarshalFloat(const float& srcElement, byte* destElement) const = 0;
 		virtual void MarshalVector2(const Math::Vector2& srcElement, byte* destElement) const = 0;
 		virtual void MarshalVector3(const Math::Vector3& srcElement, byte* destElement) const = 0;
 		virtual void MarshalVector4(const Math::Vector4& srcElement, byte* destElement) const = 0;

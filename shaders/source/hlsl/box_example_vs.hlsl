@@ -5,6 +5,13 @@ struct ObjectConstants
 };
 ConstantBuffer<ObjectConstants> gObjConstants : register(b0);
 
+struct PassConstants
+{
+    float4x4 gWorldViewProj;
+    uint matIndex;
+};
+ConstantBuffer<PassConstants> gPassConstants : register(b1);
+
 void VS(
     float3 iPosL : POSITION,
     float3 iNorm : NORMAL,

@@ -58,6 +58,8 @@ add_library(
 	blDepthBuffer.h
 	blConstantBufferDescriptorHeap.cpp
 	blConstantBufferDescriptorHeap.h
+	blUploadBuffer.cpp
+	blUploadBuffer.h
 
 	RenderComponents/blRenderComponent.cpp
 	RenderComponents/blRenderComponent.h
@@ -90,6 +92,10 @@ add_library(
 	RenderData/blDX12ConstantBufferWithPassCache.h
 	RenderData/blDX12BufferElementDataCache.cpp
 	RenderData/blDX12BufferElementDataCache.h
+	RenderData/blDX12VertexAndPassUploadBufferCache.cpp
+	RenderData/blDX12VertexAndPassUploadBufferCache.h
+	RenderData/blDX12ElementUploadBufferCache.cpp
+	RenderData/blDX12ElementUploadBufferCache.h
 	)
 
 source_group("Render Components/Headers Files"
@@ -119,7 +125,10 @@ source_group("Render Data/Headers Files"
 	RenderData/blDX12ConstantBufferCache.h
 	RenderData/blDX12CompositeMeshDataCache.h
 	RenderData/blDX12ConstantBufferWithPassCache.h,
-	RenderData/blDX12BufferElementDataCache.h)
+	RenderData/blDX12BufferElementDataCache.h
+	RenderData/blDX12VertexAndPassUploadBufferCache.h
+	RenderData/blDX12ElementUploadBufferCache.h
+)
 
 source_group("Render Data/Source Files"
 	FILES 
@@ -132,7 +141,9 @@ source_group("Render Data/Source Files"
 	RenderData/blDX12ConstantBufferCache.cpp
 	RenderData/blDX12CompositeMeshDataCache.cpp
 	RenderData/blDX12ConstantBufferWithPassCache.cpp
-	RenderData/blDX12BufferElementDataCache.cpp)
+	RenderData/blDX12BufferElementDataCache.cpp
+	RenderData/blDX12VertexAndPassUploadBufferCache.cpp
+	RenderData/blDX12ElementUploadBufferCache.cpp)
 
 target_include_directories(DX12
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}

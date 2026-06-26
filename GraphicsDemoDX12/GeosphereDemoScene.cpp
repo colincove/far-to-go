@@ -11,7 +11,7 @@ namespace BoulderLeaf::Graphics
 		auto mesh = std::reinterpret_pointer_cast<blMeshBaseResource>(
 			blResourceManager::Get().CreateResource<StandardMeshResource>(CreateGeosphere(
 				2,    //radius
-				3    //numSubdivisions
+				1    //numSubdivisions
 			)));
 		SetMeshResource(mesh);
 	}

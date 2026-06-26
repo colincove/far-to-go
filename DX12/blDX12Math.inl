@@ -2,6 +2,7 @@
 
 #include <DirectXMath.h>
 #include <minwindef.h>
+#include <blGraphicsCore.h>
 
 using namespace DirectX;
 
@@ -29,6 +30,8 @@ namespace BoulderLeaf::Graphics::DX12::Math
 		// 0x022B & 0xff00
 		// 0x0200
 		// 512
-		return EnforceByteStrideLength(byteSize, 256);
+		constexpr UINT strideLength = 256;
+		//return (byteSize + (strideLength - 1)) & ~(strideLength - 1);
+		return EnforceByteStrideLength(byteSize, 256); //need this function somewhere else?
 	}
 }

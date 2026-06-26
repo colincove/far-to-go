@@ -10,6 +10,12 @@ namespace BoulderLeaf::Graphics::DX12
 		return gDX12BufferAdapter;
 	}
 
+	void DX12BufferAdapter::MarshalFloat(const float& srcElement, byte* destElementPtr) const
+	{
+		float& destElement = *reinterpret_cast<float*>(destElementPtr);
+		destElement = srcElement;
+	}
+
 	void DX12BufferAdapter::MarshalVector2(const Math::Vector2& srcElement, byte* destElementPtr) const
 	{
 		DirectX::XMFLOAT2& destElement = *reinterpret_cast<DirectX::XMFLOAT2*>(destElementPtr);
@@ -45,11 +51,12 @@ namespace BoulderLeaf::Graphics::DX12
 		return BufferFormat::DX12;
 	}
 
-
 	size_t DX12BufferAdapter::SizeOfElement(BufferElementType type) const
 	{
 		switch (type)
 		{
+		case BufferElementType::Float:
+			return sizeof(float);
 		case BufferElementType::Float2:
 			return sizeof(DirectX::XMFLOAT2);
 		case BufferElementType::Float3:
@@ -79,6 +86,8 @@ namespace BoulderLeaf::Graphics::DX12
 
 			switch (element.ElementType)
 			{
+			case BufferElementType::Float:
+				format = DXGI_FORMAT_R32_FLOAT;
 			case BufferElementType::Float2:
 				format = DXGI_FORMAT_R32G32_FLOAT;
 				break;

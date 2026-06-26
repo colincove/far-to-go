@@ -2,6 +2,7 @@
 #include <blDX12Buffer.h>
 #include <Resources/blResourceManager.h>
 #include <blBuffer.h>
+#include <blDX12Math.inl>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -18,10 +19,11 @@ namespace BoulderLeaf::Graphics::DX12
 
 		const std::vector<BufferElementDescription>& elementDescriptions = resourceData.GetElementDescriptions();
 
-		const size_t destElementSize = GetBufferElementSize(elementDescriptions, DX12::DX12BufferAdapter::Get());
+		cache.elementSize = Math::CalcConstantBufferByteSize(
+			GetBufferElementSize(elementDescriptions, DX12::DX12BufferAdapter::Get()));
 
 		// Allocate storage for a single element (blDataElementBuffer is used for single-element pass data)
-		std::unique_ptr<byte[]> destData = std::make_unique<byte[]>(destElementSize);
+		std::unique_ptr<byte[]> destData = std::make_unique<byte[]>(cache.elementSize);
 
 		// Marshal the single element from BoulderLeaf format into DX12 format
 		MarshalBufferElement(elementDescriptions, destData.get(), resourceData.GetData(), DX12::DX12BufferAdapter::Get());

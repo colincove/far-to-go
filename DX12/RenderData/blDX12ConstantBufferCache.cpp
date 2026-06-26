@@ -13,7 +13,6 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	}
 
-	//TODO: Why is this data specific to standard object constants? I want to be able to use this for any type of constant buffer.
 	void blDX12ConstantBufferCache::InitializeCache(
 		const blDataBufferInterfaceResource& resource,
 		blDX12ConstantBufferCacheData& cache)
@@ -25,8 +24,7 @@ namespace BoulderLeaf::Graphics::DX12
 			(UINT) (resource.GetData().Count() * Constants::FrameResourceCount),
 			resource.GetName());
 
-		const UINT objCBByteSize = Math::CalcConstantBufferByteSize(static_cast<UINT>(bufferData.dataBuffer.GetElementSize()));
-		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = bufferData.uploadBuffer->Resource()->GetGPUVirtualAddress();
+		const UINT objCBByteSize = Math::CalcConstantBufferByteSize(static_cast<UINT>(bufferData.dataBuffer->GetElementSize()));
 		auto cbvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(cache.descriptorHeap->GetDescriptorHeap()->GetCPUDescriptorHandleForHeapStart());
 
 		const size_t count = resource.GetData().Count();
@@ -35,9 +33,7 @@ namespace BoulderLeaf::Graphics::DX12
 			for (int i = 0; i < count; ++i)
 			{
 				D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-
-				//this is ugly. probably need to figure out a cleaner way to calculate and share
-				cbvDesc.BufferLocation = (cbAddress + ((objCBByteSize * count) * frameResource)) + (i * objCBByteSize);
+				cbvDesc.BufferLocation = bufferData.uploadBuffer->GetBufferLocationForIndex(frameResource, i);
 				cbvDesc.SizeInBytes = objCBByteSize;
 				mDevice->GetDX12Device()->CreateConstantBufferView(
 					&cbvDesc,
