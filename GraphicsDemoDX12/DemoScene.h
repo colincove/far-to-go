@@ -1,9 +1,26 @@
 #pragma once
 
 #include <memory>
-#include <blGraphicsAPI.h>
-#include <blTime.h>
-#include <blWindow.h>
+
+namespace BoulderLeaf
+{
+	class blResourceContainer;
+
+	namespace Graphics
+	{
+		class API;
+	}
+
+	namespace Core
+	{
+		class blWindow;
+	}
+
+	namespace Metrics
+	{
+		class blTime;
+	}
+}
 
 namespace BoulderLeaf::Graphics
 {
@@ -12,8 +29,9 @@ namespace BoulderLeaf::Graphics
 	protected:
 		std::shared_ptr<API> mGraphicsAPI;
 		std::shared_ptr<Core::blWindow> mWindow;
+		blResourceContainer* mResourceContainer;
 	public:
-		blDemoScene(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window);
+		blDemoScene(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer);
 		virtual void Draw() = 0;
 		virtual void Update(const Metrics::blTime& gameTime) = 0;
 	};

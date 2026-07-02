@@ -36,11 +36,13 @@ namespace BoulderLeaf::Graphics::DX12
 	class blDX12;
 	class blDX12ConstantBufferWithPassCache;
 	class blDX12ElementUploadBufferCache;
+	class blDX12ResourceCacheGlobalInterface;
 
 	struct blGlobalRenderData
 	{
 		friend blDX12;
 
+		blDX12ResourceCacheGlobalInterface* resourceCacheGlobalInterface;
 		std::shared_ptr<blDevice> device;
 		std::shared_ptr<blCommandQueue> commandQueue;
 		std::shared_ptr<blFactory> factory;

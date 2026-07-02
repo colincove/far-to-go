@@ -80,6 +80,32 @@ namespace BoulderLeaf::Graphics::DX12
 		return cbAddress;
 	}
 
+	blDX12blDataBufferUploadBuffer_Resource::blDX12blDataBufferUploadBuffer_Resource(
+		std::shared_ptr<blDevice> device,
+		bool isConstantBuffer,
+		blResourceHandleOfType<blDataBufferInterface> handle)
+		: mHandle(handle), 
+		blUploadBufferBase(device, isConstantBuffer, std::wstring(handle.GetName()))
+	{
+
+	}
+
+	UINT blDX12blDataBufferUploadBuffer_Resource::GetTotalSize() const
+	{
+		//TODO
+		return 0;
+	}
+
+	void blDX12blDataBufferUploadBuffer_Resource::CopyData(int currentFrameResource)
+	{
+		//TODO
+	}
+
+	void blDX12blDataBufferUploadBuffer_Resource::CopyAllData()
+	{
+		//TODO
+	}
+
 	blDX12blVertexDataUploadBuffer::blDX12blVertexDataUploadBuffer(
 		std::shared_ptr<blDevice> device,
 		bool isConstantBuffer,

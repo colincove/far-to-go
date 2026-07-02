@@ -2,6 +2,7 @@ add_executable(
 	GraphicsTests 
 	GraphicsTests.cpp
 	VirtualCamera.cpp
+	Buffer.cpp
 	main.cpp
 	Mesh.cpp
 	RenderGroups.cpp)

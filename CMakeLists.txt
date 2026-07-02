@@ -79,6 +79,7 @@ add_subdirectory(RapidXML)
 add_subdirectory(imgui)
 add_subdirectory(Core)
 add_subdirectory(CoreApplication)
+add_subdirectory(CoreApplicationTests)
 
 target_link_libraries(
 	FarToGo 

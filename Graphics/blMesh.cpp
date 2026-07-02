@@ -224,4 +224,33 @@ namespace BoulderLeaf::Graphics
 		{ "Color",		VertexElementType::Float4 },
 		{ "TEXCOORD",	VertexElementType::Float2 }
 	};
+
+	const blMeshStorage::index* blInlineMesh::GetIndicesStart() const
+	{
+		return reinterpret_cast<const blMeshStorage::index*>(
+			reinterpret_cast<const byte*>(&mHeader) + sizeof(Header));
+	}
+
+	blMeshStorage::index* blInlineMesh::GetIndicesStartMutable()
+	{
+		return reinterpret_cast<blMeshStorage::index*>(
+			reinterpret_cast<byte*>(&mHeader) + sizeof(Header));
+	}
+
+	uint64_t blInlineMesh::GetTotalSize() const
+	{
+		return sizeof(Header) +
+			(mHeader.mVertexCount * mHeader.mVertexSize) +
+			(mHeader.mIndexCount * sizeof(blMeshStorage::index));
+	}
+
+	const byte* blInlineMesh::GetVertexStart() const
+	{
+		return reinterpret_cast<const byte*>(GetIndicesStart()) + sizeof(blMeshStorage::index) * mHeader.mIndexCount;
+	}
+
+	byte* blInlineMesh::GetVertexStartMutable() 
+	{
+		return reinterpret_cast<byte*>(GetIndicesStartMutable()) + sizeof(blMeshStorage::index) * mHeader.mIndexCount;
+	}
 }

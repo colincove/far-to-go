@@ -10,6 +10,8 @@
 #include <vector>
 #include <RenderItems/blRenderItem.h>
 #include <blCompositeMesh.h>
+#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResourceHandleOfType.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -27,6 +29,8 @@ namespace BoulderLeaf::Graphics
 		blDataBufferInterfaceResourcePtr constantBuffer;
 		blMeshBaseResourcePtr mesh;
 		blMaterialResourcePtr material;
+		blResourceHandleOfType<blInlineMesh> meshResource;
+		BufferDescription meshResourceBufferDescription;
 	};
 
 	struct RenderCompositeMeshDataInstanced : public RenderData
@@ -37,6 +41,7 @@ namespace BoulderLeaf::Graphics
 		blMaterialResourcePtr material;
 		blResourceId submeshId;
 		size_t instance;
+
 	};
 
 	struct RenderCompositeMeshDataWithPassConstants : public RenderData

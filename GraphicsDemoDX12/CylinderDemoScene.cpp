@@ -5,9 +5,17 @@
 namespace BoulderLeaf::Graphics
 {
 	blCylinderDemoScene::blCylinderDemoScene(
-		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window)
-		: blMeshDemoSceneBase(graphicsAPI, window)
+		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer)
+		: blMeshDemoSceneBase(graphicsAPI, window, resourceContainer)
 	{
+
+		std::unique_ptr<byte[]> cubeMesh = CubeInline();
+		SetMeshResourceExprimentalFromInlineMesh(L"Cube", CubeInline(),
+			BufferDescription{
+				BufferFormat::BoulderLeaf,
+				StandardVertexDefinition::Description
+			});
+
 		auto mesh = std::reinterpret_pointer_cast<blMeshBaseResource>(
 			blResourceManager::Get().CreateResource<StandardMeshResource>(CreateCylinder(
 				2,    //bottomRadius

@@ -12,6 +12,7 @@
 #include <blWindow.h>
 #include <blTime.h>
 #include <DemoScene.h>
+#include <memory>
 
 namespace BoulderLeaf::Graphics
 {
@@ -19,6 +20,7 @@ namespace BoulderLeaf::Graphics
 	{
 	protected:
 		blMeshBaseResourcePtr mMeshResource;
+		blResourceHandleOfType<blInlineMesh> mInlineMeshResourceHandle;
 		blSceneResourcePtr mSceneResource;
 		blShaderResourcePtr mShaderResource;
 		blMaterialResourcePtr mMaterialResource;
@@ -33,8 +35,8 @@ namespace BoulderLeaf::Graphics
 		VirtualCamera mCamera;
 
 	public:
-		blMeshDemoSceneBase(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window)
-			: blDemoScene(graphicsAPI, window),
+		blMeshDemoSceneBase(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer)
+			: blDemoScene(graphicsAPI, window, resourceContainer),
 			mTheta(1.5f * PIf),
 			mPhi(PIfDIV4),
 			mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
@@ -105,6 +107,33 @@ namespace BoulderLeaf::Graphics
 		{
 			mMeshResource = mesh;
 			mDrawData.mesh = mMeshResource;
+		}
+
+		void SetMeshResourceExprimentalFromInlineMesh(
+			std::wstring name, 
+			const std::unique_ptr<byte[]>& mesh,
+			const BufferDescription& bufferDescription)
+		{
+			blInlineMesh& inlineMeshSource = reinterpret_cast<blInlineMesh&>(*mesh.get());
+
+			blResourceHandleOfType<blInlineMesh> resource = blResourceHandleOfType<blInlineMesh>(
+				mResourceContainer->CreateResource(name, inlineMeshSource.GetTotalSize()));
+			
+			memcpy(resource.GetMutable(),
+				mesh.get(),
+				inlineMeshSource.GetTotalSize());
+
+			resource->mHeader.description = InlineBufferDescription::CreateResourceFromBufferDescription(name, bufferDescription, mResourceContainer);
+
+			mInlineMeshResourceHandle = resource;
+			mDrawData.meshResource = resource;
+			mDrawData.meshResourceBufferDescription = bufferDescription;
+		}
+
+		void SetMeshResourceExprimental(const blResourceHandleOfType<blInlineMesh> mesh)
+		{
+			mInlineMeshResourceHandle = mesh;
+			mDrawData.meshResource = mesh;
 		}
 	};
 }

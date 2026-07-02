@@ -61,6 +61,15 @@ add_library(
 	blUploadBuffer.cpp
 	blUploadBuffer.h
 
+	ResourceCache/blDX12ResourceCache.cpp
+	ResourceCache/blDX12ResourceCache.h
+	ResourceCache/blDX12ResourceCacheData.h
+	ResourceCache/blDX12ResourceCacheInterface.cpp
+	ResourceCache/blDX12ResourceCacheInterface.h
+	ResourceCache/blDX12MeshTranslationCache.h
+	ResourceCache/blDX12MeshTranslationCache.cpp
+	ResourceCache/blDX12ResourceCacheTemplate.h
+
 	RenderComponents/blRenderComponent.cpp
 	RenderComponents/blRenderComponent.h
 	RenderComponents/blMeshRenderComponent.cpp
@@ -98,7 +107,21 @@ add_library(
 	RenderData/blDX12ElementUploadBufferCache.h
 	)
 
-source_group("Render Components/Headers Files"
+source_group("ResourceCache/Headers Files"
+	FILES 
+	ResourceCache/blDX12ResourceCache.h
+	ResourceCache/blDX12ResourceCacheData.h
+	ResourceCache/blDX12ResourceCacheInterface.h
+	ResourceCache/blDX12MeshTranslationCache.h
+	ResourceCache/blDX12ResourceCacheTemplate.h)
+
+source_group("ResourceCache/Source Files"
+	FILES 
+	ResourceCache/blDX12ResourceCache.cpp
+	ResourceCache/blDX12ResourceCacheInterface.cpp
+	ResourceCache/blDX12MeshTranslationCache.cpp)
+
+source_group("RenderComponents/Headers Files"
 	FILES 
 	RenderComponents/blRenderComponent.h
 	RenderComponents/blMeshRenderComponent.h
@@ -106,7 +129,7 @@ source_group("Render Components/Headers Files"
 	RenderComponents/blCompositeMeshRenderComponent.h
 	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.h)
 
-source_group("Render Components/Source Files"
+source_group("RenderComponents/Source Files"
 	FILES 
 	RenderComponents/blRenderComponent.cpp
 	RenderComponents/blMeshRenderComponent.cpp
@@ -114,7 +137,7 @@ source_group("Render Components/Source Files"
 	RenderComponents/blCompositeMeshRenderComponent.cpp
 	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.cpp)
 
-source_group("Render Data/Headers Files"
+source_group("RenderData/Headers Files"
 	FILES 
 	RenderData/blDX12BufferData.h
 	RenderData/blDX12MeshDataDeviceCache.h
@@ -130,7 +153,7 @@ source_group("Render Data/Headers Files"
 	RenderData/blDX12ElementUploadBufferCache.h
 )
 
-source_group("Render Data/Source Files"
+source_group("RenderData/Source Files"
 	FILES 
 	RenderData/blDX12BufferData.cpp
 	RenderData/blDX12MeshDataCache.cpp

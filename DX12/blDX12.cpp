@@ -33,7 +33,8 @@ namespace BoulderLeaf::Graphics::DX12
 		mMeshInstancedRenderComponent(),
 		mCompositeMeshRenderComponent(),
 		mCompositeMeshRenderWithPassConstantsRenderComponent(),
-		mCurrentFence(0)
+		mCurrentFence(0),
+		mResourceCacheGlobalInterface()
 	{
 		//this is not working for me right now. not sure why. some build issues. 
 //#ifdef DEBUG
@@ -55,6 +56,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blGlobalRenderData& globalRenderDataRef = *mGlobalRenderDataPtr.get();
 
 		globalRenderDataRef.globalRenderFrameContext = std::make_shared<blGlobalRenderFrameContext>();
+		globalRenderDataRef.resourceCacheGlobalInterface = &mResourceCacheGlobalInterface;
 
 		globalRenderDataRef.viewPort.TopLeftX = 0;
 		globalRenderDataRef.viewPort.TopLeftY = 0;

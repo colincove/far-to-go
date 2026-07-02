@@ -5,8 +5,8 @@
 namespace BoulderLeaf::Graphics
 {
 	ShapesWithPassDemoScene::ShapesWithPassDemoScene(
-		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window)
-		: blDemoScene(graphicsAPI, window),
+		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer)
+		: blDemoScene(graphicsAPI, window, resourceContainer),
 		mTheta(1.5f * PIf),
 		mPhi(PIfDIV4),
 		mCurrentShapeToDraw(0),

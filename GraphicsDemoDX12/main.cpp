@@ -12,12 +12,19 @@
 #include <CylinderDemoScene.h>
 #include <ShapesWithPassDemoScene.h>
 #include <DemoImgui.h>
+#include <Resources/blResourcesExprimental.h>
 
 using namespace BoulderLeaf;
 using namespace BoulderLeaf::Graphics;
 
 int main()
 {	
+	blResourceContainerPool pool;
+	blResourceContainer* container = pool.GetContainer(
+		1000000 * 256, // 256mb
+		10000
+	);
+
 	Metrics::LoadPIX();
 	std::shared_ptr<Core::blWindow> window(std::make_shared<Core::blWindow>("Graphics Demo"));
 	std::shared_ptr<Graphics::API> api(std::make_shared<DX12::blDX12>(window));
@@ -31,13 +38,13 @@ int main()
 
 	MSG msg = { };
 
-	std::array<std::shared_ptr<blDemoScene>, 5> demoScenes =
+	std::array<std::unique_ptr<blDemoScene>, 5> demoScenes =
 	{
-		std::make_shared<blBoxScene>(api, window),
-		std::make_shared<blCylinderDemoScene>(api, window),
-		std::make_shared<blGeosphereDemoScene>(api, window),
-		std::make_shared<blShapesDemoScene>(api, window),
-		std::make_shared<ShapesWithPassDemoScene>(api, window),
+		std::make_unique<blBoxScene>(api, window, container),
+		std::make_unique<blCylinderDemoScene>(api, window, container),
+		std::make_unique<blGeosphereDemoScene>(api, window, container),
+		std::make_unique<blShapesDemoScene>(api, window, container),
+		std::make_unique<ShapesWithPassDemoScene>(api, window, container),
 	};
 
 	Imgui::SetCurrentSelection(1);
@@ -54,7 +61,7 @@ int main()
 		{
 			api->Update(gameTime);
 
-			for (const std::shared_ptr<blDemoScene>& demoScenePtr : demoScenes)
+			for (const std::unique_ptr<blDemoScene>& demoScenePtr : demoScenes)
 			{
 				demoScenePtr->Update(gameTime);
 			}

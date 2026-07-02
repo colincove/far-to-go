@@ -1,4 +1,6 @@
 #include <blMeshInstancedRenderComponent.h>
+#include <ResourceCache/blDX12MeshTranslationCache.h>
+#include <ResourceCache/blDX12ResourceCacheInterface.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -15,6 +17,10 @@ namespace BoulderLeaf::Graphics::DX12
 	void blMeshInstancedRenderComponent::Render(const RenderMeshDataInstanced& renderData, const  blSceneResourcePtr scene)
 	{
 		blGlobalRenderData& globalRenderData = *mGlobalRenderData.get();
+
+		const blInlineMesh& inlineMesh = *renderData.meshResource;
+		const blDX12MeshTranslationCacheData& meshTranslationCacheData = globalRenderData.resourceCacheGlobalInterface->
+			GetMeshTranslationCacheData(renderData.meshResource);
 
 		const blMaterial& material = renderData.material->GetData();
 		const blShaderResource& shaderResource = *material.shader;

@@ -12,6 +12,8 @@
 #include <Resources/blResource.h>
 #include <string>
 #include <blBuffer.h>
+#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResourceHandleOfType.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -21,7 +23,7 @@ namespace BoulderLeaf::Graphics
 	using VertexElementDescription = BufferElementDescription;
 
 	template<typename TVertex, BufferFormat TFormat>
-	struct VertexDefinition : public BufferDefinition<TVertex, TFormat>
+	struct VertexDefinition : public BufferDefinitionTemplate<TVertex, TFormat>
 	{
 		using VertexType = TVertex;
 	};
@@ -50,6 +52,7 @@ namespace BoulderLeaf::Graphics
 
 		struct Header
 		{
+			Header() : Header(0, 0, 0, BufferFormat::BoulderLeaf) {}
 			Header(
 				size_t vertexCount,
 				size_t indexCount,
@@ -189,6 +192,67 @@ namespace BoulderLeaf::Graphics
 		void GraftMeshData(const blMeshStorage& other, const size_t index, const size_t vertex, bool offsetVertexIndices);
 	};
 
+	struct blInlineMesh
+	{
+		struct Header : public blMeshStorage::Header {
+			Header() : Header(0, 0, 0, BufferFormat::BoulderLeaf) {}
+			Header(
+				size_t vertexCount,
+				size_t indexCount,
+				size_t vertexSize,
+				BufferFormat format)
+				: blMeshStorage::Header(vertexCount, indexCount, vertexSize, format), description()
+			{
+			}
+
+			blMeshStorage::Header meshHeader;
+			blResourceRef description;
+		};
+
+		Header mHeader;
+
+		const blMeshStorage::index* GetIndicesStart() const;
+		blMeshStorage::index* GetIndicesStartMutable();
+		uint64_t GetTotalSize() const;
+
+		const byte* GetVertexStart() const;
+		byte* GetVertexStartMutable();
+
+		void GraftMeshData(const blInlineMesh& other, const size_t index, const size_t vertex, bool offsetVertexIndices);
+	};
+
+	template<typename TVertex>
+	std::unique_ptr<byte[]> BuildInlineMesh(const TVertex* vertices,
+		const size_t vertexCount,
+		const blMeshStorage::index* indices,
+		const size_t indexCount)
+	{
+		blInlineMesh::Header header = blInlineMesh::Header(
+			vertexCount,
+			indexCount,
+			sizeof(TVertex),
+			BufferFormat::BoulderLeaf
+		);
+
+		std::unique_ptr<byte[]> buffer = std::make_unique<byte[]>(
+			(uint64_t)(sizeof(blInlineMesh::Header) +
+			header.GetIndexBufferSize() + 
+			header.GetVertexBufferSize()));
+
+		blInlineMesh* mesh = reinterpret_cast<blInlineMesh*>(buffer.get());
+		mesh->mHeader = header;
+
+		memcpy(mesh->GetVertexStartMutable(),
+			vertices,
+			mesh->mHeader.mVertexCount * mesh->mHeader.mVertexSize);
+
+		memcpy(mesh->GetIndicesStartMutable(),
+			indices,
+			mesh->mHeader.mIndexCount * sizeof(blMeshStorage::index));
+
+		return std::move(buffer);
+	}
+
 	class blMeshBase
 	{
 	protected:
@@ -269,6 +333,57 @@ namespace BoulderLeaf::Graphics
 			prototype.vertices.clear();
 			return prototype;
 		}
+
+		static uint64_t CalculateSizeOfPrototype(
+			const Prototype& prototype, 
+			const BufferDescription& bufferDescription,
+			const blBufferElementAdapter& adapter)
+		{
+			blMeshStorage::Header header = blMeshStorage::Header(
+				prototype.vertices.size(),
+				prototype.indices.size(),
+				adapter.SizeOf(bufferDescription),
+				adapter.GetFormat()
+			);
+
+			return sizeof(blMeshStorage::Header) + blMeshStorage::GetBufferSize(header);
+		}
+
+		static void WritePrototype(
+			const Prototype& prototype,
+			blInlineMesh& mesh)
+		{
+			mesh.mHeader = blMeshStorage::Header(
+				prototype.vertices.size(),
+				prototype.indices.size(),
+				sizeof(TVertex),
+				BufferFormat::BoulderLeaf
+			);
+
+			memcpy(mesh.GetVertexStartMutable(), 
+				&prototype.vertices[0],
+				mesh.mHeader.mVertexCount * mesh.mHeader.mVertexSize);
+
+			memcpy(mesh.GetIndicesStartMutable(), 
+				&prototype.indices[0],
+				mesh.mHeader.mIndexCount * sizeof(blMeshStorage::index));
+		}
+
+		static blResourceHandleOfType<blInlineMesh> CreateMeshResourceFromPrototype(const Prototype& prototype,
+			std::wstring name,
+			blResourceContainer* resourceContainer
+		)
+		{
+			uint64_t size = CalculateSizeOfPrototype(prototype);
+
+			blResourceHandleOfType<blInlineMesh> resource = blResourceHandleOfType<blInlineMesh>(
+				resourceContainer->CreateResource(name, size));
+			
+			WritePrototype(prototype, *resource);
+
+			return resource;
+		}
+
 	public:
 		blMesh() : blMeshBase() {}
 		blMesh(const blMeshStorage& storage) : blMeshBase(storage){}

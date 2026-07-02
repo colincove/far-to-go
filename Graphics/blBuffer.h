@@ -17,6 +17,13 @@
 #include <blGraphicsCore.h>
 #include <minwindef.h>
 
+namespace BoulderLeaf {
+	template<typename TResource>
+	class blResourceHandleOfType;
+
+	class blResourceContainer;
+}
+
 namespace BoulderLeaf::Graphics
 {
 	enum class BufferFormat
@@ -24,6 +31,8 @@ namespace BoulderLeaf::Graphics
 		BoulderLeaf,
 		DX12
 	};
+
+
 
 	enum class BufferElementType : byte
 	{
@@ -41,8 +50,91 @@ namespace BoulderLeaf::Graphics
 		BufferElementType ElementType;
 	};
 
+	struct BufferDescription
+	{
+		BufferFormat format;
+
+		//memory ownership ambiguos. use unique_ptr?
+		std::vector<BufferElementDescription> elementDescriptions;
+	};
+
+	struct InlineBufferElementDescription
+	{
+		struct Header
+		{
+			BufferElementType ElementType;
+			uint32_t nameStringLength;
+		};
+
+		Header mHeader;
+
+		std::string_view GetName()
+		{
+			return std::string_view(reinterpret_cast<char*>(this) + CalculateNameStringOffset(), mHeader.nameStringLength * sizeof(char));
+		}
+
+		static uint64_t CalculateNameStringOffset()
+		{
+			return sizeof(InlineBufferElementDescription);
+		}
+
+		uint64_t CalculateTotalSize() const
+		{
+			return sizeof(InlineBufferElementDescription) + mHeader.nameStringLength * sizeof(char);
+		}
+	};
+
+	struct InlineBufferDescription
+	{
+		struct Header
+		{
+			BufferFormat format;
+			uint32_t numElementDescriptions;
+		};
+
+		Header mHeader;
+		
+		static uint64_t CalculateBufferElementDescriptionOffset();
+
+		static uint64_t CalculateTotalSize(std::vector<BufferElementDescription> elementDescriptions);
+
+		void WriteDescription(const BufferDescription& desc);
+
+		// IterateElements removed; use Iterator for element traversal
+
+		class Iterator
+		{
+		private:
+			byte* mHead;
+			byte* mBegin;
+			int mNumElementDescriptions;
+		public:
+			Iterator(InlineBufferElementDescription* begin, int numElementDescriptions);
+			// construct iterator from an InlineBufferDescription reference
+			Iterator(InlineBufferDescription& desc);
+
+
+
+			InlineBufferElementDescription& operator*() const;
+
+			Iterator& operator++();
+
+			bool operator!=(const Iterator& other) const;
+
+			Iterator begin() const;
+			Iterator end() const;
+		};
+
+		BufferDescription ToBufferDescription() const;
+
+		static blResourceHandleOfType<InlineBufferDescription> CreateResourceFromBufferDescription(
+			std::wstring name,
+			const BufferDescription& desc,
+			blResourceContainer* container);
+	};
+
 	template<typename TElement, BufferFormat TFormat>
-	struct BufferDefinition
+	struct BufferDefinitionTemplate
 	{
 		constexpr static BufferFormat Format = TFormat;
 		using ElementType = TElement;
@@ -61,7 +153,7 @@ namespace BoulderLeaf::Graphics
 		virtual void MarshalMatrix4x4(const Math::Matrix4x4& srcElement, byte* destElement) const = 0;
 		virtual BufferFormat GetFormat() const = 0;
 
-		size_t SizeOf(const std::vector<BufferElementDescription>& elementDescriptions) const;
+		uint64_t SizeOf(const BufferDescription& descriptions) const;
 	};
 
 	void MarshalBuffer(

@@ -20,6 +20,7 @@
 #include <RenderComponents/blCompositeMeshRenderComponent.h>
 #include <RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.h>
 #include <blDX12Imgui.h>
+#include <ResourceCache/blDX12ResourceCacheInterface.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -36,6 +37,8 @@ namespace BoulderLeaf::Graphics::DX12
 		};
 
 	private:
+		blDX12ResourceCacheGlobalInterface mResourceCacheGlobalInterface;
+
 		std::unique_ptr<blMeshRenderComponent> mMeshRenderComponent;
 		std::unique_ptr<blMeshInstancedRenderComponent> mMeshInstancedRenderComponent;
 		std::unique_ptr<blCompositeMeshRenderComponent> mCompositeMeshRenderComponent;

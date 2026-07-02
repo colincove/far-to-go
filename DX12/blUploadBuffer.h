@@ -5,6 +5,8 @@
 #include <blDevice.h>
 #include "../DirectX-Headers/include/directx/d3dx12.h"
 #include <blBuffer.h>
+#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResourceHandleOfType.h>
 
 
 namespace BoulderLeaf::Graphics::DX12
@@ -40,6 +42,22 @@ namespace BoulderLeaf::Graphics::DX12
 		}
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocationStart(int currentFrameResource);
+	};
+
+	class blDX12blDataBufferUploadBuffer_Resource final : public blUploadBufferBase
+	{
+	private:
+		blResourceHandleOfType<blDataBufferInterface> mHandle;
+	protected:
+		blDX12blDataBufferUploadBuffer_Resource(
+			std::shared_ptr<blDevice> device,
+			bool isConstantBuffer,
+			blResourceHandleOfType<blDataBufferInterface> handle
+		);
+
+		virtual UINT GetTotalSize() const;
+		virtual void CopyData(int currentFrameResource);
+		virtual void CopyAllData();
 	};
 
 	class blDX12blVertexDataUploadBuffer final: public blUploadBufferBase

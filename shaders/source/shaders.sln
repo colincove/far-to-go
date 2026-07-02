@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11911.148 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaders", "shaders.vcxproj", "{2B7125D8-CAAA-4B9A-84C4-D6B7B70073A9}"
 EndProject
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hlsl", "hlsl", "{9BC3F847-2
 		hlsl\example_vs.hlsl = hlsl\example_vs.hlsl
 		hlsl\graphics_dx12_demoscene01_ps.hlsl = hlsl\graphics_dx12_demoscene01_ps.hlsl
 		hlsl\graphics_dx12_demoscene01_vs.hlsl = hlsl\graphics_dx12_demoscene01_vs.hlsl
+		hlsl\graphics_dx12_shapes_demo_ps.hlsl = hlsl\graphics_dx12_shapes_demo_ps.hlsl
+		hlsl\graphics_dx12_shapes_demo_vs.hlsl = hlsl\graphics_dx12_shapes_demo_vs.hlsl
 		shapes_example_ps.hlsl = shapes_example_ps.hlsl
 		shapes_example_vs.hlsl = shapes_example_vs.hlsl
 	EndProjectSection
@@ -42,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9A539806-AC0E-4291-B040-A57188F3067A}
 	EndGlobalSection
 EndGlobal
