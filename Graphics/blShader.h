@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <Resources/blResource.h>
+#include <Resources/blResourcesExprimental.h>
 #include <blBuffer.h>
 
 namespace BoulderLeaf::Graphics
@@ -38,10 +39,18 @@ namespace BoulderLeaf::Graphics
 		}
 	};
 
-	class blInlineShader
+	struct blShaderResource_exp : blBaseResource
 	{
-	public:
-		static uint64_t CalculateSize(blShader& shader);
+		blStringResource mNameStringResource;
+		blListResource mParameters;
+		blResourceRefOfType<blBufferDescriptionResource> mDescriptionResourceRef;
+
+		blShaderResource_exp(
+			blResourceStream& stream,
+			const std::string& name, 
+			const blShader::Parameter* parameters,
+			uint32_t numberOfParameters,
+			blResourceRefOfType<blBufferDescriptionResource> layout);
 	};
 }
 

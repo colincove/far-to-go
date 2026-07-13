@@ -66,6 +66,15 @@ namespace BoulderLeaf
 		return mIsValid;
 	}
 
+	bool blResourceId::operator==(const blResourceId& other) const
+	{
+		return (mValue == other.mValue) && (mContainerId == other.mContainerId);
+	}
+	bool blResourceId::operator!=(const blResourceId& other) const
+	{
+		return !(*this == other);
+	}
+
 	// Empty stub implementations
 	blResourceContainer::blResourceContainer(
 		resource_container_id id,

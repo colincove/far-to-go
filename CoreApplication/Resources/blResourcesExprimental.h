@@ -143,7 +143,7 @@ namespace BoulderLeaf
 		{
 			byte* startOfResourceBuffer = mHeap.get() + mHeapEnd;
 			blResourceStream dynamicResourceStream(startOfResourceBuffer, sizeof(TResource));
-			new (startOfResourceBuffer) TResource(dynamicResourceStream, std::forward<Args>(args)...);
+			TResource& r = *(new (startOfResourceBuffer) TResource(dynamicResourceStream, std::forward<Args>(args)...));
 			
 			const uint64_t totalSize = sizeof(TResource) + dynamicResourceStream.GetCurrentOffset();
 			blResourceHandle handle = CreateResource(name, totalSize);
@@ -239,10 +239,20 @@ namespace BoulderLeaf
 
 		blListResource(const blListResource&& other);
 
-		blListResource(blResourceStream& stream,
+		blListResource(
+			blResourceStream& stream,
 			uint32_t count,
 			uint64_t elementSize,
 			const void* data);
+
+		template<typename T>
+		blListResource(blResourceStream& stream,
+			uint32_t count,
+			const T* data) : blBaseResource(stream), mCount(count), mElementSize(sizeof(T))
+		{
+			mDataOffset = stream.GetMemberToDataOffset(this);
+			stream.Copy<T>(data, mCount * mElementSize);
+		}
 
 		blListResource(blResourceStream& stream,
 			uint32_t count,

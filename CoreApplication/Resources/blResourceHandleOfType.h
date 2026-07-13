@@ -28,6 +28,11 @@ namespace BoulderLeaf
 			return mHandle.GetName();
 		}
 
+		blResourceId GetId() const
+		{
+			return mHandle.GetId();
+		}
+
 		const T* Get() const
 		{
 			return reinterpret_cast<const T*>(mHandle.Get());

@@ -34,6 +34,9 @@ namespace BoulderLeaf
 		uint32_t GetIndex() const;
 
 		bool IsValid() const;
+
+		bool operator==(const blResourceId& other) const;
+		bool operator!=(const blResourceId& other) const;
 	};
 
 	class blResourceHandle
