@@ -340,7 +340,7 @@ namespace BoulderLeaf
 
 	blBaseResource::blBaseResource(blResourceStream& stream)
 		: mLocalStreamOffset(stream.GetCurrentOffset()),
-		mMemberToDataOffset(stream.GetMemberToDataOffset(reinterpret_cast<const byte*>(this)))
+		mMemberToDataOffset(stream.GetMemberToDataOffset(this))
 	{
 
 	}

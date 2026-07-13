@@ -143,7 +143,7 @@ namespace BoulderLeaf
 		{
 			byte* startOfResourceBuffer = mHeap.get() + mHeapEnd;
 			blResourceStream dynamicResourceStream(startOfResourceBuffer, sizeof(TResource));
-			TResource& r = *(new (startOfResourceBuffer) TResource(dynamicResourceStream, std::forward<Args>(args)...));
+			new (startOfResourceBuffer) TResource(dynamicResourceStream, std::forward<Args>(args)...);
 			
 			const uint64_t totalSize = sizeof(TResource) + dynamicResourceStream.GetCurrentOffset();
 			blResourceHandle handle = CreateResource(name, totalSize);
@@ -154,9 +154,10 @@ namespace BoulderLeaf
 		template<typename TResource, typename... Args>
 		blResourceHandleOfType<TResource> CreateResourceOfType(const std::wstring name, Args&&... args)
 		{
+			byte* startOfResourceBuffer = mHeap.get() + mHeapEnd;
 			blResourceHandle handle = CreateResource(name, sizeof(TResource));
 			blResourceHandleOfType<TResource> handleOfType(handle);
-			new (&handleOfType) TResource(std::forward<Args>(args)...);
+			new (startOfResourceBuffer) TResource(std::forward<Args>(args)...);
 			return handleOfType;
 		}
 
