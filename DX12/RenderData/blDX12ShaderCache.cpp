@@ -5,7 +5,7 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blShaderCache::blShaderCache(std::shared_ptr<blDevice> device)
+	blShaderCache::blShaderCache(blDevice* device)
 		: mDevice(device), blDX12ResourceDataCache<blShaderCacheData, blShaderResource>()
 	{
 

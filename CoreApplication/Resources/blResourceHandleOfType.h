@@ -72,6 +72,11 @@ namespace BoulderLeaf
 		{
 			return mHandle.GetContainer();
 		}
+
+		blResourceRefOfType<T> GetRef() const
+		{
+			return blResourceRefOfType<T>(mHandle);
+		}
 	};
 
 	// Template method implementations must be in the header
@@ -86,4 +91,56 @@ namespace BoulderLeaf
 	{
 		mHandle.Release();
 	}
+
+	template<typename T>
+	class blResourceRefOfType
+	{
+	private:
+		blResourceId mId;
+	public:
+		blResourceRefOfType() : mId()
+		{
+
+		}
+
+		blResourceRefOfType(blResourceId id) : mId(id)
+		{
+
+		}
+
+		blResourceRefOfType(const blResourceRef& resource) : mId(resource.GetId())
+		{
+
+		}
+
+		blResourceId GetId() const
+		{
+			return mId;
+		}
+
+		bool operator==(const blResourceRefOfType& other) const
+		{
+			return mId == other.mId;
+		}
+
+		bool operator!=(const blResourceRefOfType& other) const
+		{
+			return !(&this == other);
+		}
+
+		bool operator!() const
+		{
+			return !IsValid();
+		}
+
+		operator bool() const
+		{
+			return IsValid();
+		}
+
+		bool IsValid() const
+		{
+			return mId.IsValid();
+		}
+	};
 }

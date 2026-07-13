@@ -4,12 +4,7 @@
 
 namespace BoulderLeaf::Core
 {
-	blGameLoop::blGameLoop()
-	{
-
-	}
-
-	void blGameLoop::Run(Callbacks& callbacks)
+	void RunGameLoop(Callbacks& callbacks)
 	{
 		MSG msg = { };
 		Metrics::blTime gameTime;
@@ -43,5 +38,15 @@ namespace BoulderLeaf::Core
 				callbacks.Tick(gameTime);
 			}
 		}
+	}
+
+	blGameLoop::blGameLoop()
+	{
+
+	}
+
+	void blGameLoop::Run(Callbacks& callbacks)
+	{
+		RunGameLoop(callbacks);
 	}
 }

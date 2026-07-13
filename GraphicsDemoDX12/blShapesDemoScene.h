@@ -40,7 +40,7 @@ namespace BoulderLeaf::Graphics
 		Metrics::blTime::time mTimeSinceLastChange;
 		int mCurrentShapeToDraw;
 	public:
-		blShapesDemoScene(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer);
+		blShapesDemoScene(API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer);
 		void Draw();
 		void Update(const Metrics::blTime& gameTime);
 	};

@@ -10,29 +10,28 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		struct FrameData
 		{
-			std::shared_ptr<blCommandListAllocator> mCommandListAllocator;
+			std::unique_ptr<blCommandListAllocator> mCommandListAllocator;
 		};
 
 	protected:
-		std::shared_ptr<blGlobalRenderData> mGlobalRenderData;
-		std::shared_ptr<blCommandList> mCommandList;
+		blGlobalRenderData* mGlobalRenderData;
+		std::unique_ptr<blCommandList> mCommandList;
 		std::array<FrameData, Constants::FrameResourceCount> mFrameData;
 	public:
 		blRenderComponentBase() = default;
 		virtual ~blRenderComponentBase() = default;
 
-		blRenderComponentBase(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr,
+		blRenderComponentBase(blGlobalRenderData* globalRenderDataPtr,
 			std::wstring name = L"blRenderComponentBase")
 			: mGlobalRenderData(globalRenderDataPtr)
 		{
 			for (FrameData& frameData : mFrameData)
 			{
-				frameData.mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataPtr->device, L"RenderComponent");
+				frameData.mCommandListAllocator = std::make_unique<blCommandListAllocator>(globalRenderDataPtr->device.get(), L"RenderComponent");
 			}
 
 			FrameData& frameData = mFrameData[mGlobalRenderData->globalRenderFrameContext->GetCurrentFrameResource()];
-			std::shared_ptr<blCommandListAllocator> commandListAllocator = frameData.mCommandListAllocator;
-			mCommandList = std::make_shared<blCommandList>(commandListAllocator, name);
+			mCommandList = std::make_unique<blCommandList>(frameData.mCommandListAllocator.get(), name);
 		}
 
 		virtual void Initialize() 
@@ -43,7 +42,7 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual void StartFrame() 
 		{
 			FrameData& frameData = mFrameData[mGlobalRenderData->globalRenderFrameContext->GetCurrentFrameResource()];
-			std::shared_ptr<blCommandListAllocator> commandListAllocator = frameData.mCommandListAllocator;
+			blCommandListAllocator* commandListAllocator = frameData.mCommandListAllocator.get();
 			commandListAllocator->GetAllocatorPtr().Get()->Reset();
 			mCommandList->Reset(commandListAllocator);
 			mCommandList->RSSetViewports(1, &mGlobalRenderData->viewPort);
@@ -55,9 +54,9 @@ namespace BoulderLeaf::Graphics::DX12
 			mCommandList->Close();
 		};
 
-		std::shared_ptr<blCommandList> GetCommandList()
+		blCommandList* GetCommandList()
 		{
-			return mCommandList;
+			return mCommandList.get();
 		}
 	};
 
@@ -68,7 +67,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blRenderComponent() = default;
 		virtual ~blRenderComponent() = default;
 
-		blRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr,
+		blRenderComponent(blGlobalRenderData* globalRenderDataPtr,
 			std::wstring name = L"blRenderComponent")
 			: blRenderComponentBase(globalRenderDataPtr, name)
 		{

@@ -8,6 +8,6 @@ namespace BoulderLeaf::Graphics
 	class blCylinderDemoScene : public blMeshDemoSceneBase
 	{
 	public:
-		blCylinderDemoScene(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer);
+		blCylinderDemoScene(API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer);
 	};
 }

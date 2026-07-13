@@ -3,7 +3,7 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blRootSignature::blRootSignature(
-		std::shared_ptr<blDevice> device,
+		blDevice* device,
 		const blShader& shader)
 	{
 		// Shader programs typically require resources as input (constant

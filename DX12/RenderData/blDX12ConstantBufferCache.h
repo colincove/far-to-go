@@ -15,21 +15,21 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	struct blDX12ConstantBufferCacheData
 	{
-		std::shared_ptr<blConstantBufferDescriptorHeap> descriptorHeap;
+		std::unique_ptr<blConstantBufferDescriptorHeap> descriptorHeap;
 	};
 	
 	class blDX12ConstantBufferCache : 
 		public blDX12ResourceDataCache<blDX12ConstantBufferCacheData, blDataBufferInterfaceResource>
 	{
 	private:
-		std::shared_ptr<blDevice> mDevice;
-		std::shared_ptr<blDX12BufferDataCache> mBufferCache;
-		std::shared_ptr<blGlobalRenderFrameContext> mGlobalRenderFrameContext;
+		blDevice* mDevice;
+		blDX12BufferDataCache* mBufferCache;
+		blGlobalRenderFrameContext* mGlobalRenderFrameContext;
 	public:
 		blDX12ConstantBufferCache(
-			std::shared_ptr<blDevice> device,
-			std::shared_ptr<blDX12BufferDataCache> mBufferCache,
-			std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext);
+			blDevice* device,
+			blDX12BufferDataCache* mBufferCache,
+			blGlobalRenderFrameContext* globalRenderFrameContext);
 
 	protected:
 		virtual void InitializeCache(

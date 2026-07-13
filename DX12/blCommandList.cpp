@@ -3,7 +3,7 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blCommandList::blCommandList(std::shared_ptr<blCommandListAllocator> commandListAllocator, std::wstring name)
+	blCommandList::blCommandList(blCommandListAllocator* commandListAllocator, std::wstring name)
 		: mCommandListAllocator(commandListAllocator)
 	{
 		DX12_API_CALL(commandListAllocator->GetDevice()->GetDX12Device()->CreateCommandList(
@@ -26,7 +26,7 @@ namespace BoulderLeaf::Graphics::DX12
 		mCommandList->Reset(mCommandListAllocator->GetAllocatorPtr().Get(), nullptr);
 	}
 
-	void blCommandList::Reset(std::shared_ptr<blCommandListAllocator> commandListAllocator)
+	void blCommandList::Reset(blCommandListAllocator* commandListAllocator)
 	{
 		mCommandListAllocator = commandListAllocator;
 		Reset();

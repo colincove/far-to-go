@@ -16,7 +16,7 @@ namespace BoulderLeaf::Graphics
 	{
 	public:
 		blGraphicsAPIImpl() = default;
-		blGraphicsAPIImpl(std::shared_ptr<Core::blWindow> window) : API(window)
+		blGraphicsAPIImpl(Core::blWindow* window) : API(window)
 		{
 			blResourceManager::Get().Initialize();
 		}

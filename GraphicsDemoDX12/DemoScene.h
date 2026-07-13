@@ -27,11 +27,11 @@ namespace BoulderLeaf::Graphics
 	class blDemoScene
 	{
 	protected:
-		std::shared_ptr<API> mGraphicsAPI;
-		std::shared_ptr<Core::blWindow> mWindow;
+		API* mGraphicsAPI;
+		Core::blWindow* mWindow;
 		blResourceContainer* mResourceContainer;
 	public:
-		blDemoScene(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer);
+		blDemoScene(API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer);
 		virtual void Draw() = 0;
 		virtual void Update(const Metrics::blTime& gameTime) = 0;
 	};

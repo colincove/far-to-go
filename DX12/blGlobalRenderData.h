@@ -25,10 +25,10 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	struct blRenderGroupData
 	{
-		std::shared_ptr<blCommandListAllocator> commandListAllocator;
-		std::shared_ptr<blCommandList> commandList;
-		std::shared_ptr<blDX12MeshDataDeviceCache> meshDataDeviceCache;
-		std::shared_ptr<blCompositeMeshDataCache> compositeMeshStorageCache;
+		std::unique_ptr<blCommandListAllocator> commandListAllocator;
+		std::unique_ptr<blCommandList> commandList;
+		std::unique_ptr<blDX12MeshDataDeviceCache> meshDataDeviceCache;
+		std::unique_ptr<blCompositeMeshDataCache> compositeMeshStorageCache;
 	};
 
 	//TODO do this for ALL data here. c++ files must include the type if they want to use it. 
@@ -43,23 +43,21 @@ namespace BoulderLeaf::Graphics::DX12
 		friend blDX12;
 
 		blDX12ResourceCacheGlobalInterface* resourceCacheGlobalInterface;
-		std::shared_ptr<blDevice> device;
-		std::shared_ptr<blCommandQueue> commandQueue;
-		std::shared_ptr<blFactory> factory;
-		std::shared_ptr<blSwapChain> swapChain;
-		std::shared_ptr<blShaderCache> shaderCache;
-		std::shared_ptr<blDX12MeshStorageCache> meshStorageCache;
-		std::shared_ptr<blDX12ConstantBufferCache> constantBufferCache;
-		std::shared_ptr<blDX12ConstantBufferWithPassCache> constantBufferWithPassCache;
-		std::shared_ptr<blDX12BufferDataCache> bufferCache;
-		std::shared_ptr<blDX12VertexAndPassUploadBufferCache> vertexAndPassUploadBufferCache;
-		std::shared_ptr<blDX12BufferElementCache> bufferElementCache;
-		std::shared_ptr<blPSOCache> mPSOCache;
-		std::shared_ptr<blDepthBuffer> depthBuffer;
-		std::shared_ptr<blDX12MeshDataDeviceCache> meshDataDeviceCache;
-		std::shared_ptr<blCompositeMeshDataCache> compositeMeshStorageCache;
-		std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext;
-		std::shared_ptr<blDX12ElementUploadBufferCache> elementUploadBufferCache;
+		std::unique_ptr<blDevice> device;
+		std::unique_ptr<blCommandQueue> commandQueue;
+		std::unique_ptr<blFactory> factory;
+		std::unique_ptr<blSwapChain> swapChain;
+		std::unique_ptr<blShaderCache> shaderCache;
+		std::unique_ptr<blDX12MeshStorageCache> meshStorageCache;
+		std::unique_ptr<blDX12ConstantBufferCache> constantBufferCache;
+		std::unique_ptr<blDX12ConstantBufferWithPassCache> constantBufferWithPassCache;
+		std::unique_ptr<blDX12BufferDataCache> bufferCache;
+		std::unique_ptr<blDX12VertexAndPassUploadBufferCache> vertexAndPassUploadBufferCache;
+		std::unique_ptr<blDX12BufferElementCache> bufferElementCache;
+		std::unique_ptr<blPSOCache> mPSOCache;
+		std::unique_ptr<blDepthBuffer> depthBuffer;
+		std::unique_ptr<blGlobalRenderFrameContext> globalRenderFrameContext;
+		std::unique_ptr<blDX12ElementUploadBufferCache> elementUploadBufferCache;
 
 		blRenderGroupData renderGroupData[blRenderGroups::MaxValue];
 

@@ -13,7 +13,7 @@ namespace BoulderLeaf::Graphics::DX12
 	private:
 		ComPtr<ID3D12Fence> mFence;
 	public:
-		blFence(std::shared_ptr<blDevice> device, std::wstring name = L"Default");
+		blFence(blDevice* device, std::wstring name = L"Default");
 		ID3D12Fence* Get() { return mFence.Get(); }
 
 		UINT64 GetCompletedValue();

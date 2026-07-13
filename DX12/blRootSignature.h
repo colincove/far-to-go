@@ -19,7 +19,7 @@ namespace BoulderLeaf::Graphics::DX12
 	class blRootSignature
 	{
 	public:
-		blRootSignature(std::shared_ptr<blDevice> device, const blShader& shader);
+		blRootSignature(blDevice* device, const blShader& shader);
 		ComPtr<ID3D12RootSignature> GetRootSignature() const { return mRootSignature; }
 	private:
 		ComPtr<ID3D12RootSignature> mRootSignature = nullptr;

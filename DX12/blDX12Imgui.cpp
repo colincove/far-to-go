@@ -72,8 +72,8 @@ namespace
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blDX12Imgui::blDX12Imgui(std::shared_ptr<blGlobalRenderData> globalRenderData,
-		std::shared_ptr<Core::blWindow> window)
+	blDX12Imgui::blDX12Imgui(blGlobalRenderData* globalRenderData,
+		Core::blWindow* window)
 		: blRenderComponentBase(globalRenderData, L"Imgui"),
 		mWindow(window)
 		
@@ -89,8 +89,8 @@ namespace BoulderLeaf::Graphics::DX12
 	void blDX12Imgui::Initialize()
 	{
 		blRenderComponentBase::Initialize();
-		mConstantBufferDescriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(
-			mGlobalRenderData->device,
+		mConstantBufferDescriptorHeap = std::make_unique<blConstantBufferDescriptorHeap>(
+			mGlobalRenderData->device.get(),
 			1024, //uuuuuuh. how 
 			L"DX12Imgui");
 

@@ -5,11 +5,11 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blDX12ConstantBufferWithPassCache::blDX12ConstantBufferWithPassCache(
-		std::shared_ptr<blDevice> device,
-		std::shared_ptr<blDX12BufferDataCache> bufferCache,
-		std::shared_ptr<blDX12BufferElementCache> bufferElementCache,
-		std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext,
-		std::shared_ptr<blDX12ElementUploadBufferCache> elementUploadBufferCache) :
+		blDevice* device,
+		blDX12BufferDataCache* bufferCache,
+		blDX12BufferElementCache* bufferElementCache,
+		blGlobalRenderFrameContext* globalRenderFrameContext,
+		blDX12ElementUploadBufferCache* elementUploadBufferCache) :
 		mDevice(device),
 		mBufferCache(bufferCache),
 		mBufferElementCache(bufferElementCache),
@@ -38,7 +38,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		const blDX12BufferElementCacheData& passConstantData = mBufferElementCache->Get(*resource.GetData().GetPassElementBuffer());
 
-		cache.descriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(
+		cache.descriptorHeap = std::make_unique<blConstantBufferDescriptorHeap>(
 			mDevice,
 			// +1 because of the pass constants
 			(UINT)((vertexBufferPtr->GetData().Count() + 1) * Constants::FrameResourceCount),

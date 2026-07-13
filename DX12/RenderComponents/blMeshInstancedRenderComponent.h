@@ -9,9 +9,9 @@ namespace BoulderLeaf::Graphics::DX12
 	class blMeshInstancedRenderComponent : public blRenderComponent<RenderMeshDataInstanced>
 	{
 	private:
-		std::shared_ptr<blDX12MeshDataDeviceCache> mMeshDataDeviceCache;
+		std::unique_ptr<blDX12MeshDataDeviceCache> mMeshDataDeviceCache;
 	public:
-		blMeshInstancedRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr);
+		blMeshInstancedRenderComponent(blGlobalRenderData* globalRenderDataPtr);
 		virtual ~blMeshInstancedRenderComponent() = default;
 		virtual void Render(const RenderMeshDataInstanced& item, const blSceneResourcePtr scene) override;
 	};

@@ -9,8 +9,8 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blDX12BufferDataCache::blDX12BufferDataCache(
-		std::shared_ptr<blDevice> device, 
-		std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext)
+		blDevice* device, 
+		blGlobalRenderFrameContext* globalRenderFrameContext)
 		: mDevice(device), blDX12ResourceDataCache(), mGlobalRenderFrameContext(globalRenderFrameContext)
 	{
 

@@ -21,18 +21,18 @@ namespace BoulderLeaf::Graphics::DX12
 		public blDX12ResourceDataCache<blDX12ConstantBufferCacheData, blVertexBufferWithPassBufferResource>
 	{
 	private:
-		std::shared_ptr<blDevice> mDevice;
-		std::shared_ptr<blDX12BufferDataCache> mBufferCache;
-		std::shared_ptr<blDX12BufferElementCache> mBufferElementCache;
-		std::shared_ptr<blGlobalRenderFrameContext> mGlobalRenderFrameContext;
-		std::shared_ptr<blDX12ElementUploadBufferCache> mElementUploadBufferCache;
+		blDevice* mDevice;
+		blDX12BufferDataCache* mBufferCache;
+		blDX12BufferElementCache* mBufferElementCache;
+		blGlobalRenderFrameContext* mGlobalRenderFrameContext;
+		blDX12ElementUploadBufferCache* mElementUploadBufferCache;
 	public:
 		blDX12ConstantBufferWithPassCache(
-			std::shared_ptr<blDevice> device,
-			std::shared_ptr<blDX12BufferDataCache> mBufferCache,
-			std::shared_ptr<blDX12BufferElementCache> bufferElementCache,
-			std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext,
-			std::shared_ptr<blDX12ElementUploadBufferCache> elementUploadBufferCache);
+			blDevice* device,
+			blDX12BufferDataCache* mBufferCache,
+			blDX12BufferElementCache* bufferElementCache,
+			blGlobalRenderFrameContext* globalRenderFrameContext,
+			blDX12ElementUploadBufferCache* elementUploadBufferCache);
 
 	protected:
 		virtual void InitializeCache(

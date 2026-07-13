@@ -14,13 +14,13 @@ namespace BoulderLeaf::Graphics::DX12
 	class blUploadBufferBase
 	{
 	private:
-		std::shared_ptr<blDevice> mDevice;
+		blDevice* mDevice;
 		std::wstring mName;
 		ComPtr<ID3D12Resource> mUploadBuffer;
 		bool mIsInitialized;
 	protected:
 		blUploadBufferBase(
-			std::shared_ptr<blDevice> device,
+			blDevice* device,
 			bool isConstantBuffer,
 			std::wstring name);
 
@@ -50,7 +50,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blResourceHandleOfType<blDataBufferInterface> mHandle;
 	protected:
 		blDX12blDataBufferUploadBuffer_Resource(
-			std::shared_ptr<blDevice> device,
+			blDevice* device,
 			bool isConstantBuffer,
 			blResourceHandleOfType<blDataBufferInterface> handle
 		);
@@ -66,7 +66,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blDataBufferInterfaceWeakPtr mDataPtr;
 	public:
 		blDX12blVertexDataUploadBuffer(
-			std::shared_ptr<blDevice> device,
+			blDevice* device,
 			bool isConstantBuffer,
 			blDataBufferInterfaceWeakPtr dataPtr,
 			std::wstring name
@@ -90,7 +90,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blVertexBufferWithPassBufferWeakPtr mDataPtr;
 	public:
 		blDX12VertexBufferWithPassUploadBuffer(
-			std::shared_ptr<blDevice> device,
+			blDevice* device,
 			bool isConstantBuffer,
 			blVertexBufferWithPassBufferWeakPtr dataPtr,
 			std::wstring name
@@ -107,7 +107,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blDataElementBuffer* mDataPtr;
 	public:
 		blDX12ElementUploadBuffer(
-			std::shared_ptr<blDevice> device,
+			blDevice* device,
 			bool isConstantBuffer,
 			blDataElementBuffer* dataPtr,
 			std::wstring name

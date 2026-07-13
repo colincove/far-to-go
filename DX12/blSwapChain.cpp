@@ -14,10 +14,10 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	blSwapChain::blSwapChain(
 		size_t bufferCount,
-		const std::shared_ptr<blDevice> device,
-		const std::shared_ptr<Core::blWindow> window,
-		const std::shared_ptr<blCommandQueue> commandQueue,
-		const std::shared_ptr<blFactory> factory) :
+		blDevice* device,
+		Core::blWindow* window,
+		blCommandQueue* commandQueue,
+		blFactory* factory) :
 		mSwapChainBuffers(bufferCount),
 		mBufferCount(bufferCount),
 		mCurrBackBuffer(0)

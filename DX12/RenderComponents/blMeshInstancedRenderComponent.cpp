@@ -5,22 +5,24 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blMeshInstancedRenderComponent::blMeshInstancedRenderComponent(
-		std::shared_ptr<blGlobalRenderData> globalRenderDataPtr)
+		blGlobalRenderData* globalRenderDataPtr)
 		: blRenderComponent(globalRenderDataPtr, L"blMeshInstancedRenderComponent"),
-		mMeshDataDeviceCache(std::make_shared<blDX12MeshDataDeviceCache>(
-			globalRenderDataPtr->device,
-			mCommandList,
-			globalRenderDataPtr->meshStorageCache))
+		mMeshDataDeviceCache(std::make_unique<blDX12MeshDataDeviceCache>(
+			globalRenderDataPtr->device.get(),
+			mCommandList.get(),
+			globalRenderDataPtr->meshStorageCache.get()))
 	{
 	}
 
 	void blMeshInstancedRenderComponent::Render(const RenderMeshDataInstanced& renderData, const  blSceneResourcePtr scene)
 	{
-		blGlobalRenderData& globalRenderData = *mGlobalRenderData.get();
+		blGlobalRenderData& globalRenderData = *mGlobalRenderData;
 
 		const blInlineMesh& inlineMesh = *renderData.meshResource;
 		const blDX12MeshTranslationCacheData& meshTranslationCacheData = globalRenderData.resourceCacheGlobalInterface->
 			GetMeshTranslationCacheData(renderData.meshResource);
+
+		const blInlineMesh& translatedMesh = *meshTranslationCacheData.translatedMesh;
 
 		const blMaterial& material = renderData.material->GetData();
 		const blShaderResource& shaderResource = *material.shader;

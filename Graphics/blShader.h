@@ -33,8 +33,15 @@ namespace BoulderLeaf::Graphics
 
 		blShader(const std::string& name, const std::vector<Parameter>&& parameters,
 			const std::vector<BufferElementDescription>& layout)
-			: mName(name), mParameters(parameters), mLayout(layout) {
+			: mName(name), mParameters(parameters), mLayout(layout) 
+		{
 		}
+	};
+
+	class blInlineShader
+	{
+	public:
+		static uint64_t CalculateSize(blShader& shader);
 	};
 }
 

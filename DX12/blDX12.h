@@ -33,7 +33,7 @@ namespace BoulderLeaf::Graphics::DX12
 		struct FrameData
 		{
 			UINT64 mFence = 0;
-			std::shared_ptr<blCommandListAllocator> mCommandListAllocator;
+			std::unique_ptr<blCommandListAllocator> mCommandListAllocator;
 		};
 
 	private:
@@ -49,12 +49,12 @@ namespace BoulderLeaf::Graphics::DX12
 
 		std::set<blResourceId> mDirtyResources;
 	private:
-		std::shared_ptr<blGlobalRenderData> mGlobalRenderDataPtr;
-		std::vector<std::shared_ptr<blDX12ResourceCacheBase>> mResourceCaches;
-		std::shared_ptr<Core::blWindow> mWindow;
+		blGlobalRenderData mGlobalRenderData;
+		std::vector<blDX12ResourceCacheBase*> mResourceCaches;
+		Core::blWindow* mWindow;
 		std::map<blSceneResource, blRenderSceneContext> mSceneContextMap;
-		std::shared_ptr<blCommandList> mCommandList;
-		std::shared_ptr<blFence> mFence;
+		std::unique_ptr<blCommandList> mCommandList;
+		std::unique_ptr<blFence> mFence;
 		std::array<FrameData, Constants::FrameResourceCount> mFrameData;
 		UINT64 mCurrentFence;
 	public:
@@ -68,7 +68,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		virtual void MarkResourceDirty(const blResourceId resourceId) override;
 	public:
-		blDX12(std::shared_ptr<Core::blWindow> window);
+		blDX12(Core::blWindow* window);
 		~blDX12();
 	protected:
 		void OnWindowMessage(MSG msg) override;

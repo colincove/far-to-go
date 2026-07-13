@@ -16,8 +16,8 @@ namespace BoulderLeaf::Graphics::DX12
 		ComPtr<ID3D12DescriptorHeap> mDsvHeap;
 	public:
 		blDepthBuffer(
-			const std::shared_ptr<blDevice> device,
-			const std::shared_ptr<Core::blWindow> window);
+			blDevice* device,
+			const Core::blWindow* window);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 	};

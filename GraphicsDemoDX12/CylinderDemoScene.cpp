@@ -5,7 +5,7 @@
 namespace BoulderLeaf::Graphics
 {
 	blCylinderDemoScene::blCylinderDemoScene(
-		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer)
+		API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer)
 		: blMeshDemoSceneBase(graphicsAPI, window, resourceContainer)
 	{
 

@@ -13,6 +13,9 @@ namespace BoulderLeaf
 	template<typename T>
 	class blResourceHandleOfType;
 
+	template<typename T>
+	class blResourceRefOfType;
+
 	struct blResourceId
 	{
 		// TODO: I did not want these to be seperate value
@@ -101,11 +104,21 @@ namespace BoulderLeaf
 
 		}
 
+		template<typename TResource>
+		constexpr blResourceRef(const blResourceRefOfType<TResource>& resourceRefOfType)
+			: blResourceRef(resourceRefOfType.GetId())
+		{
+
+		}
+
 		blResourceId GetId() const;
 
 		bool operator==(const blResourceRef& other) const;
 
 		bool operator!=(const blResourceRef& other) const;
+
+		bool operator!() const;
+		operator bool() const;
 
 		bool IsValid() const;
 	};

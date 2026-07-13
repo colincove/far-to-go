@@ -5,16 +5,16 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blCompositeMeshRenderComponent::blCompositeMeshRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr) :
+	blCompositeMeshRenderComponent::blCompositeMeshRenderComponent(blGlobalRenderData* globalRenderDataPtr) :
 		blRenderComponent(globalRenderDataPtr),
-		mCompositeMeshStorageCache(std::make_shared<blCompositeMeshDataCache>(
-			globalRenderDataPtr->device,
-			mCommandList,
-			globalRenderDataPtr->meshStorageCache)),
-		mMeshDataDeviceCache(std::make_shared<blDX12MeshDataDeviceCache>(
-			globalRenderDataPtr->device,
-			mCommandList,
-			globalRenderDataPtr->meshStorageCache))
+		mCompositeMeshStorageCache(std::make_unique<blCompositeMeshDataCache>(
+			globalRenderDataPtr->device.get(),
+			mCommandList.get(),
+			globalRenderDataPtr->meshStorageCache.get())),
+		mMeshDataDeviceCache(std::make_unique<blDX12MeshDataDeviceCache>(
+			globalRenderDataPtr->device.get(),
+			mCommandList.get(),
+			globalRenderDataPtr->meshStorageCache.get()))
 	{
 	}
 
@@ -25,7 +25,7 @@ namespace BoulderLeaf::Graphics::DX12
 			return;
 		}
 
-		blGlobalRenderData& globalRenderData = *mGlobalRenderData.get();
+		blGlobalRenderData& globalRenderData = *mGlobalRenderData;
 
 		const blCompositeMeshDataCacheData& resourceCache = mCompositeMeshStorageCache->Get(
 			*renderData.compositeMesh

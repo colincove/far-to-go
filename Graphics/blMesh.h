@@ -194,6 +194,16 @@ namespace BoulderLeaf::Graphics
 
 	struct blInlineMesh
 	{
+		// Default constructor
+		blInlineMesh();
+
+		// Construct with explicit header parameters
+		blInlineMesh(
+			size_t vertexCount,
+			size_t indexCount,
+			size_t vertexSize,
+			BufferFormat format,
+			blResourceRef description = blResourceRef());
 		struct Header : public blMeshStorage::Header {
 			Header() : Header(0, 0, 0, BufferFormat::BoulderLeaf) {}
 			Header(
@@ -205,9 +215,18 @@ namespace BoulderLeaf::Graphics
 			{
 			}
 
-			blMeshStorage::Header meshHeader;
 			blResourceRef description;
 		};
+
+		void WriteToStream(
+			const BufferDescription& desc,
+			blResourceStream& stream) const
+		{
+
+		}
+
+		void WriteToStream(
+			blResourceStream& stream) const;
 
 		Header mHeader;
 
@@ -515,3 +534,52 @@ namespace BoulderLeaf::Graphics
 
 BL_RESOURCE(blMeshBase, eResourceType::Mesh);
 BL_RESOURCE(StandardMesh, eResourceType::Mesh);
+
+namespace BoulderLeaf::Graphics
+{
+	struct blIndexedMeshResource : blBaseResource
+	{
+		blResourceRefOfType<blListResource> mIndexListRef;
+		blResourceRefOfType<blArrayBufferResource> mArrayBufferResourceRef;
+
+		blIndexedMeshResource(
+			blResourceRefOfType<blListResource> indexListRef,
+			blResourceRefOfType<blArrayBufferResource> arrayBufferResourceRef);
+	};
+
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		const void* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		const std::uint16_t* indices,
+		uint32_t indexCount);
+
+	template<typename TVertex>
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		const TVertex* vertices,
+		uint32_t vertexCount,
+		const std::uint16_t* indices,
+		uint32_t indexCount)
+	{
+		return CreateIndexedMeshResource(
+			resourceContainer,
+			name,
+			descriptionResourceRef,
+			vertices,
+			sizeof(TVertex),
+			vertexCount,
+			indices,
+			indexCount
+		);
+	}
+
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceHandleOfType<blIndexedMeshResource> sourceMeshHandle,
+		const blBufferElementAdapter& adapter);
+}

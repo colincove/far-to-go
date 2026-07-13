@@ -12,28 +12,28 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	private:
 		ComPtr<ID3D12CommandQueue> mCommandQueue;
-		std::shared_ptr<blDevice> mDevice;
+		blDevice* mDevice;
 	public:
-		blCommandQueue(std::shared_ptr<blDevice> device, std::wstring name = L"");
+		blCommandQueue(blDevice* device, std::wstring name = L"");
 
 		ComPtr<ID3D12CommandQueue> GetDX12CommandQueue()
 		{
 			return mCommandQueue;
 		}
 
-		std::shared_ptr<blDevice> GetDevice()
+		blDevice* GetDevice()
 		{
 			return mDevice;
 		}
 
-		void ExecuteCommandLists(const std::vector<std::shared_ptr<blCommandList>>& commandLists) const
+		void ExecuteCommandLists(std::vector<blCommandList*> commandLists) const
 		{
 			const UINT numCommandLists = (UINT) commandLists.size();
 
 			std::vector<ID3D12CommandList*> commandListsVector;
 			commandListsVector.reserve(numCommandLists);
 
-			for (const std::shared_ptr<blCommandList>& commandList : commandLists)
+			for (blCommandList* commandList : commandLists)
 			{
 				commandListsVector.push_back(commandList->GetCommandListPtr().Get());
 			}

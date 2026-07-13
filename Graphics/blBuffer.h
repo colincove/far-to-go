@@ -16,12 +16,11 @@
 #include <string>
 #include <blGraphicsCore.h>
 #include <minwindef.h>
+#include <Resources/blResourcesExprimental.h>
 
 namespace BoulderLeaf {
 	template<typename TResource>
 	class blResourceHandleOfType;
-
-	class blResourceContainer;
 }
 
 namespace BoulderLeaf::Graphics
@@ -58,79 +57,26 @@ namespace BoulderLeaf::Graphics
 		std::vector<BufferElementDescription> elementDescriptions;
 	};
 
-	struct InlineBufferElementDescription
+	struct blBufferElementDescriptionResource : public blBaseResource
 	{
-		struct Header
-		{
-			BufferElementType ElementType;
-			uint32_t nameStringLength;
-		};
+		BufferElementType mElementType;
+		blStringResource mNameStringResource;
 
-		Header mHeader;
+		blBufferElementDescriptionResource(blResourceStream& stream, const BufferElementDescription& element);
 
-		std::string_view GetName()
-		{
-			return std::string_view(reinterpret_cast<char*>(this) + CalculateNameStringOffset(), mHeader.nameStringLength * sizeof(char));
-		}
-
-		static uint64_t CalculateNameStringOffset()
-		{
-			return sizeof(InlineBufferElementDescription);
-		}
-
-		uint64_t CalculateTotalSize() const
-		{
-			return sizeof(InlineBufferElementDescription) + mHeader.nameStringLength * sizeof(char);
-		}
+		const std::string_view GetName() const;
 	};
 
-	struct InlineBufferDescription
+	struct blBufferDescriptionResource : public blListDynamicResource<blBufferElementDescriptionResource, BufferElementDescription>
 	{
-		struct Header
-		{
-			BufferFormat format;
-			uint32_t numElementDescriptions;
-		};
+		BufferFormat mFormat;
 
-		Header mHeader;
-		
-		static uint64_t CalculateBufferElementDescriptionOffset();
+		blBufferDescriptionResource(
+			blResourceStream& stream,
+			const BufferDescription& desc
+		);
 
-		static uint64_t CalculateTotalSize(std::vector<BufferElementDescription> elementDescriptions);
-
-		void WriteDescription(const BufferDescription& desc);
-
-		// IterateElements removed; use Iterator for element traversal
-
-		class Iterator
-		{
-		private:
-			byte* mHead;
-			byte* mBegin;
-			int mNumElementDescriptions;
-		public:
-			Iterator(InlineBufferElementDescription* begin, int numElementDescriptions);
-			// construct iterator from an InlineBufferDescription reference
-			Iterator(InlineBufferDescription& desc);
-
-
-
-			InlineBufferElementDescription& operator*() const;
-
-			Iterator& operator++();
-
-			bool operator!=(const Iterator& other) const;
-
-			Iterator begin() const;
-			Iterator end() const;
-		};
-
-		BufferDescription ToBufferDescription() const;
-
-		static blResourceHandleOfType<InlineBufferDescription> CreateResourceFromBufferDescription(
-			std::wstring name,
-			const BufferDescription& desc,
-			blResourceContainer* container);
+		BufferDescription GetBufferDescription() const;
 	};
 
 	template<typename TElement, BufferFormat TFormat>
@@ -139,6 +85,17 @@ namespace BoulderLeaf::Graphics
 		constexpr static BufferFormat Format = TFormat;
 		using ElementType = TElement;
 		static const std::vector<BufferElementDescription> Description;
+	};
+
+	struct blArrayBufferResource : public blBaseResource
+	{
+		blResourceRefOfType<blBufferDescriptionResource> mDescriptionResourceRef;
+		blResourceRefOfType<blListResource> mBufferResourceRef;
+
+		blArrayBufferResource(
+			blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+			blResourceRefOfType<blListResource> bufferResourceRef
+		);
 	};
 
 	class blBufferElementAdapter
@@ -171,6 +128,37 @@ namespace BoulderLeaf::Graphics
 
 	size_t GetBufferElementSize(
 		const std::vector<BufferElementDescription>& elementDescriptions,
+		const blBufferElementAdapter& adapter);
+
+	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		const void* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount);
+
+	template<typename TElement>
+	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		const TElement* vertices,
+		uint32_t vertexCount)
+	{
+		return CreateArrayBufferResource(
+			resourceContainer,
+			name,
+			descriptionResourceRef,
+			vertices,
+			sizeof(TElement),
+			vertexCount);
+	}
+
+	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		const blArrayBufferResource& sourceArray,
 		const blBufferElementAdapter& adapter);
 
 	class blDataElementBuffer

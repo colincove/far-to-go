@@ -5,7 +5,7 @@
 namespace BoulderLeaf::Graphics
 {
 	blShapesDemoScene::blShapesDemoScene(
-		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer)
+		API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer)
 		: blDemoScene(graphicsAPI, window, resourceContainer),
 		mTheta(1.5f * PIf),
 		mPhi(PIfDIV4),

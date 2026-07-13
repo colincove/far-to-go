@@ -19,9 +19,9 @@ namespace BoulderLeaf::Graphics::DX12
 	protected:
 		using super = blDX12ResourceDataCache<blDX12MeshStorageCacheData, blMeshBaseResource>;
 	private:
-		std::shared_ptr<blDevice> mDevice;
+		blDevice* mDevice;
 	public:
-		blDX12MeshStorageCache(std::shared_ptr<blDevice> device);
+		blDX12MeshStorageCache(blDevice* device);
 		virtual void InitializeCache(
 			const blMeshBaseResource& resource,
 			blDX12MeshStorageCacheData& cache) override;

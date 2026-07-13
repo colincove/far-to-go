@@ -33,6 +33,16 @@ namespace BoulderLeaf
 		return !(*this == other);
 	}
 
+	bool blResourceRef::operator!() const
+	{
+		return !IsValid();
+	}
+
+	blResourceRef::operator bool() const
+	{
+		return IsValid();
+	}
+
 	bool blResourceRef::IsValid() const
 	{
 		return mId.IsValid();

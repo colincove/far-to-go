@@ -7,17 +7,20 @@
 
 namespace BoulderLeaf::Core
 {
+	struct Callbacks
+	{
+		std::function<void(MSG&)> MessageRecieved;
+		std::function<void(const Metrics::blTime&)> Tick;
+		std::function<bool()> ShouldContinue;
+	};
+
+	void RunGameLoop(Callbacks& callbacks);
+
+	/* Deprecated */
 	class blGameLoop
 	{
 	public:
-
-		struct Callbacks
-		{
-			std::function<void(MSG&)> MessageRecieved;
-			std::function<void(const Metrics::blTime&)> Tick;
-			std::function<bool()> ShouldContinue;
-		};
-
+		using Callbacks = Callbacks;
 		blGameLoop();
 		void Run(Callbacks& callbacks);
 	};

@@ -35,7 +35,7 @@ namespace BoulderLeaf::Graphics
 		VirtualCamera mCamera;
 
 	public:
-		blMeshDemoSceneBase(std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer)
+		blMeshDemoSceneBase(API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer)
 			: blDemoScene(graphicsAPI, window, resourceContainer),
 			mTheta(1.5f * PIf),
 			mPhi(PIfDIV4),
@@ -122,12 +122,12 @@ namespace BoulderLeaf::Graphics
 			memcpy(resource.GetMutable(),
 				mesh.get(),
 				inlineMeshSource.GetTotalSize());
-
+			/*
 			resource->mHeader.description = InlineBufferDescription::CreateResourceFromBufferDescription(name, bufferDescription, mResourceContainer);
 
 			mInlineMeshResourceHandle = resource;
 			mDrawData.meshResource = resource;
-			mDrawData.meshResourceBufferDescription = bufferDescription;
+			mDrawData.meshResourceBufferDescription = bufferDescription;*/
 		}
 
 		void SetMeshResourceExprimental(const blResourceHandleOfType<blInlineMesh> mesh)

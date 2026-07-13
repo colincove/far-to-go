@@ -8,8 +8,8 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blDepthBuffer::blDepthBuffer(
-		const std::shared_ptr<blDevice> device, 
-		const std::shared_ptr<Core::blWindow> window)
+		blDevice* device, 
+		const Core::blWindow* window)
 	{
 		D3D12_RESOURCE_DESC desc;
 

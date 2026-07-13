@@ -7,16 +7,16 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blCompositeMeshRenderWithPassConstantsRenderComponent::blCompositeMeshRenderWithPassConstantsRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr) :
+	blCompositeMeshRenderWithPassConstantsRenderComponent::blCompositeMeshRenderWithPassConstantsRenderComponent(blGlobalRenderData* globalRenderDataPtr) :
 		blRenderComponent(globalRenderDataPtr),
-		mCompositeMeshStorageCache(std::make_shared<blCompositeMeshDataCache>(
-			globalRenderDataPtr->device,
-			mCommandList,
-			globalRenderDataPtr->meshStorageCache)),
-		mMeshDataDeviceCache(std::make_shared<blDX12MeshDataDeviceCache>(
-			globalRenderDataPtr->device,
-			mCommandList,
-			globalRenderDataPtr->meshStorageCache))
+		mCompositeMeshStorageCache(std::make_unique<blCompositeMeshDataCache>(
+			globalRenderDataPtr->device.get(),
+			mCommandList.get(),
+			globalRenderDataPtr->meshStorageCache.get())),
+		mMeshDataDeviceCache(std::make_unique<blDX12MeshDataDeviceCache>(
+			globalRenderDataPtr->device.get(),
+			mCommandList.get(),
+			globalRenderDataPtr->meshStorageCache.get()))
 	{
 	}
 
@@ -27,7 +27,7 @@ namespace BoulderLeaf::Graphics::DX12
 			return;
 		}
 
-		blGlobalRenderData& globalRenderData = *mGlobalRenderData.get();
+		blGlobalRenderData& globalRenderData = *mGlobalRenderData;
 
 		const blCompositeMeshDataCacheData& resourceCache = mCompositeMeshStorageCache->Get(
 			*renderData.compositeMesh
@@ -70,9 +70,24 @@ namespace BoulderLeaf::Graphics::DX12
 		cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());//the descriptor table starts with the pass constants. Need to offset for the objects
 		cbvPassConstantsHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * (count + 1)) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
 
-		for (int i = 0; i < count; ++i)
+		// first. Just render the single mesh that was handed in
+		blMeshIndexedCatalogue::Entry entry = renderData.compositeMesh->GetData().GetMeshEntry(renderData.submeshId);
+		mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+		mCommandList->SetGraphicsRootDescriptorTable(1, cbvPassConstantsHandle);
+
+		mCommandList->DrawIndexedInstanced(
+			(UINT)entry.IndexCount,
+			1,
+			(UINT)entry.IndexOffset,
+			(UINT)entry.VertexOffset,
+			0);
+
+		cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());
+
+		//and then render the list of sub mesh's passed in
+		for (const blResourceId& resourceId : renderData.submeshIds)
 		{
-			blMeshIndexedCatalogue::Entry entry = renderData.compositeMesh->GetData().GetMeshEntry(renderData.submeshId);
+			blMeshIndexedCatalogue::Entry entry = renderData.compositeMesh->GetData().GetMeshEntry(resourceId);
 			mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
 			mCommandList->SetGraphicsRootDescriptorTable(1, cbvPassConstantsHandle);
 

@@ -25,10 +25,10 @@ namespace
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blDX12::blDX12(std::shared_ptr<Core::blWindow> window) :
+	blDX12::blDX12(Core::blWindow* window) :
 		blGraphicsAPIImpl(window),
 		mWindow(window),
-		mGlobalRenderDataPtr(std::make_shared<blGlobalRenderData>()),
+		mGlobalRenderData(),
 		mMeshRenderComponent(),
 		mMeshInstancedRenderComponent(),
 		mCompositeMeshRenderComponent(),
@@ -53,88 +53,86 @@ namespace BoulderLeaf::Graphics::DX12
 		}
 #endif // DEBUG
 
-		blGlobalRenderData& globalRenderDataRef = *mGlobalRenderDataPtr.get();
+		mGlobalRenderData.globalRenderFrameContext = std::make_unique<blGlobalRenderFrameContext>();
+		mGlobalRenderData.resourceCacheGlobalInterface = &mResourceCacheGlobalInterface;
 
-		globalRenderDataRef.globalRenderFrameContext = std::make_shared<blGlobalRenderFrameContext>();
-		globalRenderDataRef.resourceCacheGlobalInterface = &mResourceCacheGlobalInterface;
+		mGlobalRenderData.viewPort.TopLeftX = 0;
+		mGlobalRenderData.viewPort.TopLeftY = 0;
+		mGlobalRenderData.viewPort.Width = static_cast<float>(window->GetWidth());
+		mGlobalRenderData.viewPort.Height = static_cast<float>(window->GetHeight());
+		mGlobalRenderData.viewPort.MinDepth = 0;
+		mGlobalRenderData.viewPort.MaxDepth = 1;
 
-		globalRenderDataRef.viewPort.TopLeftX = 0;
-		globalRenderDataRef.viewPort.TopLeftY = 0;
-		globalRenderDataRef.viewPort.Width = static_cast<float>(window->GetWidth());
-		globalRenderDataRef.viewPort.Height = static_cast<float>(window->GetHeight());
-		globalRenderDataRef.viewPort.MinDepth = 0;
-		globalRenderDataRef.viewPort.MaxDepth = 1;
+		mGlobalRenderData.scissorRect = { 0, 0, static_cast<long>(window->GetWidth()), static_cast<long>(window->GetHeight()) };
 
-		globalRenderDataRef.scissorRect = { 0, 0, static_cast<long>(window->GetWidth()), static_cast<long>(window->GetHeight()) };
+		mGlobalRenderData.device = std::make_unique<blDevice>();
 
-		globalRenderDataRef.device = std::make_shared<blDevice>();
+		mGlobalRenderData.commandQueue = std::make_unique<blCommandQueue>(mGlobalRenderData.device.get(), L"Global");
+		mGlobalRenderData.factory = std::make_unique<blFactory>();
 
-		globalRenderDataRef.commandQueue = std::make_shared<blCommandQueue>(globalRenderDataRef.device, L"Global");
-		globalRenderDataRef.factory = std::make_shared<blFactory>();
-
-		globalRenderDataRef.swapChain = std::make_shared<blSwapChain>(
+		mGlobalRenderData.swapChain = std::make_unique<blSwapChain>(
 			2,
-			globalRenderDataRef.device,
+			mGlobalRenderData.device.get(),
 			window,
-			globalRenderDataRef.commandQueue,
-			globalRenderDataRef.factory);
+			mGlobalRenderData.commandQueue.get(),
+			mGlobalRenderData.factory.get());
 
-		globalRenderDataRef.shaderCache = std::make_shared<blShaderCache>(globalRenderDataRef.device);
-		globalRenderDataRef.meshStorageCache = std::make_shared<blDX12MeshStorageCache>(globalRenderDataRef.device);
-		globalRenderDataRef.mPSOCache = std::make_shared<blPSOCache>(
-			globalRenderDataRef.device,
-			globalRenderDataRef.shaderCache);
-		globalRenderDataRef.bufferCache = std::make_shared<blDX12BufferDataCache>(
-			globalRenderDataRef.device, 
-			globalRenderDataRef.globalRenderFrameContext);
-		globalRenderDataRef.vertexAndPassUploadBufferCache = std::make_shared<blDX12VertexAndPassUploadBufferCache>(
-			globalRenderDataRef.device,
-			globalRenderDataRef.globalRenderFrameContext);
-		globalRenderDataRef.bufferElementCache = std::make_shared<blDX12BufferElementCache>();
+		mGlobalRenderData.shaderCache = std::make_unique<blShaderCache>(mGlobalRenderData.device.get());
+		mGlobalRenderData.meshStorageCache = std::make_unique<blDX12MeshStorageCache>(mGlobalRenderData.device.get());
+		mGlobalRenderData.mPSOCache = std::make_unique<blPSOCache>(
+			mGlobalRenderData.device.get(),
+			mGlobalRenderData.shaderCache.get());
+		mGlobalRenderData.bufferCache = std::make_unique<blDX12BufferDataCache>(
+			mGlobalRenderData.device.get(),
+			mGlobalRenderData.globalRenderFrameContext.get());
+		mGlobalRenderData.vertexAndPassUploadBufferCache = std::make_unique<blDX12VertexAndPassUploadBufferCache>(
+			mGlobalRenderData.device.get(),
+			mGlobalRenderData.globalRenderFrameContext.get());
+		mGlobalRenderData.bufferElementCache = std::make_unique<blDX12BufferElementCache>();
 		
-		globalRenderDataRef.depthBuffer = std::make_shared<blDepthBuffer>(globalRenderDataRef.device, window);
+		mGlobalRenderData.depthBuffer = std::make_unique<blDepthBuffer>(mGlobalRenderData.device.get(), window);
 
-		globalRenderDataRef.constantBufferCache = std::make_shared<blDX12ConstantBufferCache>(
-			globalRenderDataRef.device,
-			globalRenderDataRef.bufferCache,
-			globalRenderDataRef.globalRenderFrameContext);
+		mGlobalRenderData.constantBufferCache = std::make_unique<blDX12ConstantBufferCache>(
+			mGlobalRenderData.device.get(),
+			mGlobalRenderData.bufferCache.get(),
+			mGlobalRenderData.globalRenderFrameContext.get());
 
-		globalRenderDataRef.elementUploadBufferCache = std::make_shared<blDX12ElementUploadBufferCache>(
-			globalRenderDataRef.device,
-			globalRenderDataRef.globalRenderFrameContext,
-			globalRenderDataRef.bufferElementCache
+		mGlobalRenderData.elementUploadBufferCache = std::make_unique<blDX12ElementUploadBufferCache>(
+			mGlobalRenderData.device.get(),
+			mGlobalRenderData.globalRenderFrameContext.get(),
+			mGlobalRenderData.bufferElementCache.get()
 		);
 
-		globalRenderDataRef.constantBufferWithPassCache = std::make_shared<blDX12ConstantBufferWithPassCache>(
-			globalRenderDataRef.device,
-			globalRenderDataRef.bufferCache,
-			globalRenderDataRef.bufferElementCache,
-			globalRenderDataRef.globalRenderFrameContext,
-			globalRenderDataRef.elementUploadBufferCache);
+		mGlobalRenderData.constantBufferWithPassCache = std::make_unique<blDX12ConstantBufferWithPassCache>(
+			mGlobalRenderData.device.get(),
+			mGlobalRenderData.bufferCache.get(),
+			mGlobalRenderData.bufferElementCache.get(),
+			mGlobalRenderData.globalRenderFrameContext.get(),
+			mGlobalRenderData.elementUploadBufferCache.get());
 
 		mResourceCaches = {
-			globalRenderDataRef.shaderCache,
-			globalRenderDataRef.meshStorageCache,
-			globalRenderDataRef.bufferElementCache,
-			globalRenderDataRef.constantBufferCache,
-			globalRenderDataRef.bufferCache,
-			globalRenderDataRef.mPSOCache
+			mGlobalRenderData.shaderCache.get(),
+			mGlobalRenderData.meshStorageCache.get(),
+			mGlobalRenderData.bufferElementCache.get(),
+			mGlobalRenderData.constantBufferCache.get(),
+			mGlobalRenderData.bufferCache.get(),
+			mGlobalRenderData.mPSOCache.get()
 		};
 
 		for (FrameData& frameData : mFrameData)
 		{
-			frameData.mCommandListAllocator = std::make_shared<blCommandListAllocator>(globalRenderDataRef.device, L"Global");
+			frameData.mCommandListAllocator = std::make_unique<blCommandListAllocator>(mGlobalRenderData.device.get(), L"Global");
 		}
 
-		mFence = std::make_shared<blFence>(globalRenderDataRef.device, L"Global");
-		mCommandList = std::make_shared<blCommandList>(
-			mFrameData[globalRenderDataRef.globalRenderFrameContext->currentFrameResource].mCommandListAllocator, L"Default");
+		mFence = std::make_unique<blFence>(mGlobalRenderData.device.get(), L"Global");
+		mCommandList = std::make_unique<blCommandList>(
+			mFrameData[mGlobalRenderData.globalRenderFrameContext->currentFrameResource].mCommandListAllocator.get(), L"Default");
 
-		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(mGlobalRenderDataPtr);
-		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(mGlobalRenderDataPtr);
-		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(mGlobalRenderDataPtr);
-		mDX12ImguiRenderComponent = std::make_shared<blDX12Imgui>(mGlobalRenderDataPtr, mWindow);
-		mCompositeMeshRenderWithPassConstantsRenderComponent = std::make_unique<blCompositeMeshRenderWithPassConstantsRenderComponent>(mGlobalRenderDataPtr);
+		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(&mGlobalRenderData);
+		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(&mGlobalRenderData);
+		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(&mGlobalRenderData);
+		mDX12ImguiRenderComponent = std::make_shared<blDX12Imgui>(&mGlobalRenderData, mWindow);
+		mCompositeMeshRenderWithPassConstantsRenderComponent = std::make_unique<blCompositeMeshRenderWithPassConstantsRenderComponent>(&mGlobalRenderData);
 
 		//this vector is kind of dumb. Does not scale. And holds raw pointers to components that are owned by unique_ptrs. But it is what it is for now. We can optimize this later if we need to.
 		mRenderComponents = std::vector<blRenderComponentBase*>
@@ -172,24 +170,14 @@ namespace BoulderLeaf::Graphics::DX12
 		RENDER_COMPONENT_FUNCTION_CALL(Initialize)
 
 		mCommandList->Close();
-
-		mGlobalRenderDataPtr->meshDataDeviceCache = std::make_shared<blDX12MeshDataDeviceCache>(
-			mGlobalRenderDataPtr->device,
-			mCommandList, //this should work. Buuuuuut. I need to figure out more about how the command list is related to this cache. I might be missing something. 
-			mGlobalRenderDataPtr->meshStorageCache);
-
-		mGlobalRenderDataPtr->compositeMeshStorageCache = std::make_shared<blCompositeMeshDataCache>(
-			mGlobalRenderDataPtr->device,
-			mCommandList, //this should work. Buuuuuut. I need to figure out more about how the command list is related to this cache. I might be missing something. 
-			mGlobalRenderDataPtr->meshStorageCache);
 	}
 
 	void blDX12::UpdateInternal(const Metrics::blTime& time)
 	{
-		mGlobalRenderDataPtr->globalRenderFrameContext->currentGameTime = time;
-		mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource = (Constants::FrameResourceCount + time.Tick()) % Constants::FrameResourceCount;
+		mGlobalRenderData.globalRenderFrameContext->currentGameTime = time;
+		mGlobalRenderData.globalRenderFrameContext->currentFrameResource = (Constants::FrameResourceCount + time.Tick()) % Constants::FrameResourceCount;
 
-		FrameData& frameData = mFrameData[mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource];
+		FrameData& frameData = mFrameData[mGlobalRenderData.globalRenderFrameContext->currentFrameResource];
 
 		// Has the GPU finished processing the commands of the current frame
 		// resource. If not, wait until the GPU has completed commands up to
@@ -211,7 +199,7 @@ namespace BoulderLeaf::Graphics::DX12
 	void blDX12::StartFrameInternal()
 	{
 		// TODO: We can optimize this by only updating the caches that are associated with the dirty resources.
-		for (std::shared_ptr<blDX12ResourceCacheBase> cache : mResourceCaches)
+		for (blDX12ResourceCacheBase* cache : mResourceCaches)
 		{
 			for (blResourceId resourceId : mDirtyResources)
 			{
@@ -226,16 +214,16 @@ namespace BoulderLeaf::Graphics::DX12
 
 		RENDER_COMPONENT_FUNCTION_CALL(StartFrame)
 
-		FrameData& frameData = mFrameData[mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource];
+		FrameData& frameData = mFrameData[mGlobalRenderData.globalRenderFrameContext->currentFrameResource];
 		frameData.mCommandListAllocator->Reset();
-		mCommandList->Reset(frameData.mCommandListAllocator);
+		mCommandList->Reset(frameData.mCommandListAllocator.get());
 
 		//TODO make sure we are setting up viewPort correctly. 
-		mCommandList->RSSetViewports(1, &mGlobalRenderDataPtr->viewPort);
-		mCommandList->RSSetScissorRects(1, &mGlobalRenderDataPtr->scissorRect);
+		mCommandList->RSSetViewports(1, &mGlobalRenderData.viewPort);
+		mCommandList->RSSetScissorRects(1, &mGlobalRenderData.scissorRect);
 
 		// Indicate a state transition on the resource usage.
-		ID3D12Resource* currentBackBuffer = mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer();
+		ID3D12Resource* currentBackBuffer = mGlobalRenderData.swapChain->GetCurrentBackBuffer();
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = {};
 		resourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -246,9 +234,9 @@ namespace BoulderLeaf::Graphics::DX12
 		resourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
 		mCommandList->ResourceBarrier(1, &resourceBarrier);
-		mCommandList->ClearRenderTargetView(mGlobalRenderDataPtr->swapChain->CurrentBackBufferView(),
+		mCommandList->ClearRenderTargetView(mGlobalRenderData.swapChain->CurrentBackBufferView(),
 			Colors::LightSteelBlue, 0, nullptr);
-		mCommandList->ClearDepthStencilView(mGlobalRenderDataPtr->depthBuffer->DepthStencilView(),
+		mCommandList->ClearDepthStencilView(mGlobalRenderData.depthBuffer->DepthStencilView(),
 			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
 			1.0f, 0, 0, nullptr);
 	}
@@ -260,12 +248,12 @@ namespace BoulderLeaf::Graphics::DX12
 		// Done recording commands.
 		mCommandList->Close();
 
-		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
-			std::vector<std::shared_ptr<blCommandList>> {mCommandList}
+		mGlobalRenderData.commandQueue->ExecuteCommandLists(
+			std::vector<blCommandList*> {mCommandList.get()}
 		);
 
-		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
-			std::vector<std::shared_ptr<blCommandList>> {
+		mGlobalRenderData.commandQueue->ExecuteCommandLists(
+			std::vector<blCommandList*> {
 				mMeshInstancedRenderComponent->GetCommandList(),
 				mDX12ImguiRenderComponent->GetCommandList(),
 				mCompositeMeshRenderComponent->GetCommandList(),
@@ -273,22 +261,22 @@ namespace BoulderLeaf::Graphics::DX12
 			}
 		);
 
-		FrameData& frameData = mFrameData[mGlobalRenderDataPtr->globalRenderFrameContext->currentFrameResource];
-		mCommandList->Reset(frameData.mCommandListAllocator);
+		FrameData& frameData = mFrameData[mGlobalRenderData.globalRenderFrameContext->currentFrameResource];
+		mCommandList->Reset(frameData.mCommandListAllocator.get());
 
 		D3D12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-			mGlobalRenderDataPtr->swapChain->GetCurrentBackBuffer(),
+			mGlobalRenderData.swapChain->GetCurrentBackBuffer(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		mCommandList->ResourceBarrier(1,
 			&resourceBarrier);
 
 		mCommandList->Close();
 
-		mGlobalRenderDataPtr->commandQueue->ExecuteCommandLists(
-			std::vector<std::shared_ptr<blCommandList>> {mCommandList}
+		mGlobalRenderData.commandQueue->ExecuteCommandLists(
+			std::vector<blCommandList*> {mCommandList.get()}
 		);
 
-		mGlobalRenderDataPtr->swapChain->Present();
+		mGlobalRenderData.swapChain->Present();
 
 		// Advance the fence value to mark commands up to this fence point.
 		frameData.mFence = ++mCurrentFence;
@@ -296,7 +284,7 @@ namespace BoulderLeaf::Graphics::DX12
 		// Because we are on the GPU timeline, the new fence point won’t be
 		// set until the GPU finishes processing all the commands prior to
 		// this Signal().
-		mGlobalRenderDataPtr->commandQueue->GetDX12CommandQueue()->Signal(
+		mGlobalRenderData.commandQueue->GetDX12CommandQueue()->Signal(
 			mFence->Get(), mCurrentFence);
 		//FlushCommandQueue();
 	}
@@ -337,7 +325,7 @@ namespace BoulderLeaf::Graphics::DX12
 		// Because we are on the GPU timeline, the new fence point won’t be
 		// set until the GPU finishes processing all the commands prior to
 		// this Signal().
-		mGlobalRenderDataPtr->commandQueue->Signal(
+		mGlobalRenderData.commandQueue->Signal(
 			mFence->Get(), mCurrentFence);
 
 		// Wait until the GPU has completed commands up to this fence point.

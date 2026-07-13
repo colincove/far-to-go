@@ -6,7 +6,7 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blDX12MeshStorageCache::blDX12MeshStorageCache(std::shared_ptr<blDevice> device)
+	blDX12MeshStorageCache::blDX12MeshStorageCache(blDevice* device)
 		: mDevice(device), super()
 	{
 

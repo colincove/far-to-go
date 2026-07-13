@@ -26,11 +26,11 @@ int main()
 	);
 
 	Metrics::LoadPIX();
-	std::shared_ptr<Core::blWindow> window(std::make_shared<Core::blWindow>("Graphics Demo"));
-	std::shared_ptr<Graphics::API> api(std::make_shared<DX12::blDX12>(window));
+	Core::blWindow window("Graphics Demo");
+	std::unique_ptr<Graphics::API> api(std::make_unique<DX12::blDX12>(&window));
 	api->Initialize();
 
-	window->SetCallback([&](HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
+	window.SetCallback([&](HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
 		{
 			api->WndProc(hWnd, msg, wParam, lParam);
 			return true;
@@ -40,17 +40,16 @@ int main()
 
 	std::array<std::unique_ptr<blDemoScene>, 5> demoScenes =
 	{
-		std::make_unique<blBoxScene>(api, window, container),
-		std::make_unique<blCylinderDemoScene>(api, window, container),
-		std::make_unique<blGeosphereDemoScene>(api, window, container),
-		std::make_unique<blShapesDemoScene>(api, window, container),
-		std::make_unique<ShapesWithPassDemoScene>(api, window, container),
+		std::make_unique<blBoxScene>(api.get(), &window, container),
+		std::make_unique<blCylinderDemoScene>(api.get(), &window, container),
+		std::make_unique<blGeosphereDemoScene>(api.get(), &window, container),
+		std::make_unique<blShapesDemoScene>(api.get(), &window, container),
+		std::make_unique<ShapesWithPassDemoScene>(api.get(), &window, container),
 	};
 
 	Imgui::SetCurrentSelection(1);
 
-	Core::blGameLoop gameLoop;
-	Core::blGameLoop::Callbacks callbacks =
+	Core::Callbacks callbacks =
 	{
 		.MessageRecieved = [&msg, &api](MSG& msgRecieved) -> void
 		{
@@ -77,7 +76,7 @@ int main()
 		},
 	};
 
-	gameLoop.Run(callbacks);
+	RunGameLoop(callbacks);
 
 	return 1;
 }

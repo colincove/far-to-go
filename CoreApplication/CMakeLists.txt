@@ -12,6 +12,7 @@ add_library(
 	Resources/blResourceGuid.h
 	Resources/blResourceHandle.h
 	Resources/blResourceHandleOfType.h
+	Resources/Natvis/blResourceStream.natvis
 	CoreApplicationFunctions.cmake)
 
 set_target_properties(CoreApplication PROPERTIES LINKER_LANGUAGE CXX)
@@ -43,5 +44,9 @@ source_group("Resources/Source Files"
 	FILES 
 	Resources/blResources.cpp
 	Resources/blResourceHandle.cpp)
+
+source_group("Natvis"
+	FILES 
+	Resources/Natvis/blResourceStream.natvis)
 
 install(TARGETS CoreApplication CONFIGURATIONS Debug DESTINATION Debug/lib)

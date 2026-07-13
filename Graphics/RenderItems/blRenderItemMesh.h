@@ -53,6 +53,7 @@ namespace BoulderLeaf::Graphics
 		blCompositeMeshResourcePtr compositeMesh;
 		blMaterialResourcePtr material;
 		blResourceId submeshId;
+		std::vector<blResourceId> submeshIds;
 		size_t instance;
 	};
 }

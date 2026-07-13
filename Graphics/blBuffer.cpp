@@ -126,139 +126,110 @@ namespace BoulderLeaf::Graphics
 	{
 	}
 
-	uint64_t InlineBufferDescription::CalculateBufferElementDescriptionOffset()
+	blBufferElementDescriptionResource::blBufferElementDescriptionResource(
+		blResourceStream& stream, 
+		const BufferElementDescription& element)
+		: blBaseResource(stream), 
+		mElementType(element.ElementType), 
+		mNameStringResource(stream, element.Name)
 	{
-		return sizeof(InlineBufferDescription);
+		
 	}
 
-	uint64_t InlineBufferDescription::CalculateTotalSize(std::vector<BufferElementDescription> elementDescriptions)
+	const std::string_view blBufferElementDescriptionResource::GetName() const
 	{
-		uint64_t totalSize = CalculateBufferElementDescriptionOffset();
-
-		for (const BufferElementDescription& desc : elementDescriptions)
-		{
-			InlineBufferElementDescription inlineDesc;
-			inlineDesc.mHeader.ElementType = desc.ElementType;
-			inlineDesc.mHeader.nameStringLength = (uint32_t)desc.Name.length();
-			totalSize += inlineDesc.CalculateTotalSize();
-		}
-
-		return totalSize;
+		return mNameStringResource.GetStringView();
 	}
 
-	void InlineBufferDescription::WriteDescription(const BufferDescription& desc)
-	{
-		mHeader.format = desc.format;
-		mHeader.numElementDescriptions = desc.elementDescriptions.size();
-
-		uint64_t writeOffset = CalculateBufferElementDescriptionOffset();
-
-		for (const BufferElementDescription& d : desc.elementDescriptions)
-		{
-			InlineBufferElementDescription& elemDesc = reinterpret_cast<InlineBufferElementDescription&>(
-				*(reinterpret_cast<char*>(this) + writeOffset)
-			);
-
-			elemDesc.mHeader.ElementType = d.ElementType;
-			elemDesc.mHeader.nameStringLength = d.Name.length();
-			writeOffset += InlineBufferElementDescription::CalculateNameStringOffset();
-			const uint64_t nameSize = d.Name.length() * sizeof(char);
-			memcpy(reinterpret_cast<char*>(this) + writeOffset, d.Name.c_str(), nameSize);
-			writeOffset += nameSize;
-		}
-	}
-
-	// IterateElements removed; use Iterator for element traversal
-
-	InlineBufferDescription::Iterator::Iterator(InlineBufferElementDescription* begin, int numElementDescriptions)
-		: mNumElementDescriptions(numElementDescriptions),
-		mHead(reinterpret_cast<byte*>(begin)),
-		mBegin(mHead)
+	blBufferDescriptionResource::blBufferDescriptionResource(
+		blResourceStream& stream,
+		const BufferDescription& desc)
+		: mFormat(desc.format), blListDynamicResource(stream, desc.elementDescriptions)
 	{
 
 	}
 
-	InlineBufferDescription::Iterator::Iterator(InlineBufferDescription& desc)
-		: mNumElementDescriptions(static_cast<int>(desc.mHeader.numElementDescriptions)),
-		mHead(reinterpret_cast<byte*>(reinterpret_cast<char*>(&desc) + InlineBufferDescription::CalculateBufferElementDescriptionOffset())),
-		mBegin(mHead)
-	{
-
-	}
-
-	BufferDescription InlineBufferDescription::ToBufferDescription() const
+	BufferDescription blBufferDescriptionResource::GetBufferDescription() const
 	{
 		BufferDescription desc;
-		desc.format = mHeader.format;
-		desc.elementDescriptions.reserve(mHeader.numElementDescriptions);
-
-		uint64_t readOffset = CalculateBufferElementDescriptionOffset();
-
-		for (unsigned int i = 0; i < mHeader.numElementDescriptions; ++i)
+		desc.format = mFormat;
+		for (const blBufferElementDescriptionResource& elementResource : blBufferDescriptionResource::ConstIterator(this))
 		{
-			const InlineBufferElementDescription& elemDesc = reinterpret_cast<const InlineBufferElementDescription&>(
-				*(reinterpret_cast<const char*>(this) + readOffset)
-			);
-
-			BufferElementDescription be;
-			be.ElementType = elemDesc.mHeader.ElementType;
-			const char* namePtr = reinterpret_cast<const char*>(this) + readOffset + InlineBufferElementDescription::CalculateNameStringOffset();
-			be.Name.assign(namePtr, elemDesc.mHeader.nameStringLength);
-
-			desc.elementDescriptions.push_back(std::move(be));
-
-			readOffset += elemDesc.CalculateTotalSize();
+			desc.elementDescriptions.push_back({ std::string(elementResource.GetName()), elementResource.mElementType });
 		}
-
 		return desc;
 	}
 
-	blResourceHandleOfType<InlineBufferDescription> InlineBufferDescription::CreateResourceFromBufferDescription(
+	blArrayBufferResource::blArrayBufferResource(
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		blResourceRefOfType<blListResource> bufferResourceRef) 
+		: blBaseResource(),
+		mDescriptionResourceRef(descriptionResourceRef),
+		mBufferResourceRef(bufferResourceRef)
+	{
+
+	}
+
+	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
+		blResourceContainer* resourceContainer,
 		std::wstring name,
-		const BufferDescription& desc,
-		blResourceContainer* container)
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		const void* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount)
 	{
-		const uint64_t totalSize = InlineBufferDescription::CalculateTotalSize(desc.elementDescriptions);
-		blResourceHandleOfType<InlineBufferDescription> handle = 
-			container->CreateResourceOfType<InlineBufferDescription>(name, totalSize);
-		handle->WriteDescription(desc);
-		return handle;
+		blResourceHandleOfType<blListResource> arrayData = resourceContainer->CreateResourceOfTypeWithDynamicSize<blListResource>(
+			name + L"Data",
+			vertexCount,
+			vertexSize,
+			vertices
+		);
+
+		return resourceContainer->CreateResourceOfType<blArrayBufferResource>(
+			name + L"Array",
+			descriptionResourceRef,
+			arrayData.GetRef()
+		);
 	}
 
-	InlineBufferElementDescription& InlineBufferDescription::Iterator::operator*() const
+	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		const blArrayBufferResource& sourceArray,
+		const blBufferElementAdapter& adapter)
 	{
-		return reinterpret_cast<InlineBufferElementDescription&>(*mHead);
+		blResourceHandleOfType<blListResource> sourceListResourceHandle = blResourceHandleOfType<blListResource>(
+			resourceContainer->CreateHandleFromRefOfType<blListResource>(sourceArray.mBufferResourceRef));
+
+		blResourceHandleOfType<blBufferDescriptionResource> sourceDescriptionResourceHandle = blResourceHandleOfType<blBufferDescriptionResource>(
+			resourceContainer->CreateHandleFromRefOfType<blBufferDescriptionResource>(sourceArray.mDescriptionResourceRef));
+
+		const BufferDescription sourceDescription = sourceDescriptionResourceHandle->GetBufferDescription();
+
+		blResourceHandleOfType<blListResource> arrayData = resourceContainer->CreateResourceOfTypeWithDynamicSize<blListResource>(
+			name + L"Data",
+			sourceListResourceHandle->mCount,
+			adapter.SizeOf(sourceDescription)
+		);
+
+		MarshalBuffer(
+			sourceListResourceHandle->mCount,
+			sourceDescription.elementDescriptions,
+			[&sourceListResourceHandle, &sourceDescription](size_t index) -> const byte*
+			{
+				return &sourceListResourceHandle->Get<byte>((uint32_t) index);
+			},
+			[&arrayData](size_t index) -> byte*
+			{
+				return &arrayData->GetMutable<byte>((uint32_t) index);
+			},
+			adapter
+		);
+
+		return resourceContainer->CreateResourceOfType<blArrayBufferResource>(
+			name + L"Array",
+			sourceDescriptionResourceHandle.GetRef(),
+			arrayData.GetRef()
+		);
 	}
-
-	InlineBufferDescription::Iterator& InlineBufferDescription::Iterator::operator++()
-	{
-		InlineBufferElementDescription& elemDesc = reinterpret_cast<InlineBufferElementDescription&>(*mHead);
-		mHead += elemDesc.CalculateTotalSize();
-		return *this;
-	}
-
-	bool InlineBufferDescription::Iterator::operator!=(const Iterator& other) const
-	{
-		return mHead != other.mHead;
-	}
-
-	InlineBufferDescription::Iterator InlineBufferDescription::Iterator::begin() const
-	{
-		return Iterator(reinterpret_cast<InlineBufferElementDescription*>(mBegin), mNumElementDescriptions);
-	}
-
-	InlineBufferDescription::Iterator InlineBufferDescription::Iterator::end() const
-	{
-		byte* end = mBegin;
-
-		for (unsigned int i = 0; i < mNumElementDescriptions; ++i)
-		{
-			InlineBufferElementDescription& elemDesc = reinterpret_cast<InlineBufferElementDescription&>(*end);
-			end += elemDesc.CalculateTotalSize();
-		}
-
-		return Iterator(reinterpret_cast<InlineBufferElementDescription*>(end), mNumElementDescriptions);
-	}
-
-
 }

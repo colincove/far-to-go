@@ -2,7 +2,7 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blMeshRenderComponent::blMeshRenderComponent(std::shared_ptr<blGlobalRenderData> globalRenderDataPtr)
+	blMeshRenderComponent::blMeshRenderComponent(blGlobalRenderData* globalRenderDataPtr)
 		: blRenderComponent(globalRenderDataPtr)
 	{
 	}

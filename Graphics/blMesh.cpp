@@ -225,6 +225,12 @@ namespace BoulderLeaf::Graphics
 		{ "TEXCOORD",	VertexElementType::Float2 }
 	};
 
+	void blInlineMesh::WriteToStream(blResourceStream& stream) const
+	{
+		stream.AllocateExplicit(mHeader.GetVertexBufferSize());
+		stream.AllocateExplicit(mHeader.GetIndexBufferSize());
+	}
+
 	const blMeshStorage::index* blInlineMesh::GetIndicesStart() const
 	{
 		return reinterpret_cast<const blMeshStorage::index*>(
@@ -252,5 +258,90 @@ namespace BoulderLeaf::Graphics
 	byte* blInlineMesh::GetVertexStartMutable() 
 	{
 		return reinterpret_cast<byte*>(GetIndicesStartMutable()) + sizeof(blMeshStorage::index) * mHeader.mIndexCount;
+	}
+
+	// Constructors
+	blInlineMesh::blInlineMesh()
+	{
+		mHeader = Header();
+	}
+
+	blInlineMesh::blInlineMesh(size_t vertexCount, size_t indexCount, size_t vertexSize, BufferFormat format, blResourceRef description)
+	{
+		mHeader = Header(vertexCount, indexCount, vertexSize, format);
+		mHeader.description = description;
+	}
+}
+
+namespace BoulderLeaf::Graphics
+{
+	blIndexedMeshResource::blIndexedMeshResource(
+		blResourceRefOfType<blListResource> indexListRef,
+		blResourceRefOfType<blArrayBufferResource> arrayBufferResourceRef)
+		: mIndexListRef(indexListRef),
+		mArrayBufferResourceRef(arrayBufferResourceRef)
+	{
+
+	}
+
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		const void* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		const std::uint16_t* indices,
+		uint32_t indexCount)
+	{
+		blResourceHandleOfType<blArrayBufferResource> vertexArrayResource = CreateArrayBufferResource(
+			resourceContainer,
+			name,
+			descriptionResourceRef,
+			vertices,
+			vertexSize,
+			vertexCount
+		);
+
+		blResourceHandleOfType<blListResource> indexArrayResource = resourceContainer->CreateResourceOfTypeWithDynamicSize<blListResource>(
+			name + L"Data",
+			indexCount,
+			sizeof(std::uint16_t),
+			indices
+		);
+
+		blResourceHandleOfType<blIndexedMeshResource> meshResource = resourceContainer->CreateResourceOfType<blIndexedMeshResource>(
+			name,
+			indexArrayResource.GetRef(),
+			vertexArrayResource.GetRef()
+		);
+
+		return meshResource;
+	}
+
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceHandleOfType<blIndexedMeshResource> sourceMeshHandle,
+		const blBufferElementAdapter& adapter)
+	{
+		blResourceContainer* resourceContainer = sourceMeshHandle.GetContainer();
+		const blIndexedMeshResource& sourceMesh = *sourceMeshHandle;
+
+		const blArrayBufferResource& sourceArrayBuffer =
+			*resourceContainer->CreateHandleFromRefOfType<blArrayBufferResource>(sourceMesh.mArrayBufferResourceRef);
+
+		blResourceHandleOfType<blArrayBufferResource> vertexArrayResource = CreateArrayBufferResource(
+			resourceContainer,
+			std::wstring(sourceMeshHandle.GetName()) + L" Translated Array",
+			sourceArrayBuffer,
+			adapter
+		);
+
+		blResourceHandleOfType<blIndexedMeshResource> meshResource = resourceContainer->CreateResourceOfType<blIndexedMeshResource>(
+			std::wstring(sourceMeshHandle.GetName()) + L" Translated",
+			blResourceRefOfType<blListResource>(sourceMesh.mIndexListRef.GetId()),
+			vertexArrayResource.GetRef()
+		);
+
+		return meshResource;
 	}
 }

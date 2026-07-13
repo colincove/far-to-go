@@ -4,8 +4,8 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blDX12VertexAndPassUploadBufferCache::blDX12VertexAndPassUploadBufferCache(std::shared_ptr<blDevice> device,
-		std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext)
+	blDX12VertexAndPassUploadBufferCache::blDX12VertexAndPassUploadBufferCache(blDevice* device,
+		blGlobalRenderFrameContext* globalRenderFrameContext)
 		: blDX12ResourceDataCache<blDX12VertexAndPassUploadBufferCacheData, blVertexBufferWithPassBufferResource>()
 	{
 	}

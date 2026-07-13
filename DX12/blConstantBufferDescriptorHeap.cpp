@@ -8,7 +8,7 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blConstantBufferDescriptorHeap::blConstantBufferDescriptorHeap(
-		const std::shared_ptr<blDevice> device,
+		blDevice* device,
 		UINT numDescriptors,
 		std::wstring name)
 	{

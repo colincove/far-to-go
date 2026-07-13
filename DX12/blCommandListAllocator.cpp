@@ -3,7 +3,7 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blCommandListAllocator::blCommandListAllocator(std::shared_ptr<blDevice> device, std::wstring name)
+	blCommandListAllocator::blCommandListAllocator(blDevice* device, std::wstring name)
 		: mDevice(device)
 	{
 		DX12_API_CALL(device->GetDX12Device()->CreateCommandAllocator(

@@ -5,7 +5,7 @@
 namespace BoulderLeaf::Graphics
 {
 	ShapesWithPassDemoScene::ShapesWithPassDemoScene(
-		std::shared_ptr<API> graphicsAPI, std::shared_ptr<Core::blWindow> window, blResourceContainer* resourceContainer)
+		API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer)
 		: blDemoScene(graphicsAPI, window, resourceContainer),
 		mTheta(1.5f * PIf),
 		mPhi(PIfDIV4),
@@ -50,19 +50,26 @@ namespace BoulderLeaf::Graphics
 		mMaterialResource = blResourceManager::Get().CreateResource<blMaterialResource>(mShaderResource, false);
 		mSceneResource = blResourceManager::Get().CreateResource<blSceneResource>();
 
-		mObjectConstantBufferResource = blResourceManager::Get().CreateResource<blStandardObjectConstantsBufferResource>();
+		mObjectConstantBufferResource = blResourceManager::Get().CreateResourceWithName<blStandardObjectConstantsBufferResource>(L"Shapes ObjectConstantBufferResource");
 		mObjectConstantBufferResource->GetDataMutable().reserve(1000);
 		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
+		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(1, 2, 3)});
+		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(2, 2, 2) });
+		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(-2, -1, 0) });
+		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(4, 4, 4) });
+		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(1, 1, 1) });
 
 		std::unique_ptr<byte[]> passData = std::make_unique<byte[]>(sizeof(cbPass));
 		memcpy(passData.get(), &mPassData, sizeof(cbPass));
-		mConstantBufferPassResource = blResourceManager::Get().CreateResource<blDataElementBufferResource>(
+		mConstantBufferPassResource = blResourceManager::Get().CreateResourceWithName<blDataElementBufferResource>(
+			L"Pass Constants",
 			BufferFormat::BoulderLeaf,
 			cbPassDescription,
 			std::move(passData)
 		);
 
-		mConstantBufferResource = blResourceManager::Get().CreateResource<blVertexBufferWithPassBufferResource>(
+		mConstantBufferResource = blResourceManager::Get().CreateResourceWithName<blVertexBufferWithPassBufferResource>(
+			L"Shapes mConstantBufferResource",
 			mConstantBufferPassResource,
 			std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource)
 		);
@@ -78,6 +85,7 @@ namespace BoulderLeaf::Graphics
 				mCompositeMeshResource,
 				mMaterialResource,
 				mBoxMeshResource->GetId(), //submeshId
+				std::vector<blResourceId> {},
 				0
 			},
 			RenderCompositeMeshDataWithPassConstants
@@ -89,6 +97,7 @@ namespace BoulderLeaf::Graphics
 				mCompositeMeshResource,
 				mMaterialResource,
 				mCylinderMeshResource->GetId(), //submeshId
+				std::vector<blResourceId> {},
 				1
 			},
 			RenderCompositeMeshDataWithPassConstants
@@ -100,6 +109,12 @@ namespace BoulderLeaf::Graphics
 				mCompositeMeshResource,
 				mMaterialResource,
 				mGeosphereMeshResource->GetId(), //submeshId
+				std::vector<blResourceId> {
+					mGeosphereMeshResource->GetId(),
+					mGeosphereMeshResource->GetId(),
+					mGeosphereMeshResource->GetId(),
+					mCylinderMeshResource->GetId(),
+				},
 				2
 			}
 		};
@@ -135,16 +150,25 @@ namespace BoulderLeaf::Graphics
 		Vector4 target = Vector4::Zero();
 		Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 
-		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(0, 0, 3);
-		const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up) * translate;
+		const Matrix4x4 translate = Matrix4x4::TranslationMatrix(0, 0, 0);
+		const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up)/* * translate*/;
 		const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
 		const Matrix4x4 proj = mCamera.GetProjectionMatrix();
 		const Matrix4x4 worldViewProj = world * view * proj;
 
-		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
-		mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
-		mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
+		if (!mDidSetupPassData)
+		{
+			// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
+			for (blStandardObjectConstants& constants : mObjectConstantBufferResource->GetDataMutable())
+			{
+				constants.WorldViewProj = (worldViewProj * constants.WorldViewProj).Transpose();
+			}
 
+			mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
+		
+			mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
+			mDidSetupPassData = true;
+		}
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		cbPass& passData = *reinterpret_cast<cbPass*>(mConstantBufferPassResource->GetData().GetDataMutable());
 		passData.view = worldViewProj.Transpose();

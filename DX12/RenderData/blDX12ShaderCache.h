@@ -20,9 +20,9 @@ namespace BoulderLeaf::Graphics::DX12
 	class blShaderCache : public blDX12ResourceDataCache<blShaderCacheData, blShaderResource>
 	{
 	private:
-		std::shared_ptr<blDevice> mDevice;
+		blDevice* mDevice;
 	public:
-		blShaderCache(std::shared_ptr<blDevice> device);
+		blShaderCache(blDevice* device);
 		virtual void InitializeCache(
 			const blShaderResource& resource,
 			blShaderCacheData& cache) override;

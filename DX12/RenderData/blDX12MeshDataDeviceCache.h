@@ -21,14 +21,14 @@ namespace BoulderLeaf::Graphics::DX12
 	protected:
 		using super = blDX12ResourceDataCache<blDX12MeshDataDeviceCacheData, blMeshBaseResource>;
 	private:
-		std::shared_ptr<blDevice> mDevice;
-		std::shared_ptr<blCommandList> mCommandList;
-		std::shared_ptr<blDX12MeshStorageCache> mMeshStorageCache;
+		blDevice* mDevice;
+		blCommandList* mCommandList;
+		blDX12MeshStorageCache* mMeshStorageCache;
 	public:
 		blDX12MeshDataDeviceCache(
-			std::shared_ptr<blDevice> device, 
-			std::shared_ptr<blCommandList> mCommandList,
-			std::shared_ptr<blDX12MeshStorageCache> meshStorageCache
+			blDevice* device, 
+			blCommandList* commandList,
+			blDX12MeshStorageCache* meshStorageCache
 			);
 
 		virtual void InitializeCache(

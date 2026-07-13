@@ -16,8 +16,8 @@ namespace BoulderLeaf::Graphics::DX12
 	class blDX12VertexAndPassUploadBufferCache : public blDX12ResourceDataCache<blDX12VertexAndPassUploadBufferCacheData, blVertexBufferWithPassBufferResource>
 	{
 	public:
-		blDX12VertexAndPassUploadBufferCache(std::shared_ptr<blDevice> device,
-			std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext);
+		blDX12VertexAndPassUploadBufferCache(blDevice* device,
+			blGlobalRenderFrameContext* globalRenderFrameContext);
 		virtual void UpdateCache(const blResourceId& resourceId) override;
 	protected:
 		virtual void InitializeCache(

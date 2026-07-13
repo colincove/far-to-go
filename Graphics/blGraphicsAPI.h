@@ -31,12 +31,12 @@ namespace BoulderLeaf::Graphics
 		};
 
 	private:
-		std::shared_ptr<Core::blWindow> mWindow;
+		Core::blWindow* mWindow;
 		RenderGroupData renderGroupData[blRenderGroups::MaxValue];
 		bool mInitialized;
 	public:
 		API() = default;
-		API(std::shared_ptr<Core::blWindow> window);
+		API(Core::blWindow* window);
 	public:
 		void RecieveWindowMessage(MSG msg);
 		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { return true; }

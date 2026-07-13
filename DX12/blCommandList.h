@@ -23,13 +23,13 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	private:
 		ComPtr<ID3D12GraphicsCommandList> mCommandList;
-		std::shared_ptr<blCommandListAllocator> mCommandListAllocator;
+		blCommandListAllocator* mCommandListAllocator;
 	public:
-		blCommandList(std::shared_ptr<blCommandListAllocator> commandListAllocator, std::wstring name = L"");
+		blCommandList(blCommandListAllocator* commandListAllocator, std::wstring name = L"");
 		ComPtr<ID3D12GraphicsCommandList>& GetCommandListPtr() { return mCommandList; }
 		
 		void Close() const;
-		void Reset(std::shared_ptr<blCommandListAllocator> commandListAllocator);
+		void Reset(blCommandListAllocator* commandListAllocator);
 		void Reset();
 
 		COMMAND_LIST_FUNCTION_WRAPPER(RSSetViewports)

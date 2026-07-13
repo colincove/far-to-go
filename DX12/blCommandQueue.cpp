@@ -3,7 +3,7 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	blCommandQueue::blCommandQueue(std::shared_ptr<blDevice> device, std::wstring name)
+	blCommandQueue::blCommandQueue(blDevice* device, std::wstring name)
 		: mDevice(device)
 	{
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};

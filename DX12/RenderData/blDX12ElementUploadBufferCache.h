@@ -18,13 +18,13 @@ namespace BoulderLeaf::Graphics::DX12
 	class blDX12ElementUploadBufferCache : public blDX12ResourceDataCache<blDX12ElementUploadBufferCacheData, blDataElementBufferResource>
 	{
 	private:
-		std::shared_ptr<blDevice> mDevice;
-		std::shared_ptr<blGlobalRenderFrameContext> mGlobalRenderFrameContext;
-		std::shared_ptr<blDX12BufferElementCache> mElementCache;
+		blDevice* mDevice;
+		blGlobalRenderFrameContext* mGlobalRenderFrameContext;
+		blDX12BufferElementCache* mElementCache;
 	public:
-		blDX12ElementUploadBufferCache(std::shared_ptr<blDevice> device,
-			std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext,
-			std::shared_ptr<blDX12BufferElementCache> elementCache);
+		blDX12ElementUploadBufferCache(blDevice* device,
+			blGlobalRenderFrameContext* globalRenderFrameContext,
+			blDX12BufferElementCache* elementCache);
 		virtual void UpdateCache(const blResourceId& resourceId) override;
 	protected:
 		virtual void InitializeCache(

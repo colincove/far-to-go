@@ -108,4 +108,15 @@ namespace BoulderLeaf::Graphics
 
 		EXPECT_EQ(moved.GetVertex(3), GetTestMesh().GetVertex(3));
 	}
+
+	TEST(Mesh, Resources)
+	{
+		blResourceContainerPool pool;
+		blResourceContainer* container = pool.GetContainer(
+			1000000 * 256, // 256mb
+			10000
+		);
+
+
+	}
 }

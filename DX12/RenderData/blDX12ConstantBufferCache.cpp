@@ -4,9 +4,9 @@
 namespace BoulderLeaf::Graphics::DX12
 {
 	blDX12ConstantBufferCache::blDX12ConstantBufferCache(
-		std::shared_ptr<blDevice> device,
-		std::shared_ptr<blDX12BufferDataCache> bufferCache,
-		std::shared_ptr<blGlobalRenderFrameContext> globalRenderFrameContext) :
+		blDevice* device,
+		blDX12BufferDataCache* bufferCache,
+		blGlobalRenderFrameContext* globalRenderFrameContext) :
 		mDevice(device), 
 		mBufferCache(bufferCache),
 		mGlobalRenderFrameContext(globalRenderFrameContext)
@@ -19,7 +19,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		blDX12BufferData& bufferData = mBufferCache->Get(resource);
 
-		cache.descriptorHeap = std::make_shared<blConstantBufferDescriptorHeap>(
+		cache.descriptorHeap = std::make_unique<blConstantBufferDescriptorHeap>(
 			mDevice,
 			(UINT) (resource.GetData().Count() * Constants::FrameResourceCount),
 			resource.GetName());

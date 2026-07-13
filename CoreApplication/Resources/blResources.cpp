@@ -73,6 +73,7 @@ namespace BoulderLeaf
 		uint32_t numberOfEntries,
 		blResourceContainerPool* owningPool)
 		: mRegistry(std::make_unique<Entry[]>(numberOfEntries)), 
+		mHeapSize(heapSize),
 		mHeap(std::make_unique<byte[]>(heapSize)),
 		mId(id), 
 		owningPool(owningPool),
@@ -110,37 +111,6 @@ namespace BoulderLeaf
 
 	blResourceHandle blResourceContainer::CreateResource(const std::wstring& name, uint64_t size)
 	{
-		uint32_t index = 0;
-
-		for (Entry* entry = mRegistry.get();
-			entry != mRegistry.get() + mNumberOfEntries;
-			++entry)
-		{
-			//TODO if IsMemoryFragment is true, and it has enough space, we should re-allocate the entry. 
-			//Use it for this new allocation.
-			//NOTE: If I do this. would I then need to create a new Entry that describes the empty space created?
-			//eg. if I allocate something of size 10 into a fragmented memory space of size 15,
-			//then I need to describe the remaining 5 as an empty space. As an entry.
-			//this is because I intend to use these entries to de-fragment the memory in the future. 
-			//so it must be described.
-			if (entry->IsAvailableForAllocation())
-			{
-				entry->mGuid = blResourceGuid::New();
-				entry->mSize = size;
-				entry->mOffset = mHeapEnd;//offset into heap
-				entry->mNameLength = name.length(); //TODO
-
-				const uint64_t sizeOfName = name.length() * sizeof(wchar_t);
-				memcpy(mHeap.get() + (mHeapEnd + size), name.c_str(), sizeOfName);
-				mHeapEnd += size + sizeOfName;
-				break;
-			}
-			else
-			{
-				++index;
-			}
-		}
-
 		return CreateResourceWithGuid(name, blResourceGuid::New(), size);
 	}
 
@@ -235,16 +205,35 @@ namespace BoulderLeaf
 
 	}
 
+	blResourceContainerPool::~blResourceContainerPool()
+	{
+		for (blResourceContainer* container : mOwnedContainers)
+		{
+			delete container;
+		}
+	}
+
+	void blResourceContainerPool::PrecacheContainer(
+		uint64_t heapSize,
+		uint32_t numberOfEntries)
+	{
+		mOwnedContainers.push_back(new blResourceContainer(++mCurrentId, heapSize, numberOfEntries, this));
+		mContainerPool.push_back(mOwnedContainers[mOwnedContainers.size() - 1]);
+	}
+
 	blResourceContainer* blResourceContainerPool::GetContainer(
 		uint64_t heapSize,
 		uint32_t numberOfEntries)
 	{
-		return new blResourceContainer(++mCurrentId, heapSize, numberOfEntries, this);
+		//TODO pull from pool if available, otherwise create a new one.
+		mOwnedContainers.push_back(new blResourceContainer(++mCurrentId, heapSize, numberOfEntries, this));
+		return mOwnedContainers[mOwnedContainers.size()-1];
 	}
 
-	void blResourceContainerPool::Return(const blResourceContainer& container)
+	void blResourceContainerPool::Return(blResourceContainer& container)
 	{
-		//TODO
+		//TODO. Change IDS. Invalidate data. etc. Return to pool.
+		mContainerPool.push_back(&container);
 	}
 
 	bool blResourceContainer::Entry::IsAvailableForAllocation() const
@@ -338,5 +327,65 @@ namespace BoulderLeaf
 	blResourceHandle::operator bool()
 	{
 		return IsValid();
+	}
+
+	blBaseResource::blBaseResource(blResourceStream& stream)
+		: mLocalStreamOffset(stream.GetCurrentOffset()),
+		mMemberToDataOffset(stream.GetMemberToDataOffset(reinterpret_cast<const byte*>(this)))
+	{
+
+	}
+
+	blBaseResource::blBaseResource() : mLocalStreamOffset(0)
+	{
+	}
+
+	blBaseResource::blBaseResource(uint64_t localStreamOffset) : mLocalStreamOffset(localStreamOffset)
+	{
+	}
+
+	blListResource::blListResource(
+		blResourceStream& stream,
+		uint32_t count,
+		uint64_t elementSize,
+		const void* data) : blBaseResource(stream), mCount(count), mElementSize(elementSize)
+	{
+		mDataOffset = stream.GetMemberToDataOffset(this);
+		stream.Copy(data, mCount * mElementSize);
+	}
+
+	blListResource::blListResource(
+		blResourceStream& stream,
+		uint32_t count,
+		uint64_t elementSize) : blBaseResource(stream), mCount(count), mElementSize(elementSize)
+	{
+		stream.AllocateExplicit(mCount * mElementSize);
+	}
+
+	blListResource::blListResource(const blListResource&& other)
+		: blBaseResource(other.mLocalStreamOffset), mCount(other.mCount), mElementSize(other.mElementSize)
+	{
+	}
+
+	blStringResource::blStringResource(blResourceStream& stream, const std::string& str)
+		: blBaseResource(stream), mLength(static_cast<uint32_t>(str.length()))
+	{
+		stream.Copy(str.c_str(), str.length() * sizeof(char));
+	}
+
+	const std::string_view blStringResource::GetStringView() const
+	{
+		return std::string_view(reinterpret_cast<const char*>(this) + mMemberToDataOffset, mLength * sizeof(char));
+	}
+
+	blWideStringResource::blWideStringResource(blResourceStream& stream, const std::wstring& str)
+		: blBaseResource(stream), mLength(static_cast<uint32_t>(str.length()))
+	{
+		stream.Copy(str.c_str(), str.length() * sizeof(wchar_t));
+	}
+
+	const std::wstring_view blWideStringResource::GetStringView() const
+	{
+		return std::wstring_view(reinterpret_cast<const wchar_t*>(this) + mMemberToDataOffset, mLength * sizeof(wchar_t));
 	}
 }
