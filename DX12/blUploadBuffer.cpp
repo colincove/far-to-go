@@ -297,4 +297,44 @@ namespace BoulderLeaf::Graphics::DX12
 			CopyData(i);
 		}
 	}
+
+	blDX12ListResourceUploadBuffer::blDX12ListResourceUploadBuffer(
+			blDevice* device,
+			bool isConstantBuffer,
+			blResourceHandleOfType<blListResource> data,
+			std::wstring name)
+		: mData(data),
+		blUploadBufferBase(device, isConstantBuffer, name)
+	{
+
+	}
+
+	UINT blDX12ListResourceUploadBuffer::GetTotalSize() const
+	{
+		return mData->mCount * mData->mElementSize;
+	}
+
+	D3D12_GPU_VIRTUAL_ADDRESS blDX12ListResourceUploadBuffer::GetBufferLocationForIndex(int currentFrameResource, int index)
+	{
+		return GetBufferLocationStart(currentFrameResource) + (index * mData->mElementSize);
+	}
+
+	void blDX12ListResourceUploadBuffer::CopyAllData()
+	{
+		for (int i = 0; i < (mIsConstantBuffer ? Constants::FrameResourceCount : 1); ++i)
+		{
+			CopyData(i);
+		}
+	}
+
+	void blDX12ListResourceUploadBuffer::CopyData(int currentFrameResource)
+	{
+		assert(IsInitialized());
+		assert(!(currentFrameResource > 0 && !mIsConstantBuffer));
+
+		const UINT totalSize = GetTotalSize();
+		const UINT offset = mIsConstantBuffer ? (totalSize * currentFrameResource) : 1;
+
+		memcpy(&mMappedData[0] + offset, &mData->Get<byte>(0), totalSize);
+	}
 }

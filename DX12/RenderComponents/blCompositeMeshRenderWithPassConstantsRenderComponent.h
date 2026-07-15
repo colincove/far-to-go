@@ -14,6 +14,6 @@ namespace BoulderLeaf::Graphics::DX12
 	public:
 		blCompositeMeshRenderWithPassConstantsRenderComponent(blGlobalRenderData* globalRenderDataPtr);
 		virtual ~blCompositeMeshRenderWithPassConstantsRenderComponent() = default;
-		virtual void Render(const RenderCompositeMeshDataWithPassConstants& item, const blSceneResourcePtr scene) override;
+		virtual void Render(const RenderCompositeMeshDataWithPassConstants& item) override;
 	};
 }

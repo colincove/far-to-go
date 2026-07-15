@@ -54,7 +54,6 @@ namespace BoulderLeaf::Graphics::DX12
 #endif // DEBUG
 
 		mGlobalRenderData.globalRenderFrameContext = std::make_unique<blGlobalRenderFrameContext>();
-		mGlobalRenderData.resourceCacheGlobalInterface = &mResourceCacheGlobalInterface;
 
 		mGlobalRenderData.viewPort.TopLeftX = 0;
 		mGlobalRenderData.viewPort.TopLeftY = 0;
@@ -65,7 +64,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		mGlobalRenderData.scissorRect = { 0, 0, static_cast<long>(window->GetWidth()), static_cast<long>(window->GetHeight()) };
 
-		mGlobalRenderData.device = std::make_unique<blDevice>();
+		mGlobalRenderData.device = std::make_unique<blDevice>();	
 
 		mGlobalRenderData.commandQueue = std::make_unique<blCommandQueue>(mGlobalRenderData.device.get(), L"Global");
 		mGlobalRenderData.factory = std::make_unique<blFactory>();
@@ -118,6 +117,9 @@ namespace BoulderLeaf::Graphics::DX12
 			mGlobalRenderData.bufferCache.get(),
 			mGlobalRenderData.mPSOCache.get()
 		};
+
+		mResourceCacheGlobalInterface = std::make_unique<blDX12ResourceCacheGlobalInterface>(&mGlobalRenderData);
+		mGlobalRenderData.resourceCacheGlobalInterface = mResourceCacheGlobalInterface.get();
 
 		for (FrameData& frameData : mFrameData)
 		{
@@ -286,27 +288,26 @@ namespace BoulderLeaf::Graphics::DX12
 		// this Signal().
 		mGlobalRenderData.commandQueue->GetDX12CommandQueue()->Signal(
 			mFence->Get(), mCurrentFence);
-		//FlushCommandQueue();
 	}
 
-	void blDX12::DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene)
+	void blDX12::DrawMesh(const RenderMeshData& renderItem)
 	{
-		mMeshRenderComponent->Render(renderItem, scene);
+		mMeshRenderComponent->Render(renderItem);
 	}
 
-	void blDX12::DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	void blDX12::DrawMeshInstanced(const RenderMeshDataInstanced& renderData)
 	{
-		mMeshInstancedRenderComponent->Render(renderData, scene);
+		mMeshInstancedRenderComponent->Render(renderData);
 	}
 
-	void blDX12::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	void blDX12::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData)
 	{
-		mCompositeMeshRenderComponent->Render(renderData, scene);
+		mCompositeMeshRenderComponent->Render(renderData);
 	}
 
-	void blDX12::DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene)
+	void blDX12::DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData)
 	{
-		mCompositeMeshRenderWithPassConstantsRenderComponent->Render(renderData, scene);
+		mCompositeMeshRenderWithPassConstantsRenderComponent->Render(renderData);
 	}
 
 	void blDX12::MarkResourceDirty(const blResourceId resourceId)

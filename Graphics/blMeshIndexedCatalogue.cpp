@@ -21,12 +21,20 @@ namespace BoulderLeaf::Graphics
 
 	blMeshIndexedCatalogue::index blMeshIndexedCatalogue::AddMesh(const blMeshStorage& mesh)
 	{
+		const blMeshStorage::Header header = mesh.GetHeader();
+		return AddMesh(header.mVertexCount, header.mVertexSize, header.mIndexCount);
+	}
+
+	blMeshIndexedCatalogue::index blMeshIndexedCatalogue::AddMesh(
+		uint32_t vertexCount,
+		uint64_t vertexSize,
+		uint32_t indexCount)
+	{
 		const index newIndex = mCurrentIndex;
 		const Entry& lastEntry = GetLastEntry();
-		const blMeshStorage::Header header = mesh.GetHeader();
 
-		size_t vertexBufferSize = header.GetVertexBufferSize();
-		size_t indexBufferSize = header.GetIndexBufferSize();
+		size_t vertexBufferSize = vertexCount * vertexSize;
+		size_t indexBufferSize = indexCount * sizeof(uint16_t);
 
 		size_t vertexCountOffset = 0;
 		size_t indexCountOffset = 0;
@@ -39,17 +47,38 @@ namespace BoulderLeaf::Graphics
 
 		mEntries.push_back(Entry(
 			vertexBufferSize,
-			//lastEntry.VertexOffset + lastEntry.VertexBufferSize, WHICH IS IT. BUGGG
 			vertexCountOffset,
-			header.mVertexCount,
+			vertexCount,
 			indexBufferSize,
-			//lastEntry.IndexOffset + lastEntry.IndexBufferSize, // WHICH IS IT. BUGGGG
 			indexCountOffset,
-			header.mIndexCount
+			indexCount
 		));
 
 		mCurrentIndex++;
 		return newIndex;
+	}
+
+	blMeshIndexedCatalogue::index blMeshIndexedCatalogue::AddMeshResource(const blResourceHandleOfType<blIndexedMeshResource> meshHandle)
+	{
+		blResourceContainer* container = meshHandle.GetContainer();
+
+		const blResourceHandleOfType<blListResource> indexBuffer = container->CreateHandleFromRefOfType<blListResource>(
+			meshHandle->mIndexListRef
+		);
+
+		const blResourceHandleOfType<blArrayBufferResource> vertexBuffer = container->CreateHandleFromRefOfType<blArrayBufferResource>(
+			meshHandle->mArrayBufferResourceRef
+		);
+
+		const blResourceHandleOfType<blListResource> vertexList = container->CreateHandleFromRefOfType<blListResource>(
+			vertexBuffer->mBufferResourceRef
+		);
+
+		const blResourceHandleOfType<blBufferDescriptionResource> description = container->CreateHandleFromRefOfType<blBufferDescriptionResource>(
+			vertexBuffer->mDescriptionResourceRef
+		);
+
+		return AddMesh(vertexList->mCount, vertexList->mElementSize, indexBuffer->mCount);
 	}
 
 	const blMeshIndexedCatalogue::Entry& blMeshIndexedCatalogue::GetEntry(index idx) const

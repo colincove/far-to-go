@@ -73,7 +73,7 @@ namespace BoulderLeaf::Graphics::DX12
 		{
 		}
 
-		virtual void Render(const TRenderData& renderData, const blSceneResourcePtr scene) = 0;
+		virtual void Render(const TRenderData& renderData) = 0;
 
 	};
 }

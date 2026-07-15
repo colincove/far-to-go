@@ -24,6 +24,53 @@ namespace BoulderLeaf::Graphics::DX12
 		DirectX::BoundingBox Bounds;
 	};
 
+	struct blDX12UploadBuffer
+	{
+		// System memory copies. Use Blobs because the vertex/index format can
+		// be generic.
+		// It is up to the client to cast appropriately.
+		ComPtr<ID3DBlob> bufferCPU = nullptr;
+		ComPtr<ID3D12Resource> bufferGPU = nullptr;
+		ComPtr<ID3D12Resource> bufferUploader = nullptr;
+		// Data about the buffers.
+		UINT byteStride = 0;
+		UINT bufferByteSize = 0;
+		DXGI_FORMAT IndexFormat = DXGI_FORMAT_R16_UINT;
+		// A MeshGeometry may store multiple geometries in one vertex/index
+		// buffer.
+		// Use this container to define the Submesh geometries so we can draw
+		// the Submeshes individually.
+		D3D12_VERTEX_BUFFER_VIEW BufferView() const
+		{
+			D3D12_VERTEX_BUFFER_VIEW vbv;
+			vbv.BufferLocation = bufferGPU->GetGPUVirtualAddress();
+			vbv.StrideInBytes = byteStride;
+			vbv.SizeInBytes = bufferByteSize;
+			return vbv;
+		}
+
+		D3D12_INDEX_BUFFER_VIEW IndexBufferView() const
+		{
+			D3D12_INDEX_BUFFER_VIEW ibv;
+			ibv.BufferLocation = bufferGPU->GetGPUVirtualAddress();
+			ibv.Format = DXGI_FORMAT_R16_UINT;
+			ibv.SizeInBytes = bufferByteSize;
+			return ibv;
+		}
+
+		// We can free this memory after we finish upload to the GPU.
+		void DisposeUploaders()
+		{
+			bufferUploader = nullptr;
+		}
+
+		void SetResourceNames(std::wstring name)
+		{
+			bufferGPU->SetName((L"[BL][VertexBufferGPU] " + name).c_str());
+			bufferUploader->SetName((L"[BL][IndexBufferGPU] " + name).c_str());
+		}
+	};
+
 	struct blDX12Mesh
 	{
 		// System memory copies. Use Blobs because the vertex/index format can

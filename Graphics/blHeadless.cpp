@@ -13,22 +13,22 @@ namespace BoulderLeaf::Graphics
 
 	}
 
-	void Headless::DrawMesh(const RenderMeshData& renderData, const  blSceneResourcePtr scene)
+	void Headless::DrawMesh(const RenderMeshData& renderData)
 	{
 
 	}
 
-	void Headless::DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	void Headless::DrawMeshInstanced(const RenderMeshDataInstanced& renderData)
 	{
 
 	}
 
-	void Headless::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	void Headless::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData)
 	{
 
 	}
 
-	void Headless::DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene) 
+	void Headless::DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) 
 	{
 
 	}

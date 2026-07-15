@@ -61,6 +61,27 @@ namespace BoulderLeaf::Graphics::DX12
 	);
 
 	void GenerateSubresources(
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		uint64_t vertexBufferWidth,
+		uint64_t indexBufferWidth,
+		uint64_t vertexWidth,
+		uint32_t indexCount,
+		const byte* vertexBufferData,
+		const uint16_t* indexBufferData,
+		blDX12Mesh& meshGeometry,
+		SubmeshGeometry& submesh);
+
+	void GenerateSingleSubresources(
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		uint64_t bufferWidth,
+		uint64_t elementWidth,
+		uint32_t count,
+		const byte* bufferData,
+		blDX12UploadBuffer& uploadBuffer);
+
+	void GenerateSubresources(
 		const blMeshStorage& storage,
 		ID3D12Device* device,
 		ID3D12GraphicsCommandList* commandList,

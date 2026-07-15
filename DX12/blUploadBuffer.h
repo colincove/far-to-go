@@ -122,4 +122,23 @@ namespace BoulderLeaf::Graphics::DX12
 	protected:
 		virtual UINT GetTotalSize() const override;
 	};
+
+	class blDX12ListResourceUploadBuffer final : public blUploadBufferBase
+	{
+	private:
+		blResourceHandleOfType<blListResource> mData;
+	public:
+		blDX12ListResourceUploadBuffer(
+			blDevice* device,
+			bool isConstantBuffer,
+			blResourceHandleOfType<blListResource> data,
+			std::wstring name
+		);
+
+		virtual void CopyData(int currentFrameResource) override;
+		virtual void CopyAllData() override;
+		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocationForIndex(int currentFrameResource, int index);
+	protected:
+		virtual UINT GetTotalSize() const override;
+	};
 }

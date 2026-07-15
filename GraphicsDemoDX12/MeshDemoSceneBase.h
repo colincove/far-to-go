@@ -13,19 +13,21 @@
 #include <blTime.h>
 #include <DemoScene.h>
 #include <memory>
+#include <blDX12Math.inl>
 
 namespace BoulderLeaf::Graphics
 {
 	class blMeshDemoSceneBase : public blDemoScene
 	{
 	protected:
-		blMeshBaseResourcePtr mMeshResource;
-		blResourceHandleOfType<blInlineMesh> mInlineMeshResourceHandle;
-		blSceneResourcePtr mSceneResource;
-		blShaderResourcePtr mShaderResource;
-		blMaterialResourcePtr mMaterialResource;
-		blStandardObjectConstantsBufferResourcePtr mObjectConstantBufferResource;
-		blStandardObjectConstantsBufferPtr mInstanceDataResource;
+		blResourceHandleOfType<blIndexedMeshResource> mMeshResourceHandle;
+		blResourceHandleOfType<blSceneResource_exp> mSceneResource;
+		blResourceHandleOfType<blShaderResource_exp> mShaderResource;
+		blResourceHandleOfType<blMaterialResource_exp> mMaterialResource;
+		blResourceHandleOfType<blArrayBufferResource> mObjectConstantBufferResource;
+		blResourceHandleOfType<blListResource> mObjectConstantBufferListResource;
+		blResourceHandleOfType<blArrayBufferResource> mInstanceDataResource;
+
 		RenderMeshDataInstanced mDrawData;
 		Math::Matrix4x4 mWorld = Matrix4x4::Identity();
 
@@ -41,33 +43,64 @@ namespace BoulderLeaf::Graphics
 			mPhi(PIfDIV4),
 			mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
 		{
-			mShaderResource = blResourceManager::Get().CreateResourceWithName<blShaderResource>(
-				L"graphics_dx12_demoscene01",
-				blShader(
-					"graphics_dx12_demoscene01",
-					std::vector<blShader::Parameter>
-					{
-						{1, 0, 0, blShader::Parameter::ConstantBuffer}
-					},
-					StandardVertexDefinition::Description));
+			mSceneResource = resourceContainer->CreateResourceOfType<blSceneResource_exp>(L"Scene");
+			
+			blResourceHandleOfType<blBufferDescriptionResource> desc = BufferDescriptionResource(
+				resourceContainer, { BufferFormat::BoulderLeaf, blStandardObjectConstantsDefinition::Description, 256 });
 
-			mMaterialResource = blResourceManager::Get().CreateResource<blMaterialResource>(mShaderResource, false);
-			mSceneResource = blResourceManager::Get().CreateResource<blSceneResource>();
-			mObjectConstantBufferResource = blResourceManager::Get().CreateResourceWithName<blStandardObjectConstantsBufferResource>(
-				L"blDemoScene01 Standard Object Constants Buffer");
+			mObjectConstantBufferResource = CreateArrayBufferResource(
+				resourceContainer,
+				L"ObjectConstantBuffer",
+				desc.GetRef(),
+				sizeof(blStandardObjectConstants),
+				2
+			);
 
-			mObjectConstantBufferResource->GetDataMutable().reserve(1000);
-			mObjectConstantBufferResource->GetDataMutable().push_back({Math::Matrix4x4::Identity()});
-			mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
+			mObjectConstantBufferListResource = resourceContainer->CreateHandleFromRefOfType(mObjectConstantBufferResource->mBufferResourceRef);
 
-			mDrawData.constantBuffer = std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource);
+			mDrawData.constantBuffer = mObjectConstantBufferResource;
 			mDrawData.group = blRenderGroups::Default;
+			mDrawData.material = mMaterialResource;
+		}
+
+		void SetMeshAndShaderData(blResourceHandleOfType<blIndexedMeshResource> mesh)
+		{
+			mMeshResourceHandle = mesh;
+			mDrawData.mesh = mMeshResourceHandle;
+			blResourceContainer* container = mesh.GetContainer();
+
+			const blArrayBufferResource& vertexArrayBuffer = *container->CreateHandleFromRefOfType<blArrayBufferResource>(mesh->mArrayBufferResourceRef);
+
+			// prepare shader parameters
+			std::vector<blShader::Parameter> params =
+			{
+				{1, 0, 0, blShader::Parameter::ConstantBuffer}
+			};
+
+			const std::string shaderName = "graphics_dx12_demoscene01";
+
+			// create shader resource
+			blResourceHandleOfType<blShaderResource_exp> handle =
+				container->CreateResourceOfTypeWithDynamicSize<blShaderResource_exp>(
+					L"ShaderResource",
+					shaderName,
+					params.data(),
+					static_cast<uint32_t>(params.size()),
+					vertexArrayBuffer.mDescriptionResourceRef
+				);
+
+			mMaterialResource = container->CreateResourceOfType<blMaterialResource_exp>(
+				L"MaterialResource",
+				handle.GetRef(),
+				true /*instanced*/
+			);
+
 			mDrawData.material = mMaterialResource;
 		}
 
 		virtual void Draw() override
 		{
-			mGraphicsAPI->DrawMeshInstanced(mDrawData, mSceneResource);
+			mGraphicsAPI->DrawMeshInstanced(mDrawData);
 		}
 
 		virtual void Update(const Metrics::blTime& gameTime) override
@@ -96,44 +129,9 @@ namespace BoulderLeaf::Graphics
 			const Matrix4x4 worldViewProj = world * view * proj;
 			const Matrix4x4 worldViewProj2 = world * view2 * proj;
 
-			mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
-			mObjectConstantBufferResource->GetDataMutable()[1].WorldViewProj = worldViewProj2.Transpose();
-
-			mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
-		}
-
-	protected:
-		void SetMeshResource(const blMeshBaseResourcePtr& mesh)
-		{
-			mMeshResource = mesh;
-			mDrawData.mesh = mMeshResource;
-		}
-
-		void SetMeshResourceExprimentalFromInlineMesh(
-			std::wstring name, 
-			const std::unique_ptr<byte[]>& mesh,
-			const BufferDescription& bufferDescription)
-		{
-			blInlineMesh& inlineMeshSource = reinterpret_cast<blInlineMesh&>(*mesh.get());
-
-			blResourceHandleOfType<blInlineMesh> resource = blResourceHandleOfType<blInlineMesh>(
-				mResourceContainer->CreateResource(name, inlineMeshSource.GetTotalSize()));
-			
-			memcpy(resource.GetMutable(),
-				mesh.get(),
-				inlineMeshSource.GetTotalSize());
-			/*
-			resource->mHeader.description = InlineBufferDescription::CreateResourceFromBufferDescription(name, bufferDescription, mResourceContainer);
-
-			mInlineMeshResourceHandle = resource;
-			mDrawData.meshResource = resource;
-			mDrawData.meshResourceBufferDescription = bufferDescription;*/
-		}
-
-		void SetMeshResourceExprimental(const blResourceHandleOfType<blInlineMesh> mesh)
-		{
-			mInlineMeshResourceHandle = mesh;
-			mDrawData.meshResource = mesh;
+			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0).WorldViewProj = worldViewProj.Transpose();
+			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(1).WorldViewProj = worldViewProj2.Transpose();
+			mObjectConstantBufferListResource.MarkDirty();
 		}
 	};
 }

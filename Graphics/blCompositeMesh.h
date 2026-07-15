@@ -43,6 +43,27 @@ namespace BoulderLeaf::Graphics
 		BufferFormat GetFormat() const { return mInternalIdToMeshEntryMap.begin()->second->GetData().GetFormat(); }
 
 	};
+
+	struct blCompositeMeshResource_exp : public blListResource
+	{
+		struct MeshEntry
+		{
+			blResourceRefOfType<blIndexedMeshResource> mMeshResourceRef;
+
+			uint64_t mVertexBufferSize;
+			uint64_t mVertexOffset;
+			uint32_t mVertexCount;
+			uint64_t mIndexBufferSize;
+			uint64_t mIndexOffset;
+			uint32_t mIndexCount;
+		};
+
+		blCompositeMeshResource_exp(
+			blResourceStream& stream,
+			const std::vector<blResourceRefOfType<blIndexedMeshResource>>& meshResourceRefs);
+
+		const MeshEntry* FindMeshEntry(BoulderLeaf::blResourceId id) const;
+	};
 }
 
 BL_RESOURCE(blCompositeMesh, eResourceType::Mesh)

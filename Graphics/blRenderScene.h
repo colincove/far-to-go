@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <Resources/blResource.h>
+#include <Resources/blResourcesExprimental.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -20,6 +21,11 @@ namespace BoulderLeaf::Graphics
 		blScene() = default;
 		~blScene() = default;
 	private:
+		blSceneData mData;
+	};
+
+	struct blSceneResource_exp : public blBaseResource
+	{
 		blSceneData mData;
 	};
 }

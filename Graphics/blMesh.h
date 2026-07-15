@@ -450,6 +450,14 @@ namespace BoulderLeaf::Graphics
 		TVertex& GetVertexMutable(size_t index) { return *reinterpret_cast<TVertex*>(mStorage.GetVertexMutable(index)); }
 	};
 
+	struct MeshDataPrototype
+	{
+		std::vector<StandardVertex> vertices;
+		std::vector<uint16_t> indices;
+	};
+
+	void SubdividePrototype(MeshDataPrototype& prototype);
+
 	template<typename TVertexDefinition>
 	void SubdividePrototype(typename blMesh<TVertexDefinition>::Prototype& prototype)
 	{

@@ -87,7 +87,7 @@ namespace BoulderLeaf::Graphics
 
 	void blShapesDemoScene::Draw()
 	{
-		mGraphicsAPI->DrawCompositeMeshInstanced(mRenderData[mCurrentShapeToDraw], mSceneResource);
+		mGraphicsAPI->DrawCompositeMeshInstanced(mRenderData[mCurrentShapeToDraw]);
 	}
 
 	void blShapesDemoScene::Update(const Metrics::blTime& gameTime)

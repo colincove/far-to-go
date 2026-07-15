@@ -26,11 +26,9 @@ namespace BoulderLeaf::Graphics
 	struct RenderMeshDataInstanced : public RenderData
 	{
 		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
-		blDataBufferInterfaceResourcePtr constantBuffer;
-		blMeshBaseResourcePtr mesh;
-		blMaterialResourcePtr material;
-		blResourceHandleOfType<blInlineMesh> meshResource;
-		BufferDescription meshResourceBufferDescription;
+		blResourceHandleOfType<blArrayBufferResource> constantBuffer;
+		blResourceHandleOfType<blIndexedMeshResource> mesh;
+		blResourceHandleOfType<blMaterialResource_exp> material;
 	};
 
 	struct RenderCompositeMeshDataInstanced : public RenderData

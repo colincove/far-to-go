@@ -37,7 +37,7 @@ namespace BoulderLeaf::Graphics::DX12
 		};
 
 	private:
-		blDX12ResourceCacheGlobalInterface mResourceCacheGlobalInterface;
+		std::unique_ptr<blDX12ResourceCacheGlobalInterface> mResourceCacheGlobalInterface;
 
 		std::unique_ptr<blMeshRenderComponent> mMeshRenderComponent;
 		std::unique_ptr<blMeshInstancedRenderComponent> mMeshInstancedRenderComponent;
@@ -61,10 +61,10 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
 		virtual void InitializeInternal() override;
 		virtual void UpdateInternal(const Metrics::blTime& time) override;
-		virtual void DrawMesh(const RenderMeshData& renderItem, const blSceneResourcePtr scene) override;
-		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
-		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene) override;
-		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene) override;
+		virtual void DrawMesh(const RenderMeshData& renderItem) override;
+		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData) override;
+		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData) override;
+		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) override;
 
 		virtual void MarkResourceDirty(const blResourceId resourceId) override;
 	public:

@@ -23,6 +23,7 @@ namespace BoulderLeaf
 
 		bool IsValid() const;
 		void Release();
+		void MarkDirty();
 		const std::wstring_view GetName() const
 		{
 			return mHandle.GetName();
@@ -46,6 +47,12 @@ namespace BoulderLeaf
 		T* operator->()
 		{
 			return reinterpret_cast<T*>(mHandle.GetMutable());
+		}
+
+		// const overload so operator-> can be used on const handles
+		const T* operator->() const
+		{
+			return reinterpret_cast<const T*>(mHandle.Get());
 		}
 
 		T& operator*()
@@ -95,6 +102,12 @@ namespace BoulderLeaf
 	void blResourceHandleOfType<T>::Release()
 	{
 		mHandle.Release();
+	}
+
+	template<typename T>
+	void blResourceHandleOfType<T>::MarkDirty()
+	{
+		mHandle.MarkDirty();
 	}
 
 	template<typename T>

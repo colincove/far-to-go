@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ResourceCache/blDX12ResourceCacheData.h>
-#include <ResourceCache/blDX12MeshTranslationCache.h>
+#include <ResourceCache/blDX12ResourceCachesImpl.h>
+#include <ResourceCache/blDX12ResourceCacheInterface.h>
 
 namespace BoulderLeaf
 {
@@ -14,6 +14,7 @@ namespace BoulderLeaf
 		namespace DX12
 		{
 			class blCommandList;
+			struct blGlobalRenderData;
 		}
 	}
 }
@@ -29,11 +30,17 @@ namespace BoulderLeaf::Graphics::DX12
 	class blDX12ResourceCacheGlobalInterface : public blDX12ResourceCacheInterface
 	{
 	private:
-		blDX12MeshTranslationCache mMeshTranslationCache;
+		blDX12ArrayBufferTranslationCache blArrayBufferTranslationCache;
+		blDX12ShaderCache mShaderCache;
+		blDX12DescriptorHeapCache mDescriptorHeapCache;
+		blDX12MappedUploadBufferCache mMappedUploadBufferCache;
 	public:
-		blDX12ResourceCacheGlobalInterface();
+		blDX12ResourceCacheGlobalInterface(blGlobalRenderData* globalRenderData);
 
-		const blDX12MeshTranslationCacheData& GetMeshTranslationCacheData(const blResourceHandleOfType<blInlineMesh> resource);
+		const blDX12ArrayBufferTranslationCacheData& GetArrayBufferTranslationCacheData(const blResourceHandleOfType<blArrayBufferResource> resource);
+		const blDX12ShaderCacheData& GetShaderCacheData(const blResourceHandleOfType<blShaderResource_exp> resource);
+		const blDX12DescriptorHeapCacheData& GetDescriptorHeapCacheData(const blResourceHandleOfType<blListResource> resource);
+		const blDX12MappedUploadBufferCacheData& GetMappedUploadBufferCache(const blResourceHandleOfType<blListResource> resource);
 	};
 
 	class blDX12ResourceCacheCommandListInterface : public blDX12ResourceCacheInterface

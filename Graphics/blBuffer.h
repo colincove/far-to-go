@@ -52,9 +52,9 @@ namespace BoulderLeaf::Graphics
 	struct BufferDescription
 	{
 		BufferFormat format;
-
 		//memory ownership ambiguos. use unique_ptr?
 		std::vector<BufferElementDescription> elementDescriptions;
+		uint64_t minStride;
 	};
 
 	struct blBufferElementDescriptionResource : public blBaseResource
@@ -70,6 +70,7 @@ namespace BoulderLeaf::Graphics
 	struct blBufferDescriptionResource : public blListDynamicResource<blBufferElementDescriptionResource, BufferElementDescription>
 	{
 		BufferFormat mFormat;
+		uint64_t mMinStride;
 
 		blBufferDescriptionResource(
 			blResourceStream& stream,
@@ -135,6 +136,13 @@ namespace BoulderLeaf::Graphics
 		std::wstring name,
 		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
 		const void* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount);
+
+	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
 		uint64_t vertexSize,
 		uint32_t vertexCount);
 

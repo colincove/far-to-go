@@ -47,11 +47,13 @@ namespace BoulderLeaf::Graphics
 
 		blShaderResource_exp(
 			blResourceStream& stream,
-			const std::string& name, 
+			const std::string& name,
 			const blShader::Parameter* parameters,
 			uint32_t numberOfParameters,
 			blResourceRefOfType<blBufferDescriptionResource> layout);
 	};
+
+	blShader ShaderResourceToShader(const blResourceHandleOfType<blShaderResource_exp> shaderResource);
 }
 
 BL_RESOURCE(blShader, eResourceType::Shader)

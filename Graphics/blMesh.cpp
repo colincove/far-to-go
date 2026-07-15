@@ -271,6 +271,73 @@ namespace BoulderLeaf::Graphics
 		mHeader = Header(vertexCount, indexCount, vertexSize, format);
 		mHeader.description = description;
 	}
+
+	void SubdividePrototype(MeshDataPrototype& prototype)
+	{
+		struct Triangle
+		{
+			union
+			{
+				struct
+				{
+					uint16_t i0;
+					uint16_t i1;
+					uint16_t i2;
+				};
+
+				uint16_t data[3];
+			};
+		};
+
+		const size_t indexCount = prototype.indices.size();
+
+		//we will be adding 9 new indices for every existing triangle. 
+		//reserve the space up-front, so that we do not resize during operation.
+		prototype.indices.reserve(indexCount + (indexCount / 3) * 9);
+
+		for (size_t i = 0; (i + 2) < indexCount; i += 3)
+		{
+			Triangle& triangleToSubdivide = *reinterpret_cast<Triangle*>(prototype.indices.data() + i);
+
+			const std::array<Math::Vector3, 3> newPositions = {
+				prototype.vertices[triangleToSubdivide.i0].Position + (prototype.vertices[triangleToSubdivide.i1].Position - prototype.vertices[triangleToSubdivide.i0].Position) * 0.5f,
+				prototype.vertices[triangleToSubdivide.i1].Position + (prototype.vertices[triangleToSubdivide.i2].Position - prototype.vertices[triangleToSubdivide.i1].Position) * 0.5f,
+				prototype.vertices[triangleToSubdivide.i2].Position + (prototype.vertices[triangleToSubdivide.i0].Position - prototype.vertices[triangleToSubdivide.i2].Position) * 0.5f
+			};
+
+			// Add the new vertices (copies of the existing ones with adjusted positions)
+			for (int np = 0; np < 3; ++np)
+			{
+				prototype.vertices.push_back(prototype.vertices[triangleToSubdivide.data[np]]);
+				prototype.vertices.back().Position = newPositions[np];
+			}
+
+			const size_t newVertexSize = prototype.vertices.size();
+			std::array<blMeshStorage::index, 3> newIndices =
+			{
+				static_cast<blMeshStorage::index>(newVertexSize - 3),
+				static_cast<blMeshStorage::index>(newVertexSize - 2),
+				static_cast<blMeshStorage::index>(newVertexSize - 1)
+			};
+
+			// Append new triangles (indices) to the indices vector
+			prototype.indices.push_back(newIndices[0]);
+			prototype.indices.push_back(triangleToSubdivide.i1);
+			prototype.indices.push_back(newIndices[1]);
+
+			prototype.indices.push_back(newIndices[1]);
+			prototype.indices.push_back(triangleToSubdivide.i2);
+			prototype.indices.push_back(newIndices[2]);
+
+			prototype.indices.push_back(newIndices[2]);
+			prototype.indices.push_back(newIndices[0]);
+			prototype.indices.push_back(newIndices[1]);
+
+			// Update the original triangle to reference the new vertices
+			triangleToSubdivide.i1 = newIndices[0];
+			triangleToSubdivide.i2 = newIndices[2];
+		}
+	}
 }
 
 namespace BoulderLeaf::Graphics

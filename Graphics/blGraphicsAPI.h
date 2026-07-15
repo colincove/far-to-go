@@ -40,10 +40,10 @@ namespace BoulderLeaf::Graphics
 	public:
 		void RecieveWindowMessage(MSG msg);
 		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { return true; }
-		virtual void DrawMesh(const RenderMeshData& renderData, const blSceneResourcePtr scene) = 0;
-		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData, const blSceneResourcePtr scene) = 0;
-		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene) = 0;
-		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene) = 0;
+		virtual void DrawMesh(const RenderMeshData& renderData) = 0;
+		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData) = 0;
+		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData) = 0;
+		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) = 0;
 		virtual void MarkResourceDirty(const blResourceId resourceId) = 0;
 		void StartFrame();
 		void EndFrame();

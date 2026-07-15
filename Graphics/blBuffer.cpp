@@ -144,7 +144,9 @@ namespace BoulderLeaf::Graphics
 	blBufferDescriptionResource::blBufferDescriptionResource(
 		blResourceStream& stream,
 		const BufferDescription& desc)
-		: mFormat(desc.format), blListDynamicResource(stream, desc.elementDescriptions)
+		: mFormat(desc.format), 
+		mMinStride(desc.minStride), 
+		blListDynamicResource(stream, desc.elementDescriptions)
 	{
 
 	}
@@ -153,6 +155,7 @@ namespace BoulderLeaf::Graphics
 	{
 		BufferDescription desc;
 		desc.format = mFormat;
+		desc.minStride = mMinStride;
 		for (const blBufferElementDescriptionResource& elementResource : blBufferDescriptionResource::ConstIterator(this))
 		{
 			desc.elementDescriptions.push_back({ std::string(elementResource.GetName()), elementResource.mElementType });
@@ -168,6 +171,28 @@ namespace BoulderLeaf::Graphics
 		mBufferResourceRef(bufferResourceRef)
 	{
 
+	}
+
+	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		uint64_t vertexSize,
+		uint32_t vertexCount)
+	{
+		blResourceHandleOfType<blBufferDescriptionResource> descriptionResourceHandle = resourceContainer->CreateHandleFromRefOfType<blBufferDescriptionResource>(descriptionResourceRef);
+
+		blResourceHandleOfType<blListResource> arrayData = resourceContainer->CreateResourceOfTypeWithDynamicSize<blListResource>(
+			name + L"Data",
+			vertexCount,
+			descriptionResourceHandle->mMinStride == 0 ? vertexSize:EnforceByteStrideLength(vertexSize, 256)
+		);
+
+		return resourceContainer->CreateResourceOfType<blArrayBufferResource>(
+			name + L"Array",
+			descriptionResourceRef,
+			arrayData.GetRef()
+		);
 	}
 
 	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
@@ -204,18 +229,25 @@ namespace BoulderLeaf::Graphics
 		blResourceHandleOfType<blBufferDescriptionResource> sourceDescriptionResourceHandle = blResourceHandleOfType<blBufferDescriptionResource>(
 			resourceContainer->CreateHandleFromRefOfType<blBufferDescriptionResource>(sourceArray.mDescriptionResourceRef));
 
-		const BufferDescription sourceDescription = sourceDescriptionResourceHandle->GetBufferDescription();
+		BufferDescription description = sourceDescriptionResourceHandle->GetBufferDescription();
+		description.format = adapter.GetFormat();
 
+		blResourceHandleOfType<blBufferDescriptionResource> translatedDescriptionResourceHandle = resourceContainer->CreateResourceOfTypeWithDynamicSize<blBufferDescriptionResource>(
+			name,
+			description
+		);
+
+		uint64_t translatedSize = adapter.SizeOf(description);
 		blResourceHandleOfType<blListResource> arrayData = resourceContainer->CreateResourceOfTypeWithDynamicSize<blListResource>(
 			name + L"Data",
 			sourceListResourceHandle->mCount,
-			adapter.SizeOf(sourceDescription)
+			translatedDescriptionResourceHandle->mMinStride == 0 ? translatedSize : EnforceByteStrideLength(translatedSize, translatedDescriptionResourceHandle->mMinStride)
 		);
 
 		MarshalBuffer(
 			sourceListResourceHandle->mCount,
-			sourceDescription.elementDescriptions,
-			[&sourceListResourceHandle, &sourceDescription](size_t index) -> const byte*
+			description.elementDescriptions,
+			[&sourceListResourceHandle](size_t index) -> const byte*
 			{
 				return &sourceListResourceHandle->Get<byte>((uint32_t) index);
 			},
@@ -228,7 +260,7 @@ namespace BoulderLeaf::Graphics
 
 		return resourceContainer->CreateResourceOfType<blArrayBufferResource>(
 			name + L"Array",
-			sourceDescriptionResourceHandle.GetRef(),
+			translatedDescriptionResourceHandle.GetRef(),
 			arrayData.GetRef()
 		);
 	}

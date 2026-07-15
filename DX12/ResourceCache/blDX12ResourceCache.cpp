@@ -48,10 +48,20 @@ namespace BoulderLeaf::Graphics::DX12
 		if (!indexEntry.resourceHandle)
 		{
 			indexEntry.resourceHandle = resourceContainer.CreateResource(std::wstring(resource.GetName()), GetCacheDataSize());
-			InitializeCache(resource, *indexEntry.resourceHandle);
+			InitializeCache(resource, *(resourceContainer.CreateHandleFromRef(indexEntry.resourceHandle)));
+			indexEntry.version = resourceContainer.GetResourceVersion(resource.GetId());
 		}
 
-		return *indexEntry.resourceHandle;
+		uint32_t version = resourceContainer.GetResourceVersion(resource.GetId());
+		byte& cacheData = *(resourceContainer.CreateHandleFromRef(indexEntry.resourceHandle));
+
+		if (version > indexEntry.version)
+		{
+			indexEntry.version = version;
+			UpdateCache(resource, cacheData);
+		}
+
+		return cacheData;
 	}
 
 	blResourceHandleOfType<ResourceCacheIndex> blDX12ResourceCache::NewContainerIndex(blResourceContainer& resourceContainer) const

@@ -12,6 +12,7 @@ namespace BoulderLeaf
 	class blResourceHandleOfType;
 
 	class blResourceHandle;
+	class blResourceRef;
 
 	namespace Graphics
 	{
@@ -23,7 +24,8 @@ namespace BoulderLeaf::Graphics::DX12
 {
 	struct ResourceCacheIndexEntry
 	{
-		blResourceHandle resourceHandle;
+		blResourceRef resourceHandle;
+		uint32_t version;
 	};
 
 	class ResourceCacheIndex
@@ -48,6 +50,8 @@ namespace BoulderLeaf::Graphics::DX12
 		const byte& GetCachedData(const blResourceHandle resource);
 		virtual uint64_t GetCacheDataSize() const = 0;
 		virtual void InitializeCache(const blResourceHandle resource,
+			byte& cache) = 0;
+		virtual void UpdateCache(const blResourceHandle resource,
 			byte& cache) = 0;
 
 	private:

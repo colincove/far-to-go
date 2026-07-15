@@ -14,6 +14,6 @@ namespace BoulderLeaf::Graphics::DX12
 	public:
 		blCompositeMeshRenderComponent(blGlobalRenderData* globalRenderDataPtr);
 		virtual ~blCompositeMeshRenderComponent() = default;
-		virtual void Render(const RenderCompositeMeshDataInstanced& item, const blSceneResourcePtr scene) override;
+		virtual void Render(const RenderCompositeMeshDataInstanced& item) override;
 	};
 }

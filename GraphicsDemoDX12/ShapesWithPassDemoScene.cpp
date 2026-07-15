@@ -122,7 +122,7 @@ namespace BoulderLeaf::Graphics
 
 	void ShapesWithPassDemoScene::Draw()
 	{
-		mGraphicsAPI->DrawCompositeMeshWithPass(mRenderData[mCurrentShapeToDraw], mSceneResource);
+		mGraphicsAPI->DrawCompositeMeshWithPass(mRenderData[mCurrentShapeToDraw]);
 	}
 
 	void ShapesWithPassDemoScene::Update(const Metrics::blTime& gameTime)

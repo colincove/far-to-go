@@ -52,6 +52,8 @@ add_library(
 	blShaderData.cpp
 	blSwapChain.h
 	blSwapChain.cpp
+	blDX12Shader.cpp
+	blDX12Shader.h
 	blPSO.cpp
 	blPSO.h
 	blDepthBuffer.cpp
@@ -63,11 +65,10 @@ add_library(
 
 	ResourceCache/blDX12ResourceCache.cpp
 	ResourceCache/blDX12ResourceCache.h
-	ResourceCache/blDX12ResourceCacheData.h
+	ResourceCache/blDX12ResourceCachesImpl.cpp
+	ResourceCache/blDX12ResourceCachesImpl.h
 	ResourceCache/blDX12ResourceCacheInterface.cpp
 	ResourceCache/blDX12ResourceCacheInterface.h
-	ResourceCache/blDX12MeshTranslationCache.h
-	ResourceCache/blDX12MeshTranslationCache.cpp
 	ResourceCache/blDX12ResourceCacheTemplate.h
 
 	RenderComponents/blRenderComponent.cpp
@@ -110,16 +111,15 @@ add_library(
 source_group("ResourceCache/Headers Files"
 	FILES 
 	ResourceCache/blDX12ResourceCache.h
-	ResourceCache/blDX12ResourceCacheData.h
+	ResourceCache/blDX12ResourceCachesImpl.h
 	ResourceCache/blDX12ResourceCacheInterface.h
-	ResourceCache/blDX12MeshTranslationCache.h
 	ResourceCache/blDX12ResourceCacheTemplate.h)
 
 source_group("ResourceCache/Source Files"
 	FILES 
 	ResourceCache/blDX12ResourceCache.cpp
-	ResourceCache/blDX12ResourceCacheInterface.cpp
-	ResourceCache/blDX12MeshTranslationCache.cpp)
+	ResourceCache/blDX12ResourceCachesImpl.cpp
+	ResourceCache/blDX12ResourceCacheInterface.cpp)
 
 source_group("RenderComponents/Headers Files"
 	FILES 

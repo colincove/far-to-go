@@ -185,6 +185,18 @@ namespace BoulderLeaf
 		return std::wstring_view(stringStart, entry.mNameLength);
 	}
 
+	uint32_t blResourceContainer::GetResourceVersion(blResourceId id) const
+	{
+		const Entry& entry = mRegistry.get()[id.GetIndex()];
+		return entry.mVersion;
+	}
+
+	void blResourceContainer::MarkResourceDirty(blResourceId id)
+	{
+		Entry& entry = mRegistry.get()[id.GetIndex()];
+		entry.mVersion++;
+	}
+
 	uint32_t blResourceContainer::Capacity() const
 	{
 		return mNumberOfEntries;
@@ -288,6 +300,11 @@ namespace BoulderLeaf
 		return mOwner != nullptr && mId.IsValid();
 	}
 
+	void blResourceHandle::MarkDirty()
+	{
+		mOwner->MarkResourceDirty(mId);
+	}
+
 	const blResourceGuid blResourceHandle::GetGuid() const
 	{
 		return mOwner->GetDataGuid(mId);
@@ -368,6 +385,7 @@ namespace BoulderLeaf
 		uint32_t count,
 		uint64_t elementSize) : blBaseResource(stream), mCount(count), mElementSize(elementSize)
 	{
+		mDataOffset = stream.GetMemberToDataOffset(this);
 		stream.AllocateExplicit(mCount * mElementSize);
 	}
 

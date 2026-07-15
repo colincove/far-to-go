@@ -109,6 +109,71 @@ namespace BoulderLeaf::Graphics::DX12
 		return defaultBuffer;
 	}
 
+	void GenerateSingleSubresources(
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		uint64_t bufferWidth,
+		uint64_t elementWidth,
+		uint32_t count,
+		const byte* bufferData,
+		blDX12UploadBuffer& uploadBuffer)
+	{
+		DX12_API_CALL(D3DCreateBlob(bufferWidth, &uploadBuffer.bufferCPU));
+		CopyMemory(uploadBuffer.bufferCPU->GetBufferPointer(), bufferData, bufferWidth);
+
+		uploadBuffer.bufferGPU = CreateDefaultBuffer(
+			device,
+			commandList,
+			bufferData,
+			bufferWidth,
+			uploadBuffer.bufferUploader);
+
+		uploadBuffer.byteStride = elementWidth;
+		uploadBuffer.bufferByteSize = bufferWidth;
+	}
+
+	void GenerateSubresources(
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		uint64_t vertexBufferWidth,
+		uint64_t indexBufferWidth,
+		uint64_t vertexWidth,
+		uint32_t indexCount,
+		const byte* vertexBufferData,
+		const uint16_t* indexBufferData,
+		blDX12Mesh& meshGeometry,
+		SubmeshGeometry& submesh)
+	{
+		DX12_API_CALL(D3DCreateBlob(vertexBufferWidth, &meshGeometry.VertexBufferCPU));
+		CopyMemory(meshGeometry.VertexBufferCPU->GetBufferPointer(), vertexBufferData, vertexBufferWidth);
+		DX12_API_CALL(D3DCreateBlob(indexBufferWidth, &meshGeometry.IndexBufferCPU));
+		CopyMemory(meshGeometry.IndexBufferCPU->GetBufferPointer(), indexBufferData, indexBufferWidth);
+
+		meshGeometry.VertexBufferGPU = CreateDefaultBuffer(
+			device,
+			commandList,
+			vertexBufferData,
+			vertexBufferWidth,
+			meshGeometry.VertexBufferUploader);
+
+		meshGeometry.IndexBufferGPU = CreateDefaultBuffer(
+			device,
+			commandList,
+			indexBufferData,
+			indexBufferWidth,
+			meshGeometry.IndexBufferUploader);
+
+		meshGeometry.VertexByteStride = vertexWidth;
+		meshGeometry.VertexBufferByteSize = vertexBufferWidth;
+		meshGeometry.IndexFormat = DXGI_FORMAT_R16_UINT;
+		meshGeometry.IndexBufferByteSize = indexBufferWidth;
+
+		submesh = SubmeshGeometry();
+		submesh.IndexCount = indexCount;
+		submesh.StartIndexLocation = 0;
+		submesh.BaseVertexLocation = 0;
+	}
+
 	void GenerateSubresources(
 		const blMeshStorage& storage,
 		ID3D12Device* device,
@@ -119,33 +184,17 @@ namespace BoulderLeaf::Graphics::DX12
 		assert(storage.GetFormat() == BufferFormat::DX12);
 		const blMeshStorage::Header& header = storage.GetHeader();
 
-		DX12_API_CALL(D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.VertexBufferCPU));
-		CopyMemory(meshGeometry.VertexBufferCPU->GetBufferPointer(), storage.VertexBegin(), header.GetVertexBufferSize());
-		DX12_API_CALL(D3DCreateBlob(header.GetVertexBufferSize(), &meshGeometry.IndexBufferCPU));
-		CopyMemory(meshGeometry.IndexBufferCPU->GetBufferPointer(), storage.IndexBegin(), header.GetVertexBufferSize());
-
-		meshGeometry.VertexBufferGPU = CreateDefaultBuffer(
+		return GenerateSubresources(
 			device,
 			commandList,
+			(uint64_t)header.GetVertexBufferSize(),
+			(uint64_t)header.GetIndexBufferSize(),
+			(uint64_t)header.mVertexSize,
+			(uint32_t) storage.GetIndexCount(),
 			storage.VertexBegin(),
-			header.GetVertexBufferSize(),
-			meshGeometry.VertexBufferUploader);
-
-		meshGeometry.IndexBufferGPU = CreateDefaultBuffer(
-			device,
-			commandList,
 			storage.IndexBegin(),
-			header.GetIndexBufferSize(),
-			meshGeometry.IndexBufferUploader);
-
-		meshGeometry.VertexByteStride = (UINT)header.mVertexSize;
-		meshGeometry.VertexBufferByteSize = (UINT)header.GetVertexBufferSize();
-		meshGeometry.IndexFormat = DXGI_FORMAT_R16_UINT;
-		meshGeometry.IndexBufferByteSize = (UINT)header.GetIndexBufferSize();
-
-		submesh = SubmeshGeometry();
-		submesh.IndexCount = (UINT)storage.GetIndexCount();
-		submesh.StartIndexLocation = 0;
-		submesh.BaseVertexLocation = 0;
+			meshGeometry,
+			submesh
+		);
 	}
 }

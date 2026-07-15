@@ -7,7 +7,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	}
 
-	void blMeshRenderComponent::Render(const RenderMeshData& renderData, const  blSceneResourcePtr scene)
+	void blMeshRenderComponent::Render(const RenderMeshData& renderData)
 	{
 		/*if (renderData.material.expired())
 		{

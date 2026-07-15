@@ -18,7 +18,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	}
 
-	void blCompositeMeshRenderComponent::Render(const RenderCompositeMeshDataInstanced& renderData, const blSceneResourcePtr scene)
+	void blCompositeMeshRenderComponent::Render(const RenderCompositeMeshDataInstanced& renderData)
 	{
 		if (!renderData.compositeMesh)
 		{

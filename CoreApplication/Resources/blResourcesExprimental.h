@@ -30,17 +30,24 @@ namespace BoulderLeaf
 			}
 		};
 
+		blResourceContainer* mContainer;
 		byte* mHead;
 		byte* mResource;
 		byte* mStart;
 
 	public:
-		blResourceStream(byte* resource, uint64_t resourceOffset)
+		blResourceStream(byte* resource, uint64_t resourceOffset, blResourceContainer* container)
 			: mResource(resource), 
 			mStart(resource + resourceOffset), 
-			mHead(resource + resourceOffset)
+			mHead(resource + resourceOffset),
+			mContainer(container)
 		{
 
+		}
+
+		blResourceContainer* GetContainer()
+		{
+			return mContainer;
 		}
 
 		template<typename T>
@@ -95,6 +102,7 @@ namespace BoulderLeaf
 			uint64_t mSize;
 			uint64_t mOffset;
 			uint64_t mNameLength;
+			uint32_t mVersion;
 
 			bool IsAvailableForAllocation() const;
 			void ReleaseResource();
@@ -142,7 +150,7 @@ namespace BoulderLeaf
 		blResourceHandleOfType<TResource> CreateResourceOfTypeWithDynamicSize(const std::wstring name, Args&&... args)
 		{
 			byte* startOfResourceBuffer = mHeap.get() + mHeapEnd;
-			blResourceStream dynamicResourceStream(startOfResourceBuffer, sizeof(TResource));
+			blResourceStream dynamicResourceStream(startOfResourceBuffer, sizeof(TResource), this);
 			new (startOfResourceBuffer) TResource(dynamicResourceStream, std::forward<Args>(args)...);
 			
 			const uint64_t totalSize = sizeof(TResource) + dynamicResourceStream.GetCurrentOffset();
@@ -180,6 +188,8 @@ namespace BoulderLeaf
 		byte* GetDataMutable(blResourceId id);
 		const blResourceGuid& GetDataGuid(blResourceId id) const;
 		const std::wstring_view GetDataName(blResourceId id) const;
+		uint32_t GetResourceVersion(blResourceId id) const;
+		void MarkResourceDirty(blResourceId id);
 		uint32_t Capacity() const;
 		blResourceHandle FindByGuid(blResourceGuid& guid);
 
@@ -314,7 +324,7 @@ namespace BoulderLeaf
 			}
 
 			Iterator(blListResource* list)
-				: Iterator(list, mCurrentIndex)
+				: Iterator(list, 0)
 			{
 
 			}
@@ -358,8 +368,8 @@ namespace BoulderLeaf
 
 			}
 
-			ConstIterator(blListResource* list)
-				: ConstIterator(list, mCurrentIndex)
+			ConstIterator(const blListResource* list)
+				: ConstIterator(list, 0)
 			{
 
 			}

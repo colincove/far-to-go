@@ -20,7 +20,7 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 	}
 
-	void blCompositeMeshRenderWithPassConstantsRenderComponent::Render(const RenderCompositeMeshDataWithPassConstants& renderData, const blSceneResourcePtr scene)
+	void blCompositeMeshRenderWithPassConstantsRenderComponent::Render(const RenderCompositeMeshDataWithPassConstants& renderData)
 	{
 		if (!renderData.compositeMesh)
 		{

@@ -28,7 +28,21 @@ namespace BoulderLeaf::Graphics::DX12
 			);
 		}
 
+		virtual void UpdateCache(const blResourceHandle resource,
+			byte& cache) override final
+		{
+			UpdateCacheTemplate(
+				blResourceHandleOfType<TResource>(resource),
+				reinterpret_cast<TCache&>(cache)
+			);
+		}
+
 		virtual void InitializeCacheTemplate(const blResourceHandleOfType<TResource> resource,
 			TCache& cache) = 0;
+
+		virtual void UpdateCacheTemplate(const blResourceHandleOfType<TResource> resource,
+			TCache& cache) 
+		{
+		}
 	};
 }

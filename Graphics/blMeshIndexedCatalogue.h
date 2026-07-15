@@ -53,7 +53,12 @@ namespace BoulderLeaf::Graphics
 	private:
 		const Entry& GetLastEntry() const;
 	public:
+		index AddMesh(
+			uint32_t vertexCount,
+			uint64_t vertexSize,
+			uint32_t indexCount);
 		index AddMesh(const blMeshStorage& mesh);
+		index AddMeshResource(const blResourceHandleOfType<blIndexedMeshResource> meshHandle);
 		const Entry& GetEntry(index idx) const;
 		Entry& GetEntryMutable(index idx);
 		index GetMeshCount() const { return mCurrentIndex; }

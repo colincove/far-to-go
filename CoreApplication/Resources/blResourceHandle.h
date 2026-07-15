@@ -76,6 +76,7 @@ namespace BoulderLeaf
 
 		void Release();
 		bool IsValid() const;
+		void MarkDirty();
 		const blResourceGuid GetGuid() const;
 		const blResourceId& GetId() const;
 		const std::wstring_view GetName() const;
