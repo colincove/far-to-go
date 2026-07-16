@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <blMesh.h>
+#include <Deprecated/blMeshDeprecated.h>
 
 namespace
 {

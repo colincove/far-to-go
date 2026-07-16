@@ -8,8 +8,7 @@
 #include <DirectXColors.h>
 #include <memory>
 #include <string>
-#include <blMesh.h>
-#include <blMeshLibrary.h>
+#include <Deprecated/blMeshDeprecated.h>
 #include <blDX12Buffer.h>
 
 #include <thread>

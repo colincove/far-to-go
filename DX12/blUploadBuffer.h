@@ -44,22 +44,6 @@ namespace BoulderLeaf::Graphics::DX12
 		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocationStart(int currentFrameResource);
 	};
 
-	class blDX12blDataBufferUploadBuffer_Resource final : public blUploadBufferBase
-	{
-	private:
-		blResourceHandleOfType<blDataBufferInterface> mHandle;
-	protected:
-		blDX12blDataBufferUploadBuffer_Resource(
-			blDevice* device,
-			bool isConstantBuffer,
-			blResourceHandleOfType<blDataBufferInterface> handle
-		);
-
-		virtual UINT GetTotalSize() const;
-		virtual void CopyData(int currentFrameResource);
-		virtual void CopyAllData();
-	};
-
 	class blDX12ListResourceUploadBuffer final : public blUploadBufferBase
 	{
 	private:

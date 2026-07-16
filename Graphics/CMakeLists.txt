@@ -32,8 +32,12 @@ add_library(
 	blRenderScene.cpp
 	blVirtualCamera.h
 	blVirtualCamera.cpp
+	blVertex.h
+	blVertex.cpp
 	blRenderGroup.h
 	blRenderGroup.cpp
+	Deprecated/blMeshDeprecated.h
+	Deprecated/blMeshDeprecated.cpp
 	Natvis/blMeshStorageHeader.natvis
 	Config/resourceManager.xml
 	Config.cmake)
@@ -61,7 +65,7 @@ target_link_libraries(
 	RapidXML
 )
 
-source_group("RenderItems/Headers Files"
+source_group("RenderItems/Header Files"
 	FILES 
 	RenderItems/blRenderItemMesh.h
 	RenderItems/blRenderItem.h)
@@ -69,6 +73,14 @@ source_group("RenderItems/Headers Files"
 source_group("RenderItems/Source Files"
 	FILES 
 	RenderItems/blRenderItem.cpp)
+
+source_group("Deprecated/Header Files"
+	FILES 
+	Deprecated/blMeshDeprecated.h)
+
+source_group("Deprecated/Source Files"
+	FILES 
+	Deprecated/blMeshDeprecated.cpp)
 
 source_group("Natvis"
 	FILES 

@@ -173,28 +173,4 @@ namespace BoulderLeaf::Graphics::DX12
 		submesh.StartIndexLocation = 0;
 		submesh.BaseVertexLocation = 0;
 	}
-
-	void GenerateSubresources(
-		const blMeshStorage& storage,
-		ID3D12Device* device,
-		ID3D12GraphicsCommandList* commandList,
-		blDX12Mesh& meshGeometry,
-		SubmeshGeometry& submesh)
-	{
-		assert(storage.GetFormat() == BufferFormat::DX12);
-		const blMeshStorage::Header& header = storage.GetHeader();
-
-		return GenerateSubresources(
-			device,
-			commandList,
-			(uint64_t)header.GetVertexBufferSize(),
-			(uint64_t)header.GetIndexBufferSize(),
-			(uint64_t)header.mVertexSize,
-			(uint32_t) storage.GetIndexCount(),
-			storage.VertexBegin(),
-			storage.IndexBegin(),
-			meshGeometry,
-			submesh
-		);
-	}
 }

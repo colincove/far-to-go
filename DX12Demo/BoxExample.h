@@ -6,6 +6,7 @@
 #include <blDX12MeshGeometry.h>
 #include <memory>
 #include "blDX12UploadBuffer.h"
+#include <Deprecated/blMeshDeprecated.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {

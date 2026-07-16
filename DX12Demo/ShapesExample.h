@@ -11,6 +11,9 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
+	using MeshVertexDefinition = VertexDefinition<Vertex, BufferFormat::DX12>;
+	using Mesh = Graphics::blMesh<MeshVertexDefinition>;
+
 	class ShapesExample : public AbstractExample
 	{
 	public:

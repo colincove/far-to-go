@@ -80,11 +80,4 @@ namespace BoulderLeaf::Graphics::DX12
 		uint32_t count,
 		const byte* bufferData,
 		blDX12UploadBuffer& uploadBuffer);
-
-	void GenerateSubresources(
-		const blMeshStorage& storage,
-		ID3D12Device* device,
-		ID3D12GraphicsCommandList* commandList,
-		blDX12Mesh& meshGeometry,
-		SubmeshGeometry& submesh);
 }

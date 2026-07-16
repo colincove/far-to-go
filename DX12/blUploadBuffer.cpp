@@ -1,36 +1,6 @@
 #include <blUploadBuffer.h>
 #include <blDX12Buffer.h>
 
-
-namespace
-{
-	using namespace BoulderLeaf::Graphics;
-
-	static UINT CalculateVertexBufferElementSize(
-		const blDataBufferInterface& dataBufferInterface,
-		bool isConstantBuffer)
-	{
-		UINT elementByteSize = GetBufferElementSize(dataBufferInterface.GetDataElementDescriptions(), DX12::DX12BufferAdapter::Get());
-
-		if (isConstantBuffer)
-		{
-			elementByteSize = DX12::Math::CalcConstantBufferByteSize(elementByteSize);
-		}
-
-		return elementByteSize;
-	}
-
-
-	static UINT CalculateVertexBufferSize(
-		const blDataBufferInterface& dataBufferInterface,
-		bool isConstantBuffer)
-	{
-		UINT elementByteSize = CalculateVertexBufferElementSize(dataBufferInterface, isConstantBuffer);
-		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		return elementByteSize * dataBufferInterface.Count();
-	}
-}
-
 namespace BoulderLeaf::Graphics::DX12
 {
 	blUploadBufferBase::blUploadBufferBase(
@@ -78,32 +48,6 @@ namespace BoulderLeaf::Graphics::DX12
 			+ GetTotalSize() * currentFrameResource;
 
 		return cbAddress;
-	}
-
-	blDX12blDataBufferUploadBuffer_Resource::blDX12blDataBufferUploadBuffer_Resource(
-		blDevice* device,
-		bool isConstantBuffer,
-		blResourceHandleOfType<blDataBufferInterface> handle)
-		: mHandle(handle), 
-		blUploadBufferBase(device, isConstantBuffer, std::wstring(handle.GetName()))
-	{
-
-	}
-
-	UINT blDX12blDataBufferUploadBuffer_Resource::GetTotalSize() const
-	{
-		//TODO
-		return 0;
-	}
-
-	void blDX12blDataBufferUploadBuffer_Resource::CopyData(int currentFrameResource)
-	{
-		//TODO
-	}
-
-	void blDX12blDataBufferUploadBuffer_Resource::CopyAllData()
-	{
-		//TODO
 	}
 
 	blDX12ListResourceUploadBuffer::blDX12ListResourceUploadBuffer(

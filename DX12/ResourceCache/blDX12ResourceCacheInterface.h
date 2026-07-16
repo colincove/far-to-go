@@ -9,7 +9,6 @@ namespace BoulderLeaf
 
 	namespace Graphics
 	{
-		struct blInlineMesh;
 		struct blCompositeMeshResource;
 
 		namespace DX12

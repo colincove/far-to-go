@@ -13,11 +13,6 @@ namespace BoulderLeaf
 
 	class blResourceHandle;
 	class blResourceRef;
-
-	namespace Graphics
-	{
-		struct blInlineMesh;
-	}
 }
 
 namespace BoulderLeaf::Graphics::DX12

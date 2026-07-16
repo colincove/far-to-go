@@ -2,6 +2,7 @@
 
 #include <blMesh.h>
 #include <vector>
+#include <Deprecated/blMeshDeprecated.h>
 
 namespace BoulderLeaf::Graphics
 {

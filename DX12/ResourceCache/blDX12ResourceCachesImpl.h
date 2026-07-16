@@ -30,11 +30,6 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 
 	};
-
-	struct blDX12MeshUploadBufferCacheData : public blDX12ResourceCacheData
-	{
-		blDX12blDataBufferUploadBuffer_Resource translatedMesh;
-	};
 }
 
 namespace BoulderLeaf::Graphics::DX12

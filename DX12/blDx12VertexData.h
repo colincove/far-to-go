@@ -25,9 +25,6 @@ namespace BoulderLeaf::Graphics::DX12
 		XMFLOAT2 UV;
 	};
 
-	using DX12StandardVertexDefinition = VertexDefinition<Vertex, BufferFormat::DX12>;
-	using Mesh = Graphics::blMesh<DX12StandardVertexDefinition>;
-
 	inline bool operator==(const Vertex& lhs, const Vertex& rhs)
 	{
 		return memcmp(&lhs, &rhs, sizeof(Vertex));

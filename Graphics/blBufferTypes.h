@@ -15,6 +15,4 @@ namespace BoulderLeaf::Graphics
 	{
 
 	};
-
-	using blStandardObjectConstantsBuffer = blDataBuffer<blStandardObjectConstantsDefinition>;
 }

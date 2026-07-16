@@ -1,6 +1,7 @@
 #include <blDX12_LegacyV1.h>
 #include <gtest/gtest.h>
 #include "..\Graphics\blMesh.h"
+#include <Deprecated/blMeshDeprecated.h>
 #include <blDx12VertexData.h>
 
 namespace
@@ -36,23 +37,4 @@ namespace
 
 		return mesh;
 	}
-}
-
-namespace BoulderLeaf::Graphics::DX12::Test
-{
-	TEST(DX12, StorageConversion)
-	{
-		StandardMesh mesh = GetTestMesh();
-		Mesh dx12Mesh = Mesh(blMeshStorage::To<StandardVertex, Vertex>(mesh.GetStorage()));
-
-		const Vertex v1 = Vertex(
-			XMFLOAT3(-1.0f, -5.0f, -1.0f),
-			XMFLOAT3(1, 1, 1),
-			XMFLOAT3(),
-			XMFLOAT4(1, 0.5f, 0.1f, 0),
-			XMFLOAT2(2, 2)
-		);
-
-		EXPECT_EQ(dx12Mesh.GetVertex(1), v1);
-	} 
 }
