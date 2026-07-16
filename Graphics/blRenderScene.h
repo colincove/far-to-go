@@ -5,8 +5,7 @@
 #include <streambuf>
 #include <vector>
 #include <memory>
-#include <Resources/blResource.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -24,10 +23,8 @@ namespace BoulderLeaf::Graphics
 		blSceneData mData;
 	};
 
-	struct blSceneResource_exp : public blBaseResource
+	struct blSceneResource : public blBaseResource
 	{
 		blSceneData mData;
 	};
 }
-
-BL_RESOURCE(blScene, eResourceType::Scene);

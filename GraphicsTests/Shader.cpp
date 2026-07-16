@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <blShader.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <blBuffer.h>
 
 using namespace BoulderLeaf;
@@ -35,8 +35,8 @@ TEST(Shader, ResourceContents)
 	const std::string shaderName = "TestShader";
 
 	// create shader resource
-	blResourceHandleOfType<blShaderResource_exp> handle =
-		container->CreateResourceOfTypeWithDynamicSize<blShaderResource_exp>(
+	blResourceHandleOfType<blShaderResource> handle =
+		container->CreateResourceOfTypeWithDynamicSize<blShaderResource>(
 			L"ShaderResource",
 			shaderName,
 			params.data(),
@@ -46,7 +46,7 @@ TEST(Shader, ResourceContents)
 
 	ASSERT_TRUE(handle.IsValid());
 
-	const blShaderResource_exp& resource = *handle;
+	const blShaderResource& resource = *handle;
 
 	// verify name
 	EXPECT_EQ(std::string(resource.mNameStringResource.GetStringView()), shaderName);

@@ -1,31 +1,17 @@
 #pragma once
 
 #include <blShader.h>
-#include <Resources/blResource.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 
 namespace BoulderLeaf::Graphics
 {
-	class blMaterial
-	{
-	public:
-		blMaterial(blShaderResourcePtr shader, bool instanced);
-		blShaderResourcePtr shader;
-	private:
-		bool mInstanced;
-	public:
-		bool IsInstanced() const { return mInstanced; }
-	};
-
-	struct blMaterialResource_exp : public blBaseResource
+	struct blMaterialResource : public blBaseResource
 	{
 		bool mInstanced;
-		blResourceRefOfType<blShaderResource_exp> mShaderResourceRef;
+		blResourceRefOfType<blShaderResource> mShaderResourceRef;
 
-		blMaterialResource_exp(
-			blResourceRefOfType<blShaderResource_exp> shaderResourceRef,
+		blMaterialResource(
+			blResourceRefOfType<blShaderResource> shaderResourceRef,
 			bool instanced);
 	};
 }
-
-BL_RESOURCE(blMaterial, eResourceType::Material);

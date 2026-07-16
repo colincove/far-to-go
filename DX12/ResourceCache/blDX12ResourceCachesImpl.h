@@ -1,14 +1,15 @@
 #pragma once
 
 #include <ResourceCache/blDX12ResourceCacheTemplate.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <blUploadBuffer.h>
 #include <blDX12Shader.h>
 
 namespace BoulderLeaf::Graphics
 {
-	struct blShaderResource_exp;
+	struct blShaderResource;
 	struct blIndexedMeshResource;
+	struct blCompositeMeshResource;
 
 	namespace DX12
 	{
@@ -83,7 +84,7 @@ namespace BoulderLeaf::Graphics::DX12
 		std::unique_ptr<blPSO> shaderPSO;
 	};
 
-	class blDX12ShaderCache : public blDX12ResourceCacheTemplate<blShaderResource_exp, blDX12ShaderCacheData>
+	class blDX12ShaderCache : public blDX12ResourceCacheTemplate<blShaderResource, blDX12ShaderCacheData>
 	{
 	private:
 		blDevice* mDevice;
@@ -91,7 +92,7 @@ namespace BoulderLeaf::Graphics::DX12
 		blDX12ShaderCache(blDevice* device);
 	protected:
 		virtual void InitializeCacheTemplate(
-			const blResourceHandleOfType<blShaderResource_exp> resource,
+			const blResourceHandleOfType<blShaderResource> resource,
 			blDX12ShaderCacheData& cache) override;
 	};
 }
@@ -136,5 +137,22 @@ namespace BoulderLeaf::Graphics::DX12
 	protected:
 		virtual void InitializeCacheTemplate(const blResourceHandleOfType<blListResource> resource,
 			blDX12DescriptorHeapCacheData& cache) override;
+	};
+}
+
+namespace BoulderLeaf::Graphics::DX12
+{
+	struct blDX12CompositeMeshGraftingCacheData : public blDX12ResourceCacheData
+	{
+		blResourceHandleOfType<blIndexedMeshResource> graftedMesh;
+	};
+
+	class blDX12CompositeMeshGraftingCache : public blDX12ResourceCacheTemplate<blCompositeMeshResource, blDX12CompositeMeshGraftingCacheData>
+	{
+	public:
+		blDX12CompositeMeshGraftingCache();
+	protected:
+		virtual void InitializeCacheTemplate(const blResourceHandleOfType<blCompositeMeshResource> resource,
+			blDX12CompositeMeshGraftingCacheData& cache) override;
 	};
 }

@@ -6,9 +6,4 @@ namespace BoulderLeaf::Graphics::DX12
 		: mDevice(device)
 	{
 	}
-
-	void blPipelineState::SetState(blMaterial& material)
-	{
-
-	}
 }

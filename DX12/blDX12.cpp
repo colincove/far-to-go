@@ -11,9 +11,6 @@
 //Standard
 #include <assert.h>
 
-#include <blDX12ConstantBufferWithPassCache.h>
-#include <blDX12ElementUploadBufferCache.h>
-
 namespace
 {
 	#define RENDER_COMPONENT_FUNCTION_CALL(functionName) \
@@ -75,48 +72,8 @@ namespace BoulderLeaf::Graphics::DX12
 			window,
 			mGlobalRenderData.commandQueue.get(),
 			mGlobalRenderData.factory.get());
-
-		mGlobalRenderData.shaderCache = std::make_unique<blShaderCache>(mGlobalRenderData.device.get());
-		mGlobalRenderData.meshStorageCache = std::make_unique<blDX12MeshStorageCache>(mGlobalRenderData.device.get());
-		mGlobalRenderData.mPSOCache = std::make_unique<blPSOCache>(
-			mGlobalRenderData.device.get(),
-			mGlobalRenderData.shaderCache.get());
-		mGlobalRenderData.bufferCache = std::make_unique<blDX12BufferDataCache>(
-			mGlobalRenderData.device.get(),
-			mGlobalRenderData.globalRenderFrameContext.get());
-		mGlobalRenderData.vertexAndPassUploadBufferCache = std::make_unique<blDX12VertexAndPassUploadBufferCache>(
-			mGlobalRenderData.device.get(),
-			mGlobalRenderData.globalRenderFrameContext.get());
-		mGlobalRenderData.bufferElementCache = std::make_unique<blDX12BufferElementCache>();
 		
 		mGlobalRenderData.depthBuffer = std::make_unique<blDepthBuffer>(mGlobalRenderData.device.get(), window);
-
-		mGlobalRenderData.constantBufferCache = std::make_unique<blDX12ConstantBufferCache>(
-			mGlobalRenderData.device.get(),
-			mGlobalRenderData.bufferCache.get(),
-			mGlobalRenderData.globalRenderFrameContext.get());
-
-		mGlobalRenderData.elementUploadBufferCache = std::make_unique<blDX12ElementUploadBufferCache>(
-			mGlobalRenderData.device.get(),
-			mGlobalRenderData.globalRenderFrameContext.get(),
-			mGlobalRenderData.bufferElementCache.get()
-		);
-
-		mGlobalRenderData.constantBufferWithPassCache = std::make_unique<blDX12ConstantBufferWithPassCache>(
-			mGlobalRenderData.device.get(),
-			mGlobalRenderData.bufferCache.get(),
-			mGlobalRenderData.bufferElementCache.get(),
-			mGlobalRenderData.globalRenderFrameContext.get(),
-			mGlobalRenderData.elementUploadBufferCache.get());
-
-		mResourceCaches = {
-			mGlobalRenderData.shaderCache.get(),
-			mGlobalRenderData.meshStorageCache.get(),
-			mGlobalRenderData.bufferElementCache.get(),
-			mGlobalRenderData.constantBufferCache.get(),
-			mGlobalRenderData.bufferCache.get(),
-			mGlobalRenderData.mPSOCache.get()
-		};
 
 		mResourceCacheGlobalInterface = std::make_unique<blDX12ResourceCacheGlobalInterface>(&mGlobalRenderData);
 		mGlobalRenderData.resourceCacheGlobalInterface = mResourceCacheGlobalInterface.get();
@@ -200,20 +157,6 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blDX12::StartFrameInternal()
 	{
-		// TODO: We can optimize this by only updating the caches that are associated with the dirty resources.
-		for (blDX12ResourceCacheBase* cache : mResourceCaches)
-		{
-			for (blResourceId resourceId : mDirtyResources)
-			{
-				if (cache->IsCacheInitialized(resourceId))
-				{
-					cache->UpdateCache(resourceId);
-				}
-			}
-		}
-
-		mDirtyResources.clear();
-
 		RENDER_COMPONENT_FUNCTION_CALL(StartFrame)
 
 		FrameData& frameData = mFrameData[mGlobalRenderData.globalRenderFrameContext->currentFrameResource];
@@ -308,11 +251,6 @@ namespace BoulderLeaf::Graphics::DX12
 	void blDX12::DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData)
 	{
 		mCompositeMeshRenderWithPassConstantsRenderComponent->Render(renderData);
-	}
-
-	void blDX12::MarkResourceDirty(const blResourceId resourceId)
-	{
-		mDirtyResources.insert(resourceId);
 	}
 
 	// Wait until frame commands are complete. This waiting is

@@ -1,4 +1,6 @@
 #include <blMesh.h>
+#include <blVector3.inl>
+#include <array>
 
 namespace BoulderLeaf::Graphics
 {
@@ -349,6 +351,37 @@ namespace BoulderLeaf::Graphics
 		mArrayBufferResourceRef(arrayBufferResourceRef)
 	{
 
+	}
+
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		uint32_t indexCount)
+	{
+		blResourceHandleOfType<blArrayBufferResource> vertexArrayResource = CreateArrayBufferResource(
+			resourceContainer,
+			name,
+			descriptionResourceRef,
+			vertexSize,
+			vertexCount
+		);
+
+		blResourceHandleOfType<blListResource> indexArrayResource = resourceContainer->CreateResourceOfTypeWithDynamicSize<blListResource>(
+			name + L"Data",
+			indexCount,
+			sizeof(std::uint16_t)
+		);
+
+		blResourceHandleOfType<blIndexedMeshResource> meshResource = resourceContainer->CreateResourceOfType<blIndexedMeshResource>(
+			name,
+			indexArrayResource.GetRef(),
+			vertexArrayResource.GetRef()
+		);
+
+		return meshResource;
 	}
 
 	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(

@@ -1,5 +1,5 @@
 #include <ResourceCache/blDX12ResourceCachesImpl.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <blDX12Buffer.h>
 #include <blMesh.h>
 #include <blShader.h>
@@ -7,6 +7,7 @@
 #include <blDevice.h>
 #include <blDX12VertexBuffer.h>
 #include <blConstantBufferDescriptorHeap.h>
+#include <blCompositeMesh.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -100,7 +101,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 	}
 
-	void blDX12ShaderCache::InitializeCacheTemplate(const blResourceHandleOfType<blShaderResource_exp> resource,
+	void blDX12ShaderCache::InitializeCacheTemplate(const blResourceHandleOfType<blShaderResource> resource,
 		blDX12ShaderCacheData& cache)
 	{
 		LoadShaderDataFromResource_exp(
@@ -188,5 +189,20 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		//TODO: Only upload the current frame resource. Iterately update the frame resources
 		cache.mUploadBuffer->CopyAllData();
+	}
+}
+
+namespace BoulderLeaf::Graphics::DX12
+{
+	blDX12CompositeMeshGraftingCache::blDX12CompositeMeshGraftingCache()
+		: blDX12ResourceCacheTemplate()
+	{
+
+	}
+
+	void blDX12CompositeMeshGraftingCache::InitializeCacheTemplate(const blResourceHandleOfType<blCompositeMeshResource> resource,
+		blDX12CompositeMeshGraftingCacheData& cache)
+	{
+		cache.graftedMesh = CreateGraftedCompositeMeshResource(resource);
 	}
 }

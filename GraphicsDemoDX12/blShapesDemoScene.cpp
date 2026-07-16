@@ -13,73 +13,73 @@ namespace BoulderLeaf::Graphics
 		mTimeSinceLastChange(),
 		mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
 	{
-		mBoxMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
-			blResourceManager::Get().CreateResource<StandardMeshResource>(Cube()));
+		mBoxMeshResource = CubeResource(resourceContainer);
 
-		mCylinderMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
-			blResourceManager::Get().CreateResource<StandardMeshResource>(CreateCylinder(
-				2,	//bottomRadius
-				1,	//topRadius
-				3,	//height
-				20,	//sliceCount
-				10	//stackCount
-			)));
-
-		mGeosphereMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
-			blResourceManager::Get().CreateResource<StandardMeshResource>(CreateGeosphere(
-				1.5f,	//radius
-				4	//numSubdivisions
-			)));
-
-		mCompositeMeshResource = blResourceManager::Get().CreateResource<blCompositeMeshResource>(
-			3,
-			mBoxMeshResource,
-			mCylinderMeshResource,
-			mGeosphereMeshResource
+		mCylinderMeshResource = CreateCylinderResource(resourceContainer,
+			2,    //bottomRadius
+			1,    //topRadius
+			3,    //height
+			20,   //sliceCount
+			10    //stackCount
 		);
 
-		mShaderResource = blResourceManager::Get().CreateResource<blShaderResource>(blShader(
-			"graphics_dx12_demoscene01",
-			std::vector<blShader::Parameter>
+		mGeosphereMeshResource = CreateGeosphereResource(resourceContainer,
+			2,    //radius
+			1    //numSubdivisions
+		);
+
+		mCompositeMeshResource = resourceContainer->CreateResourceOfTypeWithDynamicSize<blCompositeMeshResource>(
+			L"ShapesDemoCompositeMesh",
+			std::vector<blResourceRefOfType<blIndexedMeshResource>> 
 		{
-			{1, 0, 0, blShader::Parameter::ConstantBuffer}
-		},
-			StandardVertexDefinition::Description));
+			mBoxMeshResource.GetRef(),
+			mCylinderMeshResource.GetRef(),
+			mGeosphereMeshResource.GetRef()
+		});
 
-		mMaterialResource = blResourceManager::Get().CreateResource<blMaterialResource>(mShaderResource, false);
-		mSceneResource = blResourceManager::Get().CreateResource<blSceneResource>();
+		mMaterialResource = CreateDefaultMaterial(resourceContainer);
+		mSceneResource = resourceContainer->CreateResourceOfType<blSceneResource>(L"Scene");
 
-		mObjectConstantBufferResource = blResourceManager::Get().CreateResource<blStandardObjectConstantsBufferResource>();
-		mObjectConstantBufferResource->GetDataMutable().reserve(1000);
-		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
+		blResourceHandleOfType<blBufferDescriptionResource> constantBufferDesc = BufferDescriptionResource(
+			resourceContainer, { BufferFormat::BoulderLeaf, blStandardObjectConstantsDefinition::Description, 256 });
+
+		mObjectConstantBufferResource = CreateArrayBufferResource(
+			resourceContainer,
+			L"ObjectConstantBuffer",
+			constantBufferDesc.GetRef(),
+			sizeof(blStandardObjectConstants),
+			2
+		);
+
+		mObjectConstantBufferListResource = resourceContainer->CreateHandleFromRefOfType(mObjectConstantBufferResource->mBufferResourceRef);
 
 		mRenderData = std::vector<RenderCompositeMeshDataInstanced>
 		{
 			RenderCompositeMeshDataInstanced
 			{
 				blRenderGroups::Default,
-				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
+				mObjectConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
-				mBoxMeshResource->GetId(), //submeshId
+				mBoxMeshResource.GetId(), //submeshId
 				0
 			},
 			RenderCompositeMeshDataInstanced
 			{
 				blRenderGroups::Default,
-				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
+				mObjectConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
-				mCylinderMeshResource->GetId(), //submeshId
+				mCylinderMeshResource.GetId(), //submeshId
 				1
 			},
 			RenderCompositeMeshDataInstanced
 			{
 				blRenderGroups::Default,
-				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
+				mObjectConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
-				mGeosphereMeshResource->GetId(), //submeshId
+				mGeosphereMeshResource.GetId(), //submeshId
 				2
 			}
 		};
@@ -122,7 +122,7 @@ namespace BoulderLeaf::Graphics
 		const Matrix4x4 worldViewProj = world * view * proj;
 
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
-		mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
-		mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0).WorldViewProj = worldViewProj.Transpose();
+		mObjectConstantBufferListResource.MarkDirty();
 	}
 }

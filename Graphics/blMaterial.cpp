@@ -2,13 +2,8 @@
 
 namespace BoulderLeaf::Graphics
 {
-	blMaterial::blMaterial(blShaderResourcePtr shader, bool instanced)
-		: shader(shader), mInstanced(instanced)
-	{
-	}
-
-	blMaterialResource_exp::blMaterialResource_exp(
-		blResourceRefOfType<blShaderResource_exp> shaderResourceRef,
+	blMaterialResource::blMaterialResource(
+		blResourceRefOfType<blShaderResource> shaderResourceRef,
 		bool instanced)
 		: mInstanced(instanced), mShaderResourceRef(shaderResourceRef)
 	{

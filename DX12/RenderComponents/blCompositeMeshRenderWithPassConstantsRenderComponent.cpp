@@ -1,102 +1,102 @@
 #include <blCompositeMeshRenderWithPassConstantsRenderComponent.h>
-
-#include <RenderData/blDX12CompositeMeshDataCache.h>
+#include <ResourceCache/blDX12ResourceCachesImpl.h>
+#include <ResourceCache/blDX12ResourceCacheInterface.h>
 #include <blDX12Buffer.h>
-
-#include <blDX12ConstantBufferWithPassCache.h>
+#include <blDX12MeshGeometry.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
 	blCompositeMeshRenderWithPassConstantsRenderComponent::blCompositeMeshRenderWithPassConstantsRenderComponent(blGlobalRenderData* globalRenderDataPtr) :
 		blRenderComponent(globalRenderDataPtr),
-		mCompositeMeshStorageCache(std::make_unique<blCompositeMeshDataCache>(
-			globalRenderDataPtr->device.get(),
-			mCommandList.get(),
-			globalRenderDataPtr->meshStorageCache.get())),
-		mMeshDataDeviceCache(std::make_unique<blDX12MeshDataDeviceCache>(
-			globalRenderDataPtr->device.get(),
-			mCommandList.get(),
-			globalRenderDataPtr->meshStorageCache.get()))
+		mBufferUploadCache(globalRenderDataPtr->device.get(), mCommandList.get())
 	{
 	}
 
 	void blCompositeMeshRenderWithPassConstantsRenderComponent::Render(const RenderCompositeMeshDataWithPassConstants& renderData)
 	{
-		if (!renderData.compositeMesh)
-		{
-			return;
-		}
-
 		blGlobalRenderData& globalRenderData = *mGlobalRenderData;
+		blResourceContainer* container = renderData.compositeMesh.GetContainer();
 
-		const blCompositeMeshDataCacheData& resourceCache = mCompositeMeshStorageCache->Get(
-			*renderData.compositeMesh
-		);
+		const blDX12CompositeMeshGraftingCacheData& graftedMeshCache =
+			globalRenderData.resourceCacheGlobalInterface->GetCompositeMeshGraftingCache(renderData.compositeMesh);
+		blResourceHandleOfType<blArrayBufferResource> graftedVertexBufferHandle =
+			container->CreateHandleFromRefOfType<blArrayBufferResource>(graftedMeshCache.graftedMesh->mArrayBufferResourceRef);
 
-		const blDX12MeshDataDeviceCacheData& meshDeviceStorageCacheData = mMeshDataDeviceCache->Get(*resourceCache.meshResource);
+		const blDX12ArrayBufferTranslationCacheData& translatedMeshCache =
+			globalRenderData.resourceCacheGlobalInterface->GetArrayBufferTranslationCacheData(graftedVertexBufferHandle);
+		const blResourceHandleOfType<blListResource>& translatedVertexListResource = container->CreateHandleFromRefOfType<blListResource>(
+			translatedMeshCache.translatedArrayBuffer->mBufferResourceRef);
+		const blResourceHandleOfType<blListResource>& indexListResource = container->CreateHandleFromRefOfType<blListResource>(
+			graftedMeshCache.graftedMesh->mIndexListRef);
 
-		const blMaterial& material = renderData.material->GetData();
-		const blShaderResource& shaderResource = *material.shader;
-		const blShader& shader = shaderResource.GetData();
-		const blShaderCacheData& shaderCacheData = globalRenderData.shaderCache->Get(shaderResource);
-		const blPSOCacheData& psoCacheData = globalRenderData.mPSOCache->Get(shaderResource);
+		const blMaterialResource& material = *renderData.material;
+		const blResourceHandleOfType<blShaderResource> shaderResourceHandle =
+			renderData.material.GetContainer()->CreateHandleFromRefOfType<blShaderResource>(material.mShaderResourceRef);
 
-		// Do I not do anything with this data? How do constant buffers get bound? I'm confused. 
-		//TODO: Why is this data specific to standard object constants? I want to be able to use this for any type of constant buffer.
-		//const blDX12ConstantBufferCacheData& constantBufferCache = globalRenderData.constantBufferCache->Get(*renderData.constantBuffer.get());
-		const blDX12ConstantBufferCacheData& constantBufferCacheWithPass = globalRenderData.constantBufferWithPassCache->Get(*renderData.constantBufferWithPass.get());
+		const blDX12ShaderCacheData& shaderCacheData = globalRenderData.resourceCacheGlobalInterface->
+			GetShaderCacheData(shaderResourceHandle);
+
+		const blDX12UploadBufferCacheData& vertexUploadCacheData =
+			mBufferUploadCache.GetTypedCachedData(translatedVertexListResource);
+		const blDX12UploadBufferCacheData& indexUploadCacheData =
+			mBufferUploadCache.GetTypedCachedData(indexListResource);
+
+		const blResourceHandleOfType<blListResource> constantBufferListResource = container->CreateHandleFromRefOfType<blListResource>(
+			renderData.instanceConstantBuffer->mBufferResourceRef);
+		const blDX12MappedUploadBufferCacheData& constantBufferUploadBufferCacheData = globalRenderData.resourceCacheGlobalInterface->
+			GetMappedUploadBufferCache(constantBufferListResource);
+
+		const blResourceHandleOfType<blListResource> constantBufferResourceHandle =
+			renderData.instanceConstantBuffer.GetContainer()->CreateHandleFromRefOfType<blListResource>(renderData.instanceConstantBuffer->mBufferResourceRef);
+		const blDX12DescriptorHeapCacheData& descriptorHeapCacheData = globalRenderData.resourceCacheGlobalInterface->
+			GetDescriptorHeapCacheData(constantBufferResourceHandle);
+
+		const blResourceHandleOfType<blListResource> passConstantBufferListResource = container->CreateHandleFromRefOfType<blListResource>(
+			renderData.passConstantBuffer->mBufferResourceRef);
+		const blDX12MappedUploadBufferCacheData& passBufferUploadBufferCacheData = globalRenderData.resourceCacheGlobalInterface->
+			GetMappedUploadBufferCache(passConstantBufferListResource);
+
+		const blResourceHandleOfType<blListResource> passConstantBufferResourceHandle =
+			renderData.passConstantBuffer.GetContainer()->CreateHandleFromRefOfType<blListResource>(renderData.passConstantBuffer->mBufferResourceRef);
+		const blDX12DescriptorHeapCacheData& passDescriptorHeapCacheData = globalRenderData.resourceCacheGlobalInterface->
+			GetDescriptorHeapCacheData(passConstantBufferResourceHandle);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = globalRenderData.depthBuffer->DepthStencilView();
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = globalRenderData.swapChain->CurrentBackBufferView();
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView = meshDeviceStorageCacheData.meshGeometry.VertexBufferView();
-		D3D12_INDEX_BUFFER_VIEW indexBufferView = meshDeviceStorageCacheData.meshGeometry.IndexBufferView();
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView = vertexUploadCacheData.mUploadBuffer->BufferView();
+		D3D12_INDEX_BUFFER_VIEW indexBufferView = indexUploadCacheData.mUploadBuffer->IndexBufferView();
 
 		// Specify the buffers we are going to render to.
 		mCommandList->OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
-		ID3D12DescriptorHeap* descriptorHeaps[] = { constantBufferCacheWithPass.descriptorHeap->GetDescriptorHeap().Get() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeapCacheData.descriptorHeap->GetDescriptorHeap().Get() };
 		mCommandList->SetDescriptorHeaps((UINT)_countof(descriptorHeaps), descriptorHeaps);
-		mCommandList->SetGraphicsRootSignature(shaderCacheData.RootSignature->GetRootSignature().Get());
+		mCommandList->SetGraphicsRootSignature(shaderCacheData.shaderData.RootSignature->GetRootSignature().Get());
 		mCommandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 		mCommandList->IASetIndexBuffer(&indexBufferView);
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		mCommandList->SetPipelineState(psoCacheData.PSO->GetDX12PSO().Get());
-		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferCacheWithPass.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
-		auto cbvPassConstantsHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferCacheWithPass.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
-		
+		mCommandList->SetPipelineState(shaderCacheData.shaderPSO->GetDX12PSO().Get());
+		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorHeapCacheData.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		auto cbvPassConstantsHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(passDescriptorHeapCacheData.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
 
-		const size_t count = renderData.constantBuffer->GetData().Count();
-		cbvHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * (count + 1)) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
-		cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());//the descriptor table starts with the pass constants. Need to offset for the objects
-		cbvPassConstantsHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * (count + 1)) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
+		cbvHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * constantBufferResourceHandle->mCount) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
+		cbvPassConstantsHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * passConstantBufferResourceHandle->mCount) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
 
-		// first. Just render the single mesh that was handed in
-		blMeshIndexedCatalogue::Entry entry = renderData.compositeMesh->GetData().GetMeshEntry(renderData.submeshId);
-		mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
-		mCommandList->SetGraphicsRootDescriptorTable(1, cbvPassConstantsHandle);
-
-		mCommandList->DrawIndexedInstanced(
-			(UINT)entry.IndexCount,
-			1,
-			(UINT)entry.IndexOffset,
-			(UINT)entry.VertexOffset,
-			0);
-
-		cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());
-
-		//and then render the list of sub mesh's passed in
-		for (const blResourceId& resourceId : renderData.submeshIds)
+		for (const BoulderLeaf::blResourceId& resourceId : renderData.submeshIds)
 		{
-			blMeshIndexedCatalogue::Entry entry = renderData.compositeMesh->GetData().GetMeshEntry(resourceId);
-			mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
-			mCommandList->SetGraphicsRootDescriptorTable(1, cbvPassConstantsHandle);
+			if (const blCompositeMeshResource::MeshEntry* entry =
+				renderData.compositeMesh->FindMeshEntry(resourceId))
+			{
+				mCommandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+				mCommandList->SetGraphicsRootDescriptorTable(1, cbvPassConstantsHandle);
 
-			mCommandList->DrawIndexedInstanced(
-				(UINT)entry.IndexCount,
-				1,
-				(UINT)entry.IndexOffset,
-				(UINT)entry.VertexOffset,
-				0);
+				mCommandList->DrawIndexedInstanced(
+					(UINT)entry->mIndexCount,
+					1,
+					(UINT)entry->mIndexCountOffset,
+					(UINT)entry->mVertexCountOffset,
+					0);
+			}
 
 			cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());
 		}

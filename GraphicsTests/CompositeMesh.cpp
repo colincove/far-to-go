@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <blCompositeMesh.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <blBuffer.h>
 
 using namespace BoulderLeaf;
@@ -56,23 +56,23 @@ TEST(CompositeMesh, Resource)
 	refs.push_back(mesh1.GetRef());
 	refs.push_back(mesh2.GetRef());
 
-	blResourceHandleOfType<blCompositeMeshResource_exp> compHandle =
-		container->CreateResourceOfTypeWithDynamicSize<blCompositeMeshResource_exp>(L"CompositeMesh", refs);
+	blResourceHandleOfType<blCompositeMeshResource> compHandle =
+		container->CreateResourceOfTypeWithDynamicSize<blCompositeMeshResource>(L"CompositeMesh", refs);
 
-	const blCompositeMeshResource_exp& comp = *compHandle;
+	const blCompositeMeshResource& comp = *compHandle;
 
 	const auto* entry1 = comp.FindMeshEntry(mesh1.GetId());
 	ASSERT_NE(entry1, nullptr);
 	EXPECT_EQ(entry1->mVertexCount, (uint32_t)2);
 	EXPECT_EQ(entry1->mIndexCount, (uint32_t)3);
-	EXPECT_EQ(entry1->mVertexOffset, (uint64_t)0);
-	EXPECT_EQ(entry1->mIndexOffset, (uint64_t)0);
+	EXPECT_EQ(entry1->mVertexCountOffset, (uint32_t)0);
+	EXPECT_EQ(entry1->mIndexCountOffset, (uint32_t)0);
 
 	const auto* entry2 = comp.FindMeshEntry(mesh2.GetId());
 	ASSERT_NE(entry2, nullptr);
 	EXPECT_EQ(entry2->mVertexCount, (uint32_t)3);
 	EXPECT_EQ(entry2->mIndexCount, (uint32_t)3);
-	EXPECT_EQ(entry2->mVertexOffset, (uint64_t)2);
-	// Note: blCompositeMeshResource_exp sets index offset to the previous mesh's index count
-	EXPECT_EQ(entry2->mIndexOffset, (uint64_t)3);
+	EXPECT_EQ(entry2->mVertexCountOffset, (uint32_t)2);
+	// Note: blCompositeMeshResource sets index offset to the previous mesh's index count
+	EXPECT_EQ(entry2->mIndexCountOffset, (uint32_t)3);
 }

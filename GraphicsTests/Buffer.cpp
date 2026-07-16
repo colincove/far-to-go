@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <blBuffer.h>
-#include <Resources/blResourcesExprimental.h>	
+#include <Resources/blResources.h>	
 #include <vector>
 #include <string>
 #include <blVector2.inl>

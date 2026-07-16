@@ -12,7 +12,7 @@
 #include <CylinderDemoScene.h>
 #include <ShapesWithPassDemoScene.h>
 #include <DemoImgui.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 
 using namespace BoulderLeaf;
 using namespace BoulderLeaf::Graphics;

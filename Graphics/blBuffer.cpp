@@ -2,7 +2,7 @@
 #include <format>
 #include <cstring>
 #include <cassert>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <Resources/blResourceHandleOfType.h>
 
 namespace BoulderLeaf::Graphics
@@ -116,14 +116,6 @@ namespace BoulderLeaf::Graphics
 	{
 		assert(GetFormat() == description.format);
 		return GetBufferElementSize(description.elementDescriptions, *this);
-	}
-
-	blVertexBufferWithPassBuffer::blVertexBufferWithPassBuffer(
-		blDataElementBufferResourcePtr passElementBuffer,
-		blDataBufferInterfaceResourcePtr vertexBuffer)
-		: mPassElementBuffer(passElementBuffer),
-		mVertexBuffer(vertexBuffer)
-	{
 	}
 
 	blBufferElementDescriptionResource::blBufferElementDescriptionResource(

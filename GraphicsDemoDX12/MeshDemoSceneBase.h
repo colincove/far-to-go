@@ -1,6 +1,5 @@
 #pragma once
 
-#include <blResource.h>
 #include <blShader.h>
 #include <blMesh.h>
 #include <blGraphicsAPI.h>
@@ -21,9 +20,8 @@ namespace BoulderLeaf::Graphics
 	{
 	protected:
 		blResourceHandleOfType<blIndexedMeshResource> mMeshResourceHandle;
-		blResourceHandleOfType<blSceneResource_exp> mSceneResource;
-		blResourceHandleOfType<blShaderResource_exp> mShaderResource;
-		blResourceHandleOfType<blMaterialResource_exp> mMaterialResource;
+		blResourceHandleOfType<blSceneResource> mSceneResource;
+		blResourceHandleOfType<blMaterialResource> mMaterialResource;
 		blResourceHandleOfType<blArrayBufferResource> mObjectConstantBufferResource;
 		blResourceHandleOfType<blListResource> mObjectConstantBufferListResource;
 		blResourceHandleOfType<blArrayBufferResource> mInstanceDataResource;
@@ -43,7 +41,7 @@ namespace BoulderLeaf::Graphics
 			mPhi(PIfDIV4),
 			mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
 		{
-			mSceneResource = resourceContainer->CreateResourceOfType<blSceneResource_exp>(L"Scene");
+			mSceneResource = resourceContainer->CreateResourceOfType<blSceneResource>(L"Scene");
 			
 			blResourceHandleOfType<blBufferDescriptionResource> desc = BufferDescriptionResource(
 				resourceContainer, { BufferFormat::BoulderLeaf, blStandardObjectConstantsDefinition::Description, 256 });
@@ -80,8 +78,8 @@ namespace BoulderLeaf::Graphics
 			const std::string shaderName = "graphics_dx12_demoscene01";
 
 			// create shader resource
-			blResourceHandleOfType<blShaderResource_exp> handle =
-				container->CreateResourceOfTypeWithDynamicSize<blShaderResource_exp>(
+			blResourceHandleOfType<blShaderResource> handle =
+				container->CreateResourceOfTypeWithDynamicSize<blShaderResource>(
 					L"ShaderResource",
 					shaderName,
 					params.data(),
@@ -89,7 +87,7 @@ namespace BoulderLeaf::Graphics
 					vertexArrayBuffer.mDescriptionResourceRef
 				);
 
-			mMaterialResource = container->CreateResourceOfType<blMaterialResource_exp>(
+			mMaterialResource = container->CreateResourceOfType<blMaterialResource>(
 				L"MaterialResource",
 				handle.GetRef(),
 				true /*instanced*/

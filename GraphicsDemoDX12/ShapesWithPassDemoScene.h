@@ -1,6 +1,5 @@
 #pragma once
 
-#include <blResource.h>
 #include <blShader.h>
 #include <blMesh.h>
 #include <blGraphicsAPI.h>
@@ -97,22 +96,22 @@ namespace BoulderLeaf::Graphics
 	class ShapesWithPassDemoScene : public blDemoScene
 	{
 	private:
-		bool mDidSetupPassData;
-		blMeshBaseResourcePtr mBoxMeshResource;
-		blMeshBaseResourcePtr mCylinderMeshResource;
-		blMeshBaseResourcePtr mGeosphereMeshResource;
-		blCompositeMeshResourcePtr mCompositeMeshResource;
+		blResourceHandleOfType<blIndexedMeshResource> mBoxMeshResource;
+		blResourceHandleOfType<blIndexedMeshResource> mCylinderMeshResource;
+		blResourceHandleOfType<blIndexedMeshResource> mGeosphereMeshResource;
+		blResourceHandleOfType<blCompositeMeshResource> mCompositeMeshResource;
 
 		std::vector<RenderCompositeMeshDataWithPassConstants> mRenderData;
 
-		blSceneResourcePtr mSceneResource;
-		blShaderResourcePtr mShaderResource;
-		blMaterialResourcePtr mMaterialResource;
-		blStandardObjectConstantsBufferResourcePtr mObjectConstantBufferResource;
-		blStandardObjectConstantsBufferPtr mInstanceDataResource;
-		blVertexBufferWithPassBufferResourcePtr mConstantBufferResource;
-		blDataElementBufferResourcePtr mConstantBufferPassResource;
-		
+		blResourceHandleOfType<blSceneResource> mSceneResource;
+		blResourceHandleOfType<blShaderResource> mShaderResource;
+		blResourceHandleOfType<blMaterialResource> mMaterialResource;
+		blResourceHandleOfType<blArrayBufferResource> mObjectConstantBufferResource;
+		blResourceHandleOfType<blListResource> mObjectConstantBufferListResource;
+		blResourceHandleOfType<blArrayBufferResource> mInstanceDataResource;
+		blResourceHandleOfType<blArrayBufferResource> mPassConstantBufferResource;
+		blResourceHandleOfType<blListResource> mPassConstantBufferListResource;
+
 		cbPass mPassData;
 		Math::Matrix4x4 mProjMatrix = Matrix4x4::Identity();
 		Math::Matrix4x4 mWorld = Matrix4x4::Identity();

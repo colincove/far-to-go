@@ -2,6 +2,7 @@
 #include <ResourceCache/blDX12ResourceCachesImpl.h>
 #include <ResourceCache/blDX12ResourceCacheInterface.h>
 #include <blGlobalRenderData.h>
+#include <blDX12MeshGeometry.h>
 
 namespace BoulderLeaf::Graphics::DX12
 {
@@ -27,9 +28,9 @@ namespace BoulderLeaf::Graphics::DX12
 		const blResourceHandleOfType<blListResource>& indexListResource = container->CreateHandleFromRefOfType<blListResource>(
 			meshResource->mIndexListRef);
 
-		const blMaterialResource_exp& material = *renderData.material;
-		const blResourceHandleOfType<blShaderResource_exp> shaderResourceHandle = 
-			renderData.material.GetContainer()->CreateHandleFromRefOfType<blShaderResource_exp>(material.mShaderResourceRef);
+		const blMaterialResource& material = *renderData.material;
+		const blResourceHandleOfType<blShaderResource> shaderResourceHandle = 
+			renderData.material.GetContainer()->CreateHandleFromRefOfType<blShaderResource>(material.mShaderResourceRef);
 
 		const blDX12ShaderCacheData& shaderCacheData = globalRenderData.resourceCacheGlobalInterface->
 			GetShaderCacheData(shaderResourceHandle);

@@ -9,10 +9,9 @@
 #include <blTypes.h>
 #include <assert.h>
 #include <blCore.h>
-#include <Resources/blResource.h>
 #include <string>
 #include <blBuffer.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <Resources/blResourceHandleOfType.h>
 
 namespace BoulderLeaf::Graphics
@@ -540,9 +539,6 @@ namespace BoulderLeaf::Graphics
 	using StandardMeshUniquePtr = std::unique_ptr<::BoulderLeaf::Graphics::StandardMesh>;
 }
 
-BL_RESOURCE(blMeshBase, eResourceType::Mesh);
-BL_RESOURCE(StandardMesh, eResourceType::Mesh);
-
 namespace BoulderLeaf::Graphics
 {
 	struct blIndexedMeshResource : blBaseResource
@@ -554,6 +550,14 @@ namespace BoulderLeaf::Graphics
 			blResourceRefOfType<blListResource> indexListRef,
 			blResourceRefOfType<blArrayBufferResource> arrayBufferResourceRef);
 	};
+
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		uint32_t indexCount);
 
 	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
 		blResourceContainer* resourceContainer,

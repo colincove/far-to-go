@@ -13,107 +13,100 @@ namespace BoulderLeaf::Graphics
 		mTimeSinceLastChange(),
 		mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
 	{
-		mBoxMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
-			blResourceManager::Get().CreateResource<StandardMeshResource>(Cube()));
+		mBoxMeshResource = CubeResource(resourceContainer);
 
-		mCylinderMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
-			blResourceManager::Get().CreateResource<StandardMeshResource>(CreateCylinder(
-				2,	//bottomRadius
-				1,	//topRadius
-				3,	//height
-				20,	//sliceCount
-				10	//stackCount
-			)));
-
-		mGeosphereMeshResource = std::reinterpret_pointer_cast<blMeshBaseResource>(
-			blResourceManager::Get().CreateResource<StandardMeshResource>(CreateGeosphere(
-				1.5f,	//radius
-				4	//numSubdivisions
-			)));
-
-		mCompositeMeshResource = blResourceManager::Get().CreateResource<blCompositeMeshResource>(
-			3,
-			mBoxMeshResource,
-			mCylinderMeshResource,
-			mGeosphereMeshResource
+		mCylinderMeshResource = CreateCylinderResource(resourceContainer,
+			2,    //bottomRadius
+			1,    //topRadius
+			3,    //height
+			20,   //sliceCount
+			10    //stackCount
 		);
 
-		mShaderResource = blResourceManager::Get().CreateResource<blShaderResource>(blShader(
-			"graphics_dx12_shapes_demo",
-			std::vector<blShader::Parameter>
+		mGeosphereMeshResource = CreateGeosphereResource(resourceContainer,
+			2,    //radius
+			1    //numSubdivisions
+		);
+
+		mCompositeMeshResource = resourceContainer->CreateResourceOfTypeWithDynamicSize<blCompositeMeshResource>(
+			L"ShapesDemoCompositeMesh",
+			std::vector<blResourceRefOfType<blIndexedMeshResource>>
 		{
-			{1, 0, 0, blShader::Parameter::ConstantBuffer },
-			{ 1, 1, 0, blShader::Parameter::ConstantBuffer }
-		},
-			StandardVertexDefinition::Description));
+			mBoxMeshResource.GetRef(),
+				mCylinderMeshResource.GetRef(),
+				mGeosphereMeshResource.GetRef()
+		});
 
-		mMaterialResource = blResourceManager::Get().CreateResource<blMaterialResource>(mShaderResource, false);
-		mSceneResource = blResourceManager::Get().CreateResource<blSceneResource>();
+		mMaterialResource = CreateDefaultMaterialWithPassConstants(resourceContainer);
+		mSceneResource = resourceContainer->CreateResourceOfType<blSceneResource>(L"Scene");
 
-		mObjectConstantBufferResource = blResourceManager::Get().CreateResourceWithName<blStandardObjectConstantsBufferResource>(L"Shapes ObjectConstantBufferResource");
-		mObjectConstantBufferResource->GetDataMutable().reserve(1000);
-		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::Identity() });
-		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(1, 2, 3)});
-		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(2, 2, 2) });
-		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(-2, -1, 0) });
-		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(4, 4, 4) });
-		mObjectConstantBufferResource->GetDataMutable().push_back({ Math::Matrix4x4::TranslationMatrix(1, 1, 1) });
+		blResourceHandleOfType<blBufferDescriptionResource> constantBufferDesc = BufferDescriptionResource(
+			resourceContainer, { BufferFormat::BoulderLeaf, blStandardObjectConstantsDefinition::Description, 256 });
 
-		std::unique_ptr<byte[]> passData = std::make_unique<byte[]>(sizeof(cbPass));
-		memcpy(passData.get(), &mPassData, sizeof(cbPass));
-		mConstantBufferPassResource = blResourceManager::Get().CreateResourceWithName<blDataElementBufferResource>(
-			L"Pass Constants",
-			BufferFormat::BoulderLeaf,
-			cbPassDescription,
-			std::move(passData)
+		mObjectConstantBufferResource = CreateArrayBufferResource(
+			resourceContainer,
+			L"ObjectConstantBuffer",
+			constantBufferDesc.GetRef(),
+			sizeof(blStandardObjectConstants),
+			10
 		);
 
-		mConstantBufferResource = blResourceManager::Get().CreateResourceWithName<blVertexBufferWithPassBufferResource>(
-			L"Shapes mConstantBufferResource",
-			mConstantBufferPassResource,
-			std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource)
+		mObjectConstantBufferListResource = resourceContainer->CreateHandleFromRefOfType(mObjectConstantBufferResource->mBufferResourceRef);
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0) = { Math::Matrix4x4::Identity() };
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(1) = { Math::Matrix4x4::TranslationMatrix(1, 2, 3)};
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(2) = { Math::Matrix4x4::TranslationMatrix(2, 2, 2) };
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(3) = { Math::Matrix4x4::TranslationMatrix(-2, -1, 0) };
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(4) = { Math::Matrix4x4::TranslationMatrix(4, 4, 4) };
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(5) = { Math::Matrix4x4::TranslationMatrix(1, 1, 1) };
+
+		blResourceHandleOfType<blBufferDescriptionResource> passConstantBufferDesc = BufferDescriptionResource(
+			resourceContainer, { BufferFormat::BoulderLeaf, cbPassDescription, 256 });
+
+		mPassConstantBufferResource = CreateArrayBufferResource(
+			resourceContainer,
+			L"PassConstantBuffer",
+			passConstantBufferDesc.GetRef(),
+			sizeof(cbPass),
+			1
 		);
+
+		mPassConstantBufferListResource = resourceContainer->CreateHandleFromRefOfType(mPassConstantBufferResource->mBufferResourceRef);
 
 		mRenderData = std::vector<RenderCompositeMeshDataWithPassConstants>
 		{
 			RenderCompositeMeshDataWithPassConstants
 			{
 				blRenderGroups::Default,
-				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
-				mConstantBufferResource,
-				mConstantBufferPassResource,
+				mObjectConstantBufferResource,
+				mPassConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
-				mBoxMeshResource->GetId(), //submeshId
-				std::vector<blResourceId> {},
+				std::vector<BoulderLeaf::blResourceId> {mBoxMeshResource.GetId()},
 				0
 			},
 			RenderCompositeMeshDataWithPassConstants
 			{
 				blRenderGroups::Default,
-				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
-				mConstantBufferResource,
-				mConstantBufferPassResource,
+				mObjectConstantBufferResource,
+				mPassConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
-				mCylinderMeshResource->GetId(), //submeshId
-				std::vector<blResourceId> {},
+				std::vector<BoulderLeaf::blResourceId> {mGeosphereMeshResource.GetId()},
 				1
 			},
 			RenderCompositeMeshDataWithPassConstants
 			{
 				blRenderGroups::Default,
-				std::reinterpret_pointer_cast<blDataBufferInterfaceResource>(mObjectConstantBufferResource),
-				mConstantBufferResource,
-				mConstantBufferPassResource,
+				mObjectConstantBufferResource,
+				mPassConstantBufferResource,
 				mCompositeMeshResource,
 				mMaterialResource,
-				mGeosphereMeshResource->GetId(), //submeshId
-				std::vector<blResourceId> {
-					mGeosphereMeshResource->GetId(),
-					mGeosphereMeshResource->GetId(),
-					mGeosphereMeshResource->GetId(),
-					mCylinderMeshResource->GetId(),
+				std::vector<BoulderLeaf::blResourceId> 
+				{
+					mGeosphereMeshResource.GetId(),
+					mGeosphereMeshResource.GetId(),
+					mGeosphereMeshResource.GetId(),
+					mCylinderMeshResource.GetId(),
 				},
 				2
 			}
@@ -156,22 +149,17 @@ namespace BoulderLeaf::Graphics
 		const Matrix4x4 proj = mCamera.GetProjectionMatrix();
 		const Matrix4x4 worldViewProj = world * view * proj;
 
-		if (!mDidSetupPassData)
-		{
-			// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
-			for (blStandardObjectConstants& constants : mObjectConstantBufferResource->GetDataMutable())
-			{
-				constants.WorldViewProj = (worldViewProj * constants.WorldViewProj).Transpose();
-			}
-
-			mObjectConstantBufferResource->GetDataMutable()[0].WorldViewProj = worldViewProj.Transpose();
-		
-			mGraphicsAPI->MarkResourceDirty(mObjectConstantBufferResource->GetId());
-			mDidSetupPassData = true;
-		}
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
-		cbPass& passData = *reinterpret_cast<cbPass*>(mConstantBufferPassResource->GetData().GetDataMutable());
+		for (int i = 0; i < mObjectConstantBufferListResource->mCount; ++i)
+		{
+			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(i).WorldViewProj = worldViewProj.Transpose();
+		}
+
+		mObjectConstantBufferListResource.MarkDirty();
+		
+		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
+		cbPass& passData = mPassConstantBufferListResource->GetMutable<cbPass>(0);
 		passData.view = worldViewProj.Transpose();
-		mGraphicsAPI->MarkResourceDirty(mConstantBufferPassResource->GetId());
+		mPassConstantBufferListResource.MarkDirty();
 	}
 }

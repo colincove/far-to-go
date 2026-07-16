@@ -13,7 +13,8 @@ namespace BoulderLeaf::Graphics::DX12
 		blArrayBufferTranslationCache(),
 		mShaderCache(globalRenderData->device.get()),
 		mMappedUploadBufferCache(globalRenderData->device.get()),
-		mDescriptorHeapCache(globalRenderData->device.get(), &mMappedUploadBufferCache)
+		mDescriptorHeapCache(globalRenderData->device.get(), &mMappedUploadBufferCache),
+		mCompositeMeshGraftingCache()
 	{
 
 	}
@@ -23,7 +24,7 @@ namespace BoulderLeaf::Graphics::DX12
 		return blArrayBufferTranslationCache.GetTypedCachedData(resource);
 	}
 
-	const blDX12ShaderCacheData& blDX12ResourceCacheGlobalInterface::GetShaderCacheData(const blResourceHandleOfType<blShaderResource_exp> resource)
+	const blDX12ShaderCacheData& blDX12ResourceCacheGlobalInterface::GetShaderCacheData(const blResourceHandleOfType<blShaderResource> resource)
 	{
 		return mShaderCache.GetTypedCachedData(resource);
 	}
@@ -36,5 +37,10 @@ namespace BoulderLeaf::Graphics::DX12
 	const blDX12MappedUploadBufferCacheData& blDX12ResourceCacheGlobalInterface::GetMappedUploadBufferCache(const blResourceHandleOfType<blListResource> resource)
 	{
 		return mMappedUploadBufferCache.GetTypedCachedData(resource);
+	}
+
+	const blDX12CompositeMeshGraftingCacheData& blDX12ResourceCacheGlobalInterface::GetCompositeMeshGraftingCache(const blResourceHandleOfType<blCompositeMeshResource> resource)
+	{
+		return mCompositeMeshGraftingCache.GetTypedCachedData(resource);
 	}
 }

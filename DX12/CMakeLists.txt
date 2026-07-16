@@ -80,33 +80,7 @@ add_library(
 	RenderComponents/blCompositeMeshRenderComponent.cpp
 	RenderComponents/blCompositeMeshRenderComponent.h
 	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.cpp
-	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.h
-
-	RenderData/blDX12BufferData.cpp
-	RenderData/blDX12BufferData.h
-	RenderData/blDX12ShaderCache.cpp
-	RenderData/blDX12ShaderCache.h
-	RenderData/blDX12MeshDataCache.cpp
-	RenderData/blDX12MeshDataCache.h
-	RenderData/blDX12ResourceDataCache.cpp
-	RenderData/blDX12ResourceDataCache.h
-	RenderData/blDX12MeshDataDeviceCache.cpp
-	RenderData/blDX12MeshDataDeviceCache.h
-	RenderData/blDX12PSODataCache.h
-	RenderData/blDX12PSODataCache.cpp
-	RenderData/blDX12ConstantBufferCache.h
-	RenderData/blDX12ConstantBufferCache.cpp
-	RenderData/blDX12CompositeMeshDataCache.h
-	RenderData/blDX12CompositeMeshDataCache.cpp
-	RenderData/blDX12ConstantBufferWithPassCache.cpp
-	RenderData/blDX12ConstantBufferWithPassCache.h
-	RenderData/blDX12BufferElementDataCache.cpp
-	RenderData/blDX12BufferElementDataCache.h
-	RenderData/blDX12VertexAndPassUploadBufferCache.cpp
-	RenderData/blDX12VertexAndPassUploadBufferCache.h
-	RenderData/blDX12ElementUploadBufferCache.cpp
-	RenderData/blDX12ElementUploadBufferCache.h
-	)
+	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.h)
 
 source_group("ResourceCache/Headers Files"
 	FILES 
@@ -136,37 +110,6 @@ source_group("RenderComponents/Source Files"
 	RenderComponents/blMeshInstancedRenderComponent.cpp
 	RenderComponents/blCompositeMeshRenderComponent.cpp
 	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.cpp)
-
-source_group("RenderData/Headers Files"
-	FILES 
-	RenderData/blDX12BufferData.h
-	RenderData/blDX12MeshDataDeviceCache.h
-	RenderData/blDX12ShaderCache.h
-	RenderData/blDX12MeshDataCache.h
-	RenderData/blDX12ResourceDataCache.h
-	RenderData/blDX12PSODataCache.h
-	RenderData/blDX12ConstantBufferCache.h
-	RenderData/blDX12CompositeMeshDataCache.h
-	RenderData/blDX12ConstantBufferWithPassCache.h,
-	RenderData/blDX12BufferElementDataCache.h
-	RenderData/blDX12VertexAndPassUploadBufferCache.h
-	RenderData/blDX12ElementUploadBufferCache.h
-)
-
-source_group("RenderData/Source Files"
-	FILES 
-	RenderData/blDX12BufferData.cpp
-	RenderData/blDX12MeshDataCache.cpp
-	RenderData/blDX12ResourceDataCache.cpp
-	RenderData/blDX12MeshDataDeviceCache.cpp
-	RenderData/blDX12ShaderCache.cpp
-	RenderData/blDX12PSODataCache.cpp
-	RenderData/blDX12ConstantBufferCache.cpp
-	RenderData/blDX12CompositeMeshDataCache.cpp
-	RenderData/blDX12ConstantBufferWithPassCache.cpp
-	RenderData/blDX12BufferElementDataCache.cpp
-	RenderData/blDX12VertexAndPassUploadBufferCache.cpp
-	RenderData/blDX12ElementUploadBufferCache.cpp)
 
 target_include_directories(DX12
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}

@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <Resources/blResource.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <blBuffer.h>
 
 namespace BoulderLeaf::Graphics
@@ -39,13 +38,13 @@ namespace BoulderLeaf::Graphics
 		}
 	};
 
-	struct blShaderResource_exp : blBaseResource
+	struct blShaderResource : blBaseResource
 	{
 		blStringResource mNameStringResource;
 		blListResource mParameters;
 		blResourceRefOfType<blBufferDescriptionResource> mDescriptionResourceRef;
 
-		blShaderResource_exp(
+		blShaderResource(
 			blResourceStream& stream,
 			const std::string& name,
 			const blShader::Parameter* parameters,
@@ -53,7 +52,5 @@ namespace BoulderLeaf::Graphics
 			blResourceRefOfType<blBufferDescriptionResource> layout);
 	};
 
-	blShader ShaderResourceToShader(const blResourceHandleOfType<blShaderResource_exp> shaderResource);
+	blShader ShaderResourceToShader(const blResourceHandleOfType<blShaderResource> shaderResource);
 }
-
-BL_RESOURCE(blShader, eResourceType::Shader)

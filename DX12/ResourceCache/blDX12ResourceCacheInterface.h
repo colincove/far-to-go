@@ -10,6 +10,7 @@ namespace BoulderLeaf
 	namespace Graphics
 	{
 		struct blInlineMesh;
+		struct blCompositeMeshResource;
 
 		namespace DX12
 		{
@@ -34,13 +35,15 @@ namespace BoulderLeaf::Graphics::DX12
 		blDX12ShaderCache mShaderCache;
 		blDX12DescriptorHeapCache mDescriptorHeapCache;
 		blDX12MappedUploadBufferCache mMappedUploadBufferCache;
+		blDX12CompositeMeshGraftingCache mCompositeMeshGraftingCache;
 	public:
 		blDX12ResourceCacheGlobalInterface(blGlobalRenderData* globalRenderData);
 
 		const blDX12ArrayBufferTranslationCacheData& GetArrayBufferTranslationCacheData(const blResourceHandleOfType<blArrayBufferResource> resource);
-		const blDX12ShaderCacheData& GetShaderCacheData(const blResourceHandleOfType<blShaderResource_exp> resource);
+		const blDX12ShaderCacheData& GetShaderCacheData(const blResourceHandleOfType<blShaderResource> resource);
 		const blDX12DescriptorHeapCacheData& GetDescriptorHeapCacheData(const blResourceHandleOfType<blListResource> resource);
 		const blDX12MappedUploadBufferCacheData& GetMappedUploadBufferCache(const blResourceHandleOfType<blListResource> resource);
+		const blDX12CompositeMeshGraftingCacheData& GetCompositeMeshGraftingCache(const blResourceHandleOfType<blCompositeMeshResource> resource);
 	};
 
 	class blDX12ResourceCacheCommandListInterface : public blDX12ResourceCacheInterface

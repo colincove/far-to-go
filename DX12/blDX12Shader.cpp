@@ -18,7 +18,7 @@ namespace BoulderLeaf::Graphics::DX12
 	}
 
 	void LoadShaderDataFromResource_exp(
-		const blResourceHandleOfType<blShaderResource_exp> shaderResource, 
+		const blResourceHandleOfType<blShaderResource> shaderResource, 
 		blDevice* device,
 		blDX12ShaderData& data)
 	{

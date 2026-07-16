@@ -1,6 +1,5 @@
 #pragma once
 
-#include <blResource.h>
 #include <blShader.h>
 #include <blMesh.h>
 #include <blGraphicsAPI.h>
@@ -19,18 +18,20 @@ namespace BoulderLeaf::Graphics
 	class blShapesDemoScene : public blDemoScene
 	{
 	private:
-		blMeshBaseResourcePtr mBoxMeshResource;
-		blMeshBaseResourcePtr mCylinderMeshResource;
-		blMeshBaseResourcePtr mGeosphereMeshResource;
-		blCompositeMeshResourcePtr mCompositeMeshResource;
+		blResourceHandleOfType<blIndexedMeshResource> mBoxMeshResource;
+		blResourceHandleOfType<blIndexedMeshResource> mCylinderMeshResource;
+		blResourceHandleOfType<blIndexedMeshResource> mGeosphereMeshResource;
+		blResourceHandleOfType<blCompositeMeshResource> mCompositeMeshResource;
 
 		std::vector<RenderCompositeMeshDataInstanced> mRenderData;
 
-		blSceneResourcePtr mSceneResource;
-		blShaderResourcePtr mShaderResource;
-		blMaterialResourcePtr mMaterialResource;
-		blStandardObjectConstantsBufferResourcePtr mObjectConstantBufferResource;
-		blStandardObjectConstantsBufferPtr mInstanceDataResource;
+		blResourceHandleOfType<blSceneResource> mSceneResource;
+		blResourceHandleOfType<blShaderResource> mShaderResource;
+		blResourceHandleOfType<blMaterialResource> mMaterialResource;
+		blResourceHandleOfType<blArrayBufferResource> mObjectConstantBufferResource;
+		blResourceHandleOfType<blListResource> mObjectConstantBufferListResource;
+		blResourceHandleOfType<blArrayBufferResource> mInstanceDataResource;
+
 		Math::Matrix4x4 mWorld = Matrix4x4::Identity();
 	private:
 		float mTheta;

@@ -34,16 +34,6 @@ add_library(
 	blVirtualCamera.cpp
 	blRenderGroup.h
 	blRenderGroup.cpp
-	RenderItems/blRenderItemMesh.h
-	RenderItems/blRenderItem.h
-	RenderItems/blRenderItem.cpp
-	Resources/blResourcesCommon.h
-	Resources/blResourceManager.cpp
-	Resources/blResourceManager.h
-	Resources/blResource.cpp
-	Resources/blResource.h
-	Resources/blMeshResource.cpp
-	Resources/blMeshResource.h
 	Natvis/blMeshStorageHeader.natvis
 	Config/resourceManager.xml
 	Config.cmake)
@@ -79,19 +69,6 @@ source_group("RenderItems/Headers Files"
 source_group("RenderItems/Source Files"
 	FILES 
 	RenderItems/blRenderItem.cpp)
-
-source_group("Resources/Headers Files"
-	FILES 
-	Resources/blResourcesCommon.h
-	Resources/blResourceManager.h
-	Resources/blResource.h
-	Resources/blMeshResource.h)
-
-source_group("Resources/Source Files"
-	FILES 
-	Resources/blResourceManager.cpp
-	Resources/blResource.cpp
-	Resources/blMeshResource.cpp)
 
 source_group("Natvis"
 	FILES 

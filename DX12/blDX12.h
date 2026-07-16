@@ -24,11 +24,7 @@
 
 namespace BoulderLeaf::Graphics::DX12
 {
-	struct DX12ResourceState : public ResourceState
-	{
-	};
-
-	class blDX12 : public blGraphicsAPIImpl<DX12ResourceState>
+	class blDX12 : public blGraphicsAPIImpl
 	{
 		struct FrameData
 		{
@@ -46,13 +42,9 @@ namespace BoulderLeaf::Graphics::DX12
 		std::unique_ptr<blCompositeMeshRenderWithPassConstantsRenderComponent> mCompositeMeshRenderWithPassConstantsRenderComponent;
 
 		std::vector<blRenderComponentBase*> mRenderComponents;
-
-		std::set<blResourceId> mDirtyResources;
 	private:
 		blGlobalRenderData mGlobalRenderData;
-		std::vector<blDX12ResourceCacheBase*> mResourceCaches;
 		Core::blWindow* mWindow;
-		std::map<blSceneResource, blRenderSceneContext> mSceneContextMap;
 		std::unique_ptr<blCommandList> mCommandList;
 		std::unique_ptr<blFence> mFence;
 		std::array<FrameData, Constants::FrameResourceCount> mFrameData;
@@ -65,8 +57,6 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData) override;
 		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData) override;
 		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) override;
-
-		virtual void MarkResourceDirty(const blResourceId resourceId) override;
 	public:
 		blDX12(Core::blWindow* window);
 		~blDX12();

@@ -8,7 +8,7 @@ add_library(
 	blConfig.cpp
 	Resources/blResources.cpp
 	Resources/blResourceHandle.cpp
-	Resources/blResourcesExprimental.h
+	Resources/blResources.h
 	Resources/blResourceGuid.h
 	Resources/blResourceHandle.h
 	Resources/blResourceHandleOfType.h
@@ -35,7 +35,7 @@ target_link_libraries(
 
 source_group("Resources/Headers Files"
 	FILES 
-	Resources/blResourcesExprimental.h
+	Resources/blResources.h
 	Resources/blResourceGuid.h
 	Resources/blResourceHandle.h
 	Resources/blResourceHandleOfType.h)

@@ -1,5 +1,5 @@
 #include <ResourceCache/blDX12ResourceCache.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <Resources/blResourceHandleOfType.h>
 
 namespace BoulderLeaf::Graphics::DX12

@@ -6,9 +6,13 @@ namespace BoulderLeaf
 {
 	class blResourceContainer;
 
+	template<typename T>
+	class blResourceHandleOfType;
+
 	namespace Graphics
 	{
 		class API;
+		struct blMaterialResource;
 	}
 
 	namespace Core
@@ -35,4 +39,7 @@ namespace BoulderLeaf::Graphics
 		virtual void Draw() = 0;
 		virtual void Update(const Metrics::blTime& gameTime) = 0;
 	};
+
+	blResourceHandleOfType<blMaterialResource> CreateDefaultMaterial(blResourceContainer* container);
+	blResourceHandleOfType<blMaterialResource> CreateDefaultMaterialWithPassConstants(blResourceContainer* container);
 }

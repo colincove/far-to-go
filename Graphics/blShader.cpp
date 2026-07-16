@@ -1,11 +1,9 @@
 #include <blShader.h>
 #include <Resources/blResourceHandleOfType.h>
 
-BL_RESOURCE_IMPL(blShader);
-
 namespace BoulderLeaf::Graphics
 {
-	blShaderResource_exp::blShaderResource_exp(
+	blShaderResource::blShaderResource(
 		blResourceStream& stream,
 		const std::string& name,
 		const blShader::Parameter* parameters,
@@ -18,7 +16,7 @@ namespace BoulderLeaf::Graphics
 	{
 	}
 
-	blShader ShaderResourceToShader(const blResourceHandleOfType<blShaderResource_exp> shaderResource)
+	blShader ShaderResourceToShader(const blResourceHandleOfType<blShaderResource> shaderResource)
 	{
 		const blResourceHandleOfType<blBufferDescriptionResource> desc = shaderResource.GetContainer()->CreateHandleFromRefOfType(
 			shaderResource->mDescriptionResourceRef);

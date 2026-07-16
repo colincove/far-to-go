@@ -11,12 +11,11 @@
 #include <vector>
 #include <blTypes.h>
 #include <functional>
-#include <Resources/blResource.h>
 #include <stdexcept>
 #include <string>
 #include <blGraphicsCore.h>
 #include <minwindef.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 
 namespace BoulderLeaf {
 	template<typename TResource>
@@ -349,25 +348,3 @@ namespace BoulderLeaf::Graphics
 		}
 	};
 }
-
-BL_RESOURCE(blDataBufferInterface, eResourceType::DataBuffer);
-BL_RESOURCE(blDataElementBuffer, eResourceType::DataBuffer);
-
-namespace BoulderLeaf::Graphics
-{
-	class blVertexBufferWithPassBuffer
-	{
-	private:
-		blDataElementBufferResourcePtr mPassElementBuffer;
-		blDataBufferInterfaceResourcePtr mVertexBuffer;
-	public:
-		blVertexBufferWithPassBuffer(
-			blDataElementBufferResourcePtr passElementBuffer,
-			blDataBufferInterfaceResourcePtr vertexBuffer);
-
-		const blDataElementBufferResourcePtr GetPassElementBuffer() const { return mPassElementBuffer; }
-		const blDataBufferInterfaceResourcePtr GetVertexBuffer() const { return mVertexBuffer; }
-	};
-}
-
-BL_RESOURCE(blVertexBufferWithPassBuffer, eResourceType::DataBuffer)

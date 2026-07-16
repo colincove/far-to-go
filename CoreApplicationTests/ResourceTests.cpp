@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <Resources/blResourceHandleOfType.h>
 
 namespace BoulderLeaf::Resources

@@ -1,4 +1,4 @@
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <blCore.h>
 #include <Resources/blResourceGuid.h>
 

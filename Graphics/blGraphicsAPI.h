@@ -17,7 +17,6 @@
 #include <blRenderScene.h>
 #include <RenderItems/blRenderItemMesh.h>
 #include <blShader.h>
-#include <Resources/blResourceManager.h>
 #include <blRenderGroup.h>
 #include <blTime.h>
 
@@ -44,7 +43,6 @@ namespace BoulderLeaf::Graphics
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData) = 0;
 		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData) = 0;
 		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) = 0;
-		virtual void MarkResourceDirty(const blResourceId resourceId) = 0;
 		void StartFrame();
 		void EndFrame();
 		void Update(const Metrics::blTime& time);

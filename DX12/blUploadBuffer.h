@@ -5,7 +5,7 @@
 #include <blDevice.h>
 #include "../DirectX-Headers/include/directx/d3dx12.h"
 #include <blBuffer.h>
-#include <Resources/blResourcesExprimental.h>
+#include <Resources/blResources.h>
 #include <Resources/blResourceHandleOfType.h>
 
 
@@ -58,69 +58,6 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual UINT GetTotalSize() const;
 		virtual void CopyData(int currentFrameResource);
 		virtual void CopyAllData();
-	};
-
-	class blDX12blVertexDataUploadBuffer final: public blUploadBufferBase
-	{
-	private:
-		blDataBufferInterfaceWeakPtr mDataPtr;
-	public:
-		blDX12blVertexDataUploadBuffer(
-			blDevice* device,
-			bool isConstantBuffer,
-			blDataBufferInterfaceWeakPtr dataPtr,
-			std::wstring name
-		);
-
-		virtual void CopyData(int currentFrameResource) override;
-		virtual void CopyAllData() override;
-		void SetDataBuffer(blDataBufferInterfaceWeakPtr dataPtr)
-		{
-			mDataPtr = dataPtr;
-		}
-
-		D3D12_GPU_VIRTUAL_ADDRESS GetBufferLocationForIndex(int currentFrameResource, int index);
-	protected:
-		virtual UINT GetTotalSize() const override;
-	};
-
-	class blDX12VertexBufferWithPassUploadBuffer final : public blUploadBufferBase
-	{
-	private:
-		blVertexBufferWithPassBufferWeakPtr mDataPtr;
-	public:
-		blDX12VertexBufferWithPassUploadBuffer(
-			blDevice* device,
-			bool isConstantBuffer,
-			blVertexBufferWithPassBufferWeakPtr dataPtr,
-			std::wstring name
-		);
-
-		virtual void CopyData(int currentFrameResource) override;
-	protected:
-		virtual UINT GetTotalSize() const override;
-	};
-
-	class blDX12ElementUploadBuffer final : public blUploadBufferBase
-	{
-	private:
-		blDataElementBuffer* mDataPtr;
-	public:
-		blDX12ElementUploadBuffer(
-			blDevice* device,
-			bool isConstantBuffer,
-			blDataElementBuffer* dataPtr,
-			std::wstring name
-		);
-
-		virtual void CopyData(int currentFrameResource) override;
-		virtual void CopyAllData() override;
-		void SetDataBuffer(blDataElementBuffer* dataPtr)
-		{
-			mDataPtr = dataPtr;
-		}
-	protected:
-		virtual UINT GetTotalSize() const override;
 	};
 
 	class blDX12ListResourceUploadBuffer final : public blUploadBufferBase
