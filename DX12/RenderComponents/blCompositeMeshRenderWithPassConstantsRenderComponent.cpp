@@ -44,22 +44,25 @@ namespace BoulderLeaf::Graphics::DX12
 		const blResourceHandleOfType<blListResource> constantBufferListResource = container->CreateHandleFromRefOfType<blListResource>(
 			renderData.instanceConstantBuffer->mBufferResourceRef);
 		const blDX12MappedUploadBufferCacheData& constantBufferUploadBufferCacheData = globalRenderData.resourceCacheGlobalInterface->
-			GetMappedUploadBufferCache(constantBufferListResource);
+			GetMappedUploadBufferCache(renderData.instanceConstantBuffer);
 
 		const blResourceHandleOfType<blListResource> constantBufferResourceHandle =
 			renderData.instanceConstantBuffer.GetContainer()->CreateHandleFromRefOfType<blListResource>(renderData.instanceConstantBuffer->mBufferResourceRef);
 		const blDX12DescriptorHeapCacheData& descriptorHeapCacheData = globalRenderData.resourceCacheGlobalInterface->
-			GetDescriptorHeapCacheData(constantBufferResourceHandle);
+			GetDescriptorHeapCacheData(renderData.instanceConstantBuffer);
 
 		const blResourceHandleOfType<blListResource> passConstantBufferListResource = container->CreateHandleFromRefOfType<blListResource>(
 			renderData.passConstantBuffer->mBufferResourceRef);
 		const blDX12MappedUploadBufferCacheData& passBufferUploadBufferCacheData = globalRenderData.resourceCacheGlobalInterface->
-			GetMappedUploadBufferCache(passConstantBufferListResource);
+			GetMappedUploadBufferCache(renderData.passConstantBuffer);
 
 		const blResourceHandleOfType<blListResource> passConstantBufferResourceHandle =
 			renderData.passConstantBuffer.GetContainer()->CreateHandleFromRefOfType<blListResource>(renderData.passConstantBuffer->mBufferResourceRef);
 		const blDX12DescriptorHeapCacheData& passDescriptorHeapCacheData = globalRenderData.resourceCacheGlobalInterface->
-			GetDescriptorHeapCacheData(passConstantBufferResourceHandle);
+			GetDescriptorHeapCacheData(renderData.passConstantBuffer);
+
+		const blDX12ConstantBufferDescriptorHeapCacheData& constantBufferDescriptorHeap =
+			globalRenderData.resourceCacheGlobalInterface->GetConstantBufferDescriptorHeapCacheData(renderData.mConstantBuffers);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = globalRenderData.depthBuffer->DepthStencilView();
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = globalRenderData.swapChain->CurrentBackBufferView();
@@ -68,7 +71,9 @@ namespace BoulderLeaf::Graphics::DX12
 
 		// Specify the buffers we are going to render to.
 		mCommandList->OMSetRenderTargets(1, &backBufferView, true, &depthStencilView);
-		ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeapCacheData.descriptorHeap->GetDescriptorHeap().Get() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { 
+			constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get()
+		};
 		mCommandList->SetDescriptorHeaps((UINT)_countof(descriptorHeaps), descriptorHeaps);
 		mCommandList->SetGraphicsRootSignature(shaderCacheData.shaderData.RootSignature->GetRootSignature().Get());
 		mCommandList->IASetVertexBuffers(0, 1, &vertexBufferView);
@@ -76,11 +81,16 @@ namespace BoulderLeaf::Graphics::DX12
 		mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		mCommandList->SetPipelineState(shaderCacheData.shaderPSO->GetDX12PSO().Get());
-		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorHeapCacheData.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
-		auto cbvPassConstantsHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(passDescriptorHeapCacheData.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
 
-		cbvHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * constantBufferResourceHandle->mCount) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
-		cbvPassConstantsHandle.Offset((UINT)((globalRenderData.device->GetCbvSrvDescriptorSize() * passConstantBufferResourceHandle->mCount) * globalRenderData.globalRenderFrameContext->GetCurrentFrameResource()));
+		auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		auto cbvPassConstantsHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+
+		const UINT cbvDescSize = globalRenderData.device->GetCbvSrvDescriptorSize();
+		const UINT cbvStartOfFrameResouceOffset = (cbvDescSize * (constantBufferDescriptorHeap.instanceCount + constantBufferDescriptorHeap.numberOfConstantBuffers))
+			* globalRenderData.globalRenderFrameContext->GetCurrentFrameResource();
+		cbvHandle.Offset(cbvStartOfFrameResouceOffset);
+		cbvHandle.Offset(cbvDescSize * constantBufferDescriptorHeap.numberOfConstantBuffers);
+		cbvPassConstantsHandle.Offset(cbvStartOfFrameResouceOffset);
 
 		for (const BoulderLeaf::blResourceId& resourceId : renderData.submeshIds)
 		{
@@ -98,7 +108,7 @@ namespace BoulderLeaf::Graphics::DX12
 					0);
 			}
 
-			cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());
+			cbvHandle.Offset(cbvDescSize);
 		}
 	}
 }

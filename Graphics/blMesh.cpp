@@ -4,23 +4,9 @@
 
 namespace BoulderLeaf::Graphics
 {
+
 	void SubdividePrototype(MeshDataPrototype& prototype)
 	{
-		struct Triangle
-		{
-			union
-			{
-				struct
-				{
-					uint16_t i0;
-					uint16_t i1;
-					uint16_t i2;
-				};
-
-				uint16_t data[3];
-			};
-		};
-
 		const size_t indexCount = prototype.indices.size();
 
 		//we will be adding 9 new indices for every existing triangle. 

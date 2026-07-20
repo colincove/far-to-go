@@ -122,7 +122,7 @@ namespace BoulderLeaf::Graphics
 		const Matrix4x4 worldViewProj = world * view * proj;
 
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
-		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0).WorldViewProj = worldViewProj.Transpose();
+		mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0).WorldViewProj = worldViewProj;
 		mObjectConstantBufferListResource.MarkDirty();
 	}
 }

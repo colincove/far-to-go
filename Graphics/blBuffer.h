@@ -9,6 +9,7 @@
 #include <blMatrix4x4.inl>
 #include <exception>
 #include <vector>
+#include <cstdint>
 #include <blTypes.h>
 #include <functional>
 #include <stdexcept>
@@ -30,7 +31,7 @@ namespace BoulderLeaf::Graphics
 		DX12
 	};
 
-	enum class BufferElementType : byte
+	enum class BufferElementType : int
 	{
 		Float,
 		Float2,
@@ -38,6 +39,11 @@ namespace BoulderLeaf::Graphics
 		Float4,
 		Matrix3x3,
 		Matrix4x4,
+		Bool,
+		Int,
+		UInt,
+		Half,
+		Double,
 	};
 
 	struct BufferElementDescription
@@ -106,6 +112,11 @@ namespace BoulderLeaf::Graphics
 		virtual void MarshalVector4(const Math::Vector4& srcElement, byte* destElement) const = 0;
 		virtual void MarshalMatrix3x3(const Math::Matrix3x3& srcElement, byte* destElement) const = 0;
 		virtual void MarshalMatrix4x4(const Math::Matrix4x4& srcElement, byte* destElement) const = 0;
+		virtual void MarshalBool(const bool& srcElement, byte* destElement) const = 0;
+		virtual void MarshalInt(const int32_t& srcElement, byte* destElement) const = 0;
+		virtual void MarshalUInt(const uint32_t& srcElement, byte* destElement) const = 0;
+		virtual void MarshalHalf(const uint16_t& srcElement, byte* destElement) const = 0;
+		virtual void MarshalDouble(const double& srcElement, byte* destElement) const = 0;
 		virtual BufferFormat GetFormat() const = 0;
 
 		uint64_t SizeOf(const BufferDescription& descriptions) const;
@@ -166,20 +177,13 @@ namespace BoulderLeaf::Graphics
 		const blArrayBufferResource& sourceArray,
 		const blBufferElementAdapter& adapter);
 
-	class blDataElementBuffer
+	struct blConstantBufferResource : blBaseResource
 	{
-	private:
-		BufferFormat mFormat;
-		std::vector<BufferElementDescription> mElementDescriptions;
-		std::unique_ptr<byte[]> mData;
-	public:
-		blDataElementBuffer(BufferFormat format,
-			std::vector<BufferElementDescription> elementDescriptions,
-			std::unique_ptr<byte[]> data);
+		blResourceRefOfType<blArrayBufferResource> mInstanceConstantBuffer;
+		blListResource mPassConstantBuffers;
 
-		BufferFormat GetFormat() const { return mFormat; }
-		const std::vector<BufferElementDescription>& GetElementDescriptions() const { return mElementDescriptions; }
-		const byte* GetData() const { return mData.get(); };
-		byte* GetDataMutable() const { return mData.get(); };
+		blConstantBufferResource(blResourceStream& stream,
+			blResourceRefOfType<blArrayBufferResource> instanceConstantBuffer,
+			std::vector<blResourceRefOfType<blArrayBufferResource>> passConstantBuffers);
 	};
 }

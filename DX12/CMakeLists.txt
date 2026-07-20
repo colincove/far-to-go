@@ -77,6 +77,8 @@ add_library(
 	RenderComponents/blMeshRenderComponent.h
 	RenderComponents/blMeshInstancedRenderComponent.cpp
 	RenderComponents/blMeshInstancedRenderComponent.h
+	RenderComponents/blMeshInstancedV2RenderComponent.cpp
+	RenderComponents/blMeshInstancedV2RenderComponent.h
 	RenderComponents/blCompositeMeshRenderComponent.cpp
 	RenderComponents/blCompositeMeshRenderComponent.h
 	RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.cpp

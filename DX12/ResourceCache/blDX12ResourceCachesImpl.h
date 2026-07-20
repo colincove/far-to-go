@@ -101,16 +101,20 @@ namespace BoulderLeaf::Graphics::DX12
 		std::unique_ptr<blDX12ListResourceUploadBuffer> mUploadBuffer;
 	};
 
-	class blDX12MappedUploadBufferCache : public blDX12ResourceCacheTemplate<blListResource, blDX12MappedUploadBufferCacheData>
+	class blDX12MappedUploadBufferCache : public blDX12ResourceCacheTemplate<blArrayBufferResource, blDX12MappedUploadBufferCacheData>
 	{
 	private:
 		blDevice* mDevice;
+		blDX12ArrayBufferTranslationCache* mArrayBufferTranslationCache;
+
 	public:
-		blDX12MappedUploadBufferCache(blDevice* device);
+		blDX12MappedUploadBufferCache(
+			blDevice* device,
+			blDX12ArrayBufferTranslationCache* arrayBufferTranslationCache);
 	protected:
-		virtual void InitializeCacheTemplate(const blResourceHandleOfType<blListResource> resource,
+		virtual void InitializeCacheTemplate(const blResourceHandleOfType<blArrayBufferResource> resource,
 			blDX12MappedUploadBufferCacheData& cache) override;
-		virtual void UpdateCacheTemplate(const blResourceHandleOfType<blListResource> resource,
+		virtual void UpdateCacheTemplate(const blResourceHandleOfType<blArrayBufferResource> resource,
 			blDX12MappedUploadBufferCacheData& cache) override;
 	};
 }
@@ -122,16 +126,46 @@ namespace BoulderLeaf::Graphics::DX12
 		std::unique_ptr<blConstantBufferDescriptorHeap> descriptorHeap;
 	};
 
-	class blDX12DescriptorHeapCache : public blDX12ResourceCacheTemplate<blListResource, blDX12DescriptorHeapCacheData>
+	class blDX12DescriptorHeapCache : public blDX12ResourceCacheTemplate<blArrayBufferResource, blDX12DescriptorHeapCacheData>
 	{
 	private:
 		blDevice* mDevice;
 		blDX12MappedUploadBufferCache* mMappedUploadBufferCache;
+		blDX12ArrayBufferTranslationCache* mArrayBufferTranslationCache;
 	public:
-		blDX12DescriptorHeapCache(blDevice* device, blDX12MappedUploadBufferCache* mappedUploadBufferCache);
+		blDX12DescriptorHeapCache(
+			blDevice* device,
+			blDX12MappedUploadBufferCache* mappedUploadBufferCache,
+			blDX12ArrayBufferTranslationCache* arrayBufferTranslationCache);
 	protected:
-		virtual void InitializeCacheTemplate(const blResourceHandleOfType<blListResource> resource,
+		virtual void InitializeCacheTemplate(const blResourceHandleOfType<blArrayBufferResource> resource,
 			blDX12DescriptorHeapCacheData& cache) override;
+	};
+}
+
+namespace BoulderLeaf::Graphics::DX12
+{
+	struct blDX12ConstantBufferDescriptorHeapCacheData : public blDX12ResourceCacheData
+	{
+		std::unique_ptr<blConstantBufferDescriptorHeap> descriptorHeap;
+		uint32_t instanceCount;
+		uint32_t numberOfConstantBuffers;
+	};
+
+	class blDX12ConstantBufferDescriptorHeapCache : public blDX12ResourceCacheTemplate<blConstantBufferResource, blDX12ConstantBufferDescriptorHeapCacheData>
+	{
+	private:
+		blDevice* mDevice;
+		blDX12MappedUploadBufferCache* mMappedUploadBufferCache;
+		blDX12ArrayBufferTranslationCache* mArrayBufferTranslationCache;
+	public:
+		blDX12ConstantBufferDescriptorHeapCache(
+			blDevice* device, 
+			blDX12MappedUploadBufferCache* mappedUploadBufferCache,
+			blDX12ArrayBufferTranslationCache* arrayBufferTranslationCache);
+	protected:
+		virtual void InitializeCacheTemplate(const blResourceHandleOfType<blConstantBufferResource> resource,
+			blDX12ConstantBufferDescriptorHeapCacheData& cache) override;
 	};
 }
 

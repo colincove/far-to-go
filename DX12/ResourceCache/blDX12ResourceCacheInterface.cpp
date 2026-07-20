@@ -12,8 +12,9 @@ namespace BoulderLeaf::Graphics::DX12
 		: blDX12ResourceCacheInterface(),
 		blArrayBufferTranslationCache(),
 		mShaderCache(globalRenderData->device.get()),
-		mMappedUploadBufferCache(globalRenderData->device.get()),
-		mDescriptorHeapCache(globalRenderData->device.get(), &mMappedUploadBufferCache),
+		mMappedUploadBufferCache(globalRenderData->device.get(), &blArrayBufferTranslationCache),
+		mDescriptorHeapCache(globalRenderData->device.get(), &mMappedUploadBufferCache, &blArrayBufferTranslationCache),
+		mConstantBufferDescriptorHeapCache(globalRenderData->device.get(), &mMappedUploadBufferCache, &blArrayBufferTranslationCache),
 		mCompositeMeshGraftingCache()
 	{
 
@@ -29,12 +30,17 @@ namespace BoulderLeaf::Graphics::DX12
 		return mShaderCache.GetTypedCachedData(resource);
 	}
 
-	const blDX12DescriptorHeapCacheData& blDX12ResourceCacheGlobalInterface::GetDescriptorHeapCacheData(const blResourceHandleOfType<blListResource> resource)
+	const blDX12DescriptorHeapCacheData& blDX12ResourceCacheGlobalInterface::GetDescriptorHeapCacheData(const blResourceHandleOfType<blArrayBufferResource> resource)
 	{
 		return mDescriptorHeapCache.GetTypedCachedData(resource);
 	}
 
-	const blDX12MappedUploadBufferCacheData& blDX12ResourceCacheGlobalInterface::GetMappedUploadBufferCache(const blResourceHandleOfType<blListResource> resource)
+	const blDX12ConstantBufferDescriptorHeapCacheData& blDX12ResourceCacheGlobalInterface::GetConstantBufferDescriptorHeapCacheData(const blResourceHandleOfType<blConstantBufferResource> resource)
+	{
+		return mConstantBufferDescriptorHeapCache.GetTypedCachedData(resource);
+	}
+
+	const blDX12MappedUploadBufferCacheData& blDX12ResourceCacheGlobalInterface::GetMappedUploadBufferCache(const blResourceHandleOfType<blArrayBufferResource> resource)
 	{
 		return mMappedUploadBufferCache.GetTypedCachedData(resource);
 	}

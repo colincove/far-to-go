@@ -6,6 +6,7 @@
 #include <array>
 #include <cstdint>
 #include <blMath.inl>
+#include <blMesh.h>
 
 namespace BoulderLeaf::Graphics
 {
@@ -283,5 +284,55 @@ namespace BoulderLeaf::Graphics
 			meshData.indices.data(),
 			(uint32_t)meshData.indices.size()
 		);
+	}
+
+	blResourceHandleOfType<blIndexedMeshResource> CreateTerrainResource(blResourceContainer* container, uint16_t size)
+	{
+		BufferDescription desc = 
+		{ 
+			BufferFormat::BoulderLeaf, 
+			blTerrainVertexElementDescriptions
+		};
+
+		blResourceHandleOfType<blBufferDescriptionResource> descResource = BufferDescriptionResource(container, desc);
+		blResourceHandleOfType<blIndexedMeshResource> meshResource = CreateIndexedMeshResource<blTerrainVertex>(
+			container,
+			L"Terrain",
+			descResource.GetRef(),
+			(size * size) + size + (size  + 1),
+			size * size * 6
+		);
+
+		blResourceHandleOfType<blArrayBufferResource> vertexArrayBuffer =
+			container->CreateHandleFromRefOfType<blArrayBufferResource>(meshResource->mArrayBufferResourceRef);
+		blResourceHandleOfType<blListResource> vertexBuffer =
+			container->CreateHandleFromRefOfType<blListResource>(vertexArrayBuffer->mBufferResourceRef);
+
+		blResourceHandleOfType<blListResource> indexBuffer =
+			container->CreateHandleFromRefOfType<blListResource>(meshResource->mIndexListRef);
+
+		for (blTerrainVertex& vertexData : blListResource::Iterator<blTerrainVertex>(vertexBuffer.GetMutable()))
+		{
+			vertexData.Height = 0.0f;
+		}
+
+		const uint32_t sizePlusOne = size + 1;
+		for(uint32_t x = 0; x < size; ++x)
+		{
+			for(uint32_t y = 0; y < size; ++y)
+			{
+				const uint32_t topLeft = x + y * sizePlusOne;
+				const uint32_t topRight = x + y * sizePlusOne + 1;
+				Quad quad = { 
+					topLeft,
+					topRight,
+					topLeft + sizePlusOne * (y + 1),
+					topRight + sizePlusOne * (y + 1)};
+
+				quad.Write(&indexBuffer->GetMutable<uint16_t>((x * 6) + (y * size * 6)), 0);
+			}
+		}
+
+		return meshResource;
 	}
 }

@@ -17,6 +17,7 @@
 #include <blGraphicsAPIImpl.h>
 #include <RenderComponents/blMeshRenderComponent.h>
 #include <RenderComponents/blMeshInstancedRenderComponent.h>
+#include <RenderComponents/blMeshInstancedV2RenderComponent.h>
 #include <RenderComponents/blCompositeMeshRenderComponent.h>
 #include <RenderComponents/blCompositeMeshRenderWithPassConstantsRenderComponent.h>
 #include <blDX12Imgui.h>
@@ -37,6 +38,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		std::unique_ptr<blMeshRenderComponent> mMeshRenderComponent;
 		std::unique_ptr<blMeshInstancedRenderComponent> mMeshInstancedRenderComponent;
+		std::unique_ptr<blMeshInstancedV2RenderComponent> mMeshInstancedV2RenderComponent;
 		std::unique_ptr<blCompositeMeshRenderComponent> mCompositeMeshRenderComponent;
 		std::shared_ptr<blDX12Imgui> mDX12ImguiRenderComponent;
 		std::unique_ptr<blCompositeMeshRenderWithPassConstantsRenderComponent> mCompositeMeshRenderWithPassConstantsRenderComponent;
@@ -55,6 +57,7 @@ namespace BoulderLeaf::Graphics::DX12
 		virtual void UpdateInternal(const Metrics::blTime& time) override;
 		virtual void DrawMesh(const RenderMeshData& renderItem) override;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData) override;
+		virtual void DrawMeshInstancedV2(const RenderMeshDataInstancedV2& renderData) override;
 		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData) override;
 		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) override;
 	public:

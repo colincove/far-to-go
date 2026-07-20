@@ -16,6 +16,36 @@ namespace BoulderLeaf::Graphics::DX12
 		destElement = srcElement;
 	}
 
+void DX12BufferAdapter::MarshalBool(const bool& srcElement, byte* destElementPtr) const
+{
+	uint8_t& destElement = *reinterpret_cast<uint8_t*>(destElementPtr);
+	destElement = srcElement ? 1 : 0;
+}
+
+void DX12BufferAdapter::MarshalInt(const int32_t& srcElement, byte* destElementPtr) const
+{
+	int32_t& destElement = *reinterpret_cast<int32_t*>(destElementPtr);
+	destElement = srcElement;
+}
+
+void DX12BufferAdapter::MarshalUInt(const uint32_t& srcElement, byte* destElementPtr) const
+{
+	uint32_t& destElement = *reinterpret_cast<uint32_t*>(destElementPtr);
+	destElement = srcElement;
+}
+
+void DX12BufferAdapter::MarshalHalf(const uint16_t& srcElement, byte* destElementPtr) const
+{
+	uint16_t& destElement = *reinterpret_cast<uint16_t*>(destElementPtr);
+	destElement = srcElement;
+}
+
+void DX12BufferAdapter::MarshalDouble(const double& srcElement, byte* destElementPtr) const
+{
+	double& destElement = *reinterpret_cast<double*>(destElementPtr);
+	destElement = srcElement;
+}
+
 	void DX12BufferAdapter::MarshalVector2(const Math::Vector2& srcElement, byte* destElementPtr) const
 	{
 		DirectX::XMFLOAT2& destElement = *reinterpret_cast<DirectX::XMFLOAT2*>(destElementPtr);
@@ -37,13 +67,17 @@ namespace BoulderLeaf::Graphics::DX12
 	void DX12BufferAdapter::MarshalMatrix3x3(const Math::Matrix3x3& srcElement, byte* destElementPtr) const
 	{
 		DirectX::XMFLOAT3X3& destElement = *reinterpret_cast<DirectX::XMFLOAT3X3*>(destElementPtr);
-		destElement = DirectX::XMFLOAT3X3(srcElement.elements);
+		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
+		Math::Matrix3x3 transposed = srcElement.Transpose();
+		destElement = DirectX::XMFLOAT3X3(transposed.elements);
 	}
 
 	void DX12BufferAdapter::MarshalMatrix4x4(const Math::Matrix4x4& srcElement, byte* destElementPtr) const
 	{
 		DirectX::XMFLOAT4X4& destElement = *reinterpret_cast<DirectX::XMFLOAT4X4*>(destElementPtr);
-		destElement = DirectX::XMFLOAT4X4(srcElement.elements);
+		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
+		Math::Matrix4x4 transposed = srcElement.Transpose();
+		destElement = DirectX::XMFLOAT4X4(transposed.elements);
 	}
 
 	BufferFormat DX12BufferAdapter::GetFormat() const 
@@ -67,6 +101,16 @@ namespace BoulderLeaf::Graphics::DX12
 			return sizeof(DirectX::XMFLOAT3X3);
 		case BufferElementType::Matrix4x4:
 			return sizeof(DirectX::XMFLOAT4X4);
+	case BufferElementType::Bool:
+		return sizeof(uint8_t);
+	case BufferElementType::Int:
+		return sizeof(int32_t);
+	case BufferElementType::UInt:
+		return sizeof(uint32_t);
+	case BufferElementType::Half:
+		return sizeof(uint16_t);
+	case BufferElementType::Double:
+		return sizeof(double);
 		}
 
 		assert(false);
@@ -88,6 +132,7 @@ namespace BoulderLeaf::Graphics::DX12
 			{
 			case BufferElementType::Float:
 				format = DXGI_FORMAT_R32_FLOAT;
+				break;
 			case BufferElementType::Float2:
 				format = DXGI_FORMAT_R32G32_FLOAT;
 				break;
@@ -96,6 +141,21 @@ namespace BoulderLeaf::Graphics::DX12
 				break;
 			case BufferElementType::Float4:
 				format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+				break;
+			case BufferElementType::Bool:
+				format = DXGI_FORMAT_R8_UINT;
+				break;
+			case BufferElementType::Int:
+				format = DXGI_FORMAT_R32_SINT;
+				break;
+			case BufferElementType::UInt:
+				format = DXGI_FORMAT_R32_UINT;
+				break;
+			case BufferElementType::Half:
+				format = DXGI_FORMAT_R16_FLOAT;
+				break;
+			case BufferElementType::Double:
+				format = DXGI_FORMAT_R32G32_FLOAT;
 				break;
 			default:
 				throw std::runtime_error(std::format("Unknown vertex element type {}", static_cast<int>(element.ElementType)));

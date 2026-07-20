@@ -89,6 +89,7 @@ namespace BoulderLeaf::Graphics::DX12
 
 		mMeshRenderComponent = std::make_unique <blMeshRenderComponent>(&mGlobalRenderData);
 		mMeshInstancedRenderComponent = std::make_unique<blMeshInstancedRenderComponent>(&mGlobalRenderData);
+		mMeshInstancedV2RenderComponent = std::make_unique<blMeshInstancedV2RenderComponent>(&mGlobalRenderData);
 		mCompositeMeshRenderComponent = std::make_unique<blCompositeMeshRenderComponent>(&mGlobalRenderData);
 		mDX12ImguiRenderComponent = std::make_shared<blDX12Imgui>(&mGlobalRenderData, mWindow);
 		mCompositeMeshRenderWithPassConstantsRenderComponent = std::make_unique<blCompositeMeshRenderWithPassConstantsRenderComponent>(&mGlobalRenderData);
@@ -98,6 +99,7 @@ namespace BoulderLeaf::Graphics::DX12
 		{
 			//mMeshRenderComponent.get(), //not functioning right now. 
 			mMeshInstancedRenderComponent.get(),
+			mMeshInstancedV2RenderComponent.get(),
 			mDX12ImguiRenderComponent.get(),
 			mCompositeMeshRenderComponent.get(),
 			mCompositeMeshRenderWithPassConstantsRenderComponent.get()
@@ -242,6 +244,11 @@ namespace BoulderLeaf::Graphics::DX12
 	{
 		mMeshInstancedRenderComponent->Render(renderData);
 	}
+
+void blDX12::DrawMeshInstancedV2(const RenderMeshDataInstancedV2& renderData)
+{
+	mMeshInstancedV2RenderComponent->Render(renderData);
+}
 
 	void blDX12::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData)
 	{

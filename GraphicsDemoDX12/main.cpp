@@ -11,6 +11,7 @@
 #include <GeosphereDemoScene.h>
 #include <CylinderDemoScene.h>
 #include <ShapesWithPassDemoScene.h>
+#include <blTerrainDemo.h>
 #include <DemoImgui.h>
 #include <Resources/blResources.h>
 
@@ -38,13 +39,14 @@ int main()
 
 	MSG msg = { };
 
-	std::array<std::unique_ptr<blDemoScene>, 5> demoScenes =
+	std::array<std::unique_ptr<blDemoScene>, 6> demoScenes =
 	{
 		std::make_unique<blBoxScene>(api.get(), &window, container),
 		std::make_unique<blCylinderDemoScene>(api.get(), &window, container),
 		std::make_unique<blGeosphereDemoScene>(api.get(), &window, container),
 		std::make_unique<blShapesDemoScene>(api.get(), &window, container),
 		std::make_unique<ShapesWithPassDemoScene>(api.get(), &window, container),
+		std::make_unique<blTerrainDemoScene>(api.get(), &window, container)
 	};
 
 	Imgui::SetCurrentSelection(1);

@@ -32,6 +32,7 @@ namespace BoulderLeaf::Graphics::DX12
 	private:
 		blDX12ArrayBufferTranslationCache blArrayBufferTranslationCache;
 		blDX12ShaderCache mShaderCache;
+		blDX12ConstantBufferDescriptorHeapCache mConstantBufferDescriptorHeapCache;
 		blDX12DescriptorHeapCache mDescriptorHeapCache;
 		blDX12MappedUploadBufferCache mMappedUploadBufferCache;
 		blDX12CompositeMeshGraftingCache mCompositeMeshGraftingCache;
@@ -40,8 +41,9 @@ namespace BoulderLeaf::Graphics::DX12
 
 		const blDX12ArrayBufferTranslationCacheData& GetArrayBufferTranslationCacheData(const blResourceHandleOfType<blArrayBufferResource> resource);
 		const blDX12ShaderCacheData& GetShaderCacheData(const blResourceHandleOfType<blShaderResource> resource);
-		const blDX12DescriptorHeapCacheData& GetDescriptorHeapCacheData(const blResourceHandleOfType<blListResource> resource);
-		const blDX12MappedUploadBufferCacheData& GetMappedUploadBufferCache(const blResourceHandleOfType<blListResource> resource);
+		const blDX12DescriptorHeapCacheData& GetDescriptorHeapCacheData(const blResourceHandleOfType<blArrayBufferResource> resource);
+		const blDX12ConstantBufferDescriptorHeapCacheData& GetConstantBufferDescriptorHeapCacheData(const blResourceHandleOfType<blConstantBufferResource> resource);
+		const blDX12MappedUploadBufferCacheData& GetMappedUploadBufferCache(const blResourceHandleOfType<blArrayBufferResource> resource);
 		const blDX12CompositeMeshGraftingCacheData& GetCompositeMeshGraftingCache(const blResourceHandleOfType<blCompositeMeshResource> resource);
 	};
 

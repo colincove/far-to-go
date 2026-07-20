@@ -20,7 +20,8 @@ $asmPath = "$outDirectory\v_$fileName.asm"
 #These options will generate pdb output. These are symbols loaded by PIX to debug the shaders.
 #-Zi -Fd
 
-dxc ".\..\hlsl\$($fileName)_vs.hlsl" -T vs_6_0 -E VS -Fo $csoPath -Fc $asmPath -Od -Zi -Fd "$outDirectory\"
+#replaced -Od with -O0 to disable optimizations. This allows me to view all variables when debugging. 
+dxc ".\..\hlsl\$($fileName)_vs.hlsl" -T vs_6_0 -E VS -Fo $csoPath -Fc $asmPath -O0 -Zi -Fd "$outDirectory\"
 
 "$csoPath"
 "$asmPath"

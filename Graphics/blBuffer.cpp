@@ -46,11 +46,32 @@ namespace BoulderLeaf::Graphics
 				srcOffset += sizeof(float);
 				break;
 			}
+			case BufferElementType::Bool:
+			{
+				const bool& srcElement = *reinterpret_cast<const bool*>(srcVertex + srcOffset);
+				adapter.MarshalBool(srcElement, destVertex);
+				srcOffset += sizeof(bool);
+				break;
+			}
 			case BufferElementType::Float2:
 			{
 				const Math::Vector2& srcElement = *reinterpret_cast<const Math::Vector2*>(srcVertex + srcOffset);
 				adapter.MarshalVector2(srcElement, destVertex);
 				srcOffset += sizeof(Math::Vector2);
+				break;
+			}
+			case BufferElementType::Int:
+			{
+				const int32_t& srcElement = *reinterpret_cast<const int32_t*>(srcVertex + srcOffset);
+				adapter.MarshalInt(srcElement, destVertex);
+				srcOffset += sizeof(int32_t);
+				break;
+			}
+			case BufferElementType::UInt:
+			{
+				const uint32_t& srcElement = *reinterpret_cast<const uint32_t*>(srcVertex + srcOffset);
+				adapter.MarshalUInt(srcElement, destVertex);
+				srcOffset += sizeof(uint32_t);
 				break;
 			}
 			case BufferElementType::Float3:
@@ -60,11 +81,25 @@ namespace BoulderLeaf::Graphics
 				srcOffset += sizeof(Math::Vector3);
 				break;
 			}
+			case BufferElementType::Half:
+			{
+				const uint16_t& srcElement = *reinterpret_cast<const uint16_t*>(srcVertex + srcOffset);
+				adapter.MarshalHalf(srcElement, destVertex);
+				srcOffset += sizeof(uint16_t);
+				break;
+			}
 			case BufferElementType::Float4:
 			{
 				const Math::Vector4& srcElement = *reinterpret_cast<const Math::Vector4*>(srcVertex + srcOffset);
 				adapter.MarshalVector4(srcElement, destVertex);
 				srcOffset += sizeof(Math::Vector4);
+				break;
+			}
+			case BufferElementType::Double:
+			{
+				const double& srcElement = *reinterpret_cast<const double*>(srcVertex + srcOffset);
+				adapter.MarshalDouble(srcElement, destVertex);
+				srcOffset += sizeof(double);
 				break;
 			}
 			case BufferElementType::Matrix3x3:
@@ -100,16 +135,6 @@ namespace BoulderLeaf::Graphics
 		}
 
 		return elementSize;
-	}
-
-	blDataElementBuffer::blDataElementBuffer(BufferFormat format,
-		std::vector<BufferElementDescription> elementDescriptions,
-		std::unique_ptr<byte[]> data)
-		: mFormat(format),
-		mElementDescriptions(elementDescriptions),
-		mData(std::move(data))
-	{
-
 	}
 
 	uint64_t blBufferElementAdapter::SizeOf(const BufferDescription& description) const
@@ -255,5 +280,14 @@ namespace BoulderLeaf::Graphics
 			translatedDescriptionResourceHandle.GetRef(),
 			arrayData.GetRef()
 		);
+	}
+
+	blConstantBufferResource::blConstantBufferResource(blResourceStream& stream,
+		blResourceRefOfType<blArrayBufferResource> instanceConstantBuffer,
+		std::vector<blResourceRefOfType<blArrayBufferResource>> passConstantBuffers)
+		: mInstanceConstantBuffer(instanceConstantBuffer),
+		mPassConstantBuffers(stream, passConstantBuffers.size(), passConstantBuffers.data())
+	{
+
 	}
 }

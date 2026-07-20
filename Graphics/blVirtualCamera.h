@@ -13,6 +13,7 @@ namespace BoulderLeaf::Graphics
 		float m_farPlane;
 		float m_viewAngle;
 		float m_aspectRatio;
+		constexpr static Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 	public:
 		VirtualCamera();
 		VirtualCamera(float nearPlane, float farPlane, float viewAngle, float aspectRatio);
@@ -31,5 +32,7 @@ namespace BoulderLeaf::Graphics
 		float GetFarPlane() const;
 		float GetViewAngle() const;
 		float GetAspectRatio() const;
+
+
 	};
 }

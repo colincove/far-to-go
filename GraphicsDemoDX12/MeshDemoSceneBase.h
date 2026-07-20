@@ -127,9 +127,10 @@ namespace BoulderLeaf::Graphics
 			const Matrix4x4 worldViewProj = world * view * proj;
 			const Matrix4x4 worldViewProj2 = world * view2 * proj;
 
-			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0).WorldViewProj = worldViewProj.Transpose();
-			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(1).WorldViewProj = worldViewProj2.Transpose();
+			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0).WorldViewProj = worldViewProj;
+			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(1).WorldViewProj = worldViewProj2;
 			mObjectConstantBufferListResource.MarkDirty();
+			mObjectConstantBufferResource.MarkDirty();
 		}
 	};
 }

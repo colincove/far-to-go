@@ -11,6 +11,7 @@ namespace BoulderLeaf::Graphics
 	public:
 		virtual void DrawMesh(const RenderMeshData& renderData) override;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData) override;
+		virtual void DrawMeshInstancedV2(const RenderMeshDataInstancedV2& renderData) override;
 		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData) override;
 		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) override;
 	};

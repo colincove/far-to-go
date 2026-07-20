@@ -72,6 +72,12 @@ namespace BoulderLeaf::Graphics
 
 		mPassConstantBufferListResource = resourceContainer->CreateHandleFromRefOfType(mPassConstantBufferResource->mBufferResourceRef);
 
+		mConstantBufferResource = resourceContainer->CreateResourceOfTypeWithDynamicSize<blConstantBufferResource>(
+			L"ShapesWithPassDemoScene Constant Buffer",
+			mObjectConstantBufferResource.GetRef(),
+			std::vector<blResourceRefOfType<blArrayBufferResource>> { mPassConstantBufferResource.GetRef() }
+		);
+
 		mRenderData = std::vector<RenderCompositeMeshDataWithPassConstants>
 		{
 			RenderCompositeMeshDataWithPassConstants
@@ -82,7 +88,8 @@ namespace BoulderLeaf::Graphics
 				mCompositeMeshResource,
 				mMaterialResource,
 				std::vector<BoulderLeaf::blResourceId> {mBoxMeshResource.GetId()},
-				0
+				0,
+				mConstantBufferResource
 			},
 			RenderCompositeMeshDataWithPassConstants
 			{
@@ -92,7 +99,8 @@ namespace BoulderLeaf::Graphics
 				mCompositeMeshResource,
 				mMaterialResource,
 				std::vector<BoulderLeaf::blResourceId> {mGeosphereMeshResource.GetId()},
-				1
+				1,
+				mConstantBufferResource
 			},
 			RenderCompositeMeshDataWithPassConstants
 			{
@@ -108,7 +116,8 @@ namespace BoulderLeaf::Graphics
 					mGeosphereMeshResource.GetId(),
 					mCylinderMeshResource.GetId(),
 				},
-				2
+				2,
+			mConstantBufferResource
 			}
 		};
 	}
@@ -149,17 +158,18 @@ namespace BoulderLeaf::Graphics
 		const Matrix4x4 proj = mCamera.GetProjectionMatrix();
 		const Matrix4x4 worldViewProj = world * view * proj;
 
-		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		for (int i = 0; i < mObjectConstantBufferListResource->mCount; ++i)
 		{
-			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(i).WorldViewProj = worldViewProj.Transpose();
+			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(i).WorldViewProj = worldViewProj;
 		}
 
+		mObjectConstantBufferResource.MarkDirty();
 		mObjectConstantBufferListResource.MarkDirty();
 		
 		// We transpose the matrix here because the shader expects column-major matrices, but our math library uses row-major matrices. Transposing converts between these two conventions.
 		cbPass& passData = mPassConstantBufferListResource->GetMutable<cbPass>(0);
-		passData.view = worldViewProj.Transpose();
+		passData.view = worldViewProj;
 		mPassConstantBufferListResource.MarkDirty();
+		mPassConstantBufferResource.MarkDirty();
 	}
 }

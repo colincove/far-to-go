@@ -41,6 +41,7 @@ namespace BoulderLeaf::Graphics
 		virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { return true; }
 		virtual void DrawMesh(const RenderMeshData& renderData) = 0;
 		virtual void DrawMeshInstanced(const RenderMeshDataInstanced& renderData) = 0;
+		virtual void DrawMeshInstancedV2(const RenderMeshDataInstancedV2& renderData) = 0;
 		virtual void DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData) = 0;
 		virtual void DrawCompositeMeshWithPass(const RenderCompositeMeshDataWithPassConstants& renderData) = 0;
 		void StartFrame();

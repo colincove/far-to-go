@@ -40,7 +40,7 @@ namespace BoulderLeaf::Imgui
             return;
         }
 
-        const char* items[] = { "Box","Cylinder","Geosphere", "Shapes", "Shapes With Pass"};
+        const char* items[] = { "Box","Cylinder","Geosphere", "Shapes", "Shapes With Pass", "Terrain"};
         ImGui::Combo("Example", &item_current, items, C_ARRAY_COUNT(items));
         ImGui::End();
     }

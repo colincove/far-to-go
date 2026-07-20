@@ -45,12 +45,12 @@ namespace BoulderLeaf::Graphics::DX12
 		const blResourceHandleOfType<blListResource> constantBufferListResource = container->CreateHandleFromRefOfType<blListResource>(
 			renderData.constantBuffer->mBufferResourceRef);
 		const blDX12MappedUploadBufferCacheData& constantBufferUploadBufferCacheData = globalRenderData.resourceCacheGlobalInterface->
-			GetMappedUploadBufferCache(constantBufferListResource);
+			GetMappedUploadBufferCache(renderData.constantBuffer);
 
 		const blResourceHandleOfType<blListResource> constantBufferResourceHandle =
 			renderData.constantBuffer.GetContainer()->CreateHandleFromRefOfType<blListResource>(renderData.constantBuffer->mBufferResourceRef);
 		const blDX12DescriptorHeapCacheData& descriptorHeapCacheData = globalRenderData.resourceCacheGlobalInterface->
-			GetDescriptorHeapCacheData(constantBufferResourceHandle);
+			GetDescriptorHeapCacheData(renderData.constantBuffer);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = globalRenderData.depthBuffer->DepthStencilView();
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferView = globalRenderData.swapChain->CurrentBackBufferView();

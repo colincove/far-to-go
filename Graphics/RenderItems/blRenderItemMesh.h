@@ -27,6 +27,17 @@ namespace BoulderLeaf::Graphics
 		blResourceHandleOfType<blMaterialResource> material;
 	};
 
+	// Copy of RenderMeshDataInstanced for V2 render path. This variant uses the
+	// consolidated constantBuffers resource which owns the instance buffer and
+	// pass constant buffers.
+	struct RenderMeshDataInstancedV2 : public RenderData
+	{
+		blResourceHandleOfType<blIndexedMeshResource> mesh;
+		blResourceHandleOfType<blMaterialResource> material;
+		// Consolidated constant buffer resource: contains instance buffer and pass constant buffers.
+		blResourceHandleOfType<blConstantBufferResource> constantBuffers;
+	};
+
 	struct RenderCompositeMeshDataInstanced : public RenderData
 	{
 		//GPU buffer resource containing instance data. This is what is actually bound to the pipeline.
@@ -46,5 +57,6 @@ namespace BoulderLeaf::Graphics
 		blResourceHandleOfType<blMaterialResource> material;
 		std::vector<BoulderLeaf::blResourceId> submeshIds;
 		size_t instance;
+		blResourceHandleOfType<blConstantBufferResource> mConstantBuffers;
 	};
 }

@@ -17,6 +17,47 @@
 
 namespace BoulderLeaf::Graphics
 {
+	struct Triangle
+	{
+		union
+		{
+			struct
+			{
+				uint16_t i0;
+				uint16_t i1;
+				uint16_t i2;
+			};
+
+			uint16_t data[3];
+		};
+	};
+
+	struct Quad
+	{
+		union
+		{
+			struct
+			{
+				uint16_t i0;
+				uint16_t i1;
+				uint16_t i2;
+				uint16_t i3;
+			};
+
+			uint16_t data[4];
+		};
+
+		void Write(uint16_t* indices, uint16_t offset) const
+		{
+			indices[0] = i0 + offset;
+			indices[1] = i1 + offset;
+			indices[2] = i2 + offset;
+			indices[3] = i2 + offset;
+			indices[4] = i1 + offset;
+			indices[5] = i3 + offset;
+		}
+	};
+
 	struct MeshDataPrototype
 	{
 		std::vector<StandardVertex> vertices;
@@ -52,6 +93,23 @@ namespace BoulderLeaf::Graphics
 		uint64_t vertexSize,
 		uint32_t vertexCount,
 		uint32_t indexCount);
+
+	template<typename TVertex>
+	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
+		blResourceContainer* resourceContainer,
+		std::wstring name,
+		blResourceRefOfType<blBufferDescriptionResource> descriptionResourceRef,
+		uint32_t vertexCount,
+		uint32_t indexCount)
+	{
+		return CreateIndexedMeshResource(
+			resourceContainer,
+			name,
+			descriptionResourceRef,
+			sizeof(TVertex),
+			vertexCount,
+			indexCount);
+	}
 
 	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
 		blResourceContainer* resourceContainer,

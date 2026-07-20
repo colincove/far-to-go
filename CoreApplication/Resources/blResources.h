@@ -311,6 +311,7 @@ namespace BoulderLeaf
 			return reinterpret_cast<T*>(reinterpret_cast<byte*>(this) + mDataOffset);
 		}
 
+		template<typename T>
 		class Iterator
 		{
 		private:
@@ -329,9 +330,9 @@ namespace BoulderLeaf
 
 			}
 
-			byte& operator*() const
+			T& operator*() const
 			{
-				return mList->GetMutable<byte>(mCurrentIndex);
+				return mList->GetMutable<T>(mCurrentIndex);
 			}
 
 			Iterator& operator++()
@@ -356,6 +357,7 @@ namespace BoulderLeaf
 			}
 		};
 
+		template<typename T = byte>
 		class ConstIterator
 		{
 		private:
@@ -374,9 +376,9 @@ namespace BoulderLeaf
 
 			}
 
-			const byte& operator*() const
+			const T& operator*() const
 			{
-				return mList->Get<byte>(mCurrentIndex);
+				return mList->Get<T>(mCurrentIndex);
 			}
 
 			const ConstIterator& operator++()

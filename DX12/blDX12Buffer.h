@@ -11,6 +11,11 @@ namespace BoulderLeaf::Graphics::DX12
 		static const DX12BufferAdapter& Get();
 		virtual size_t SizeOfElement(BufferElementType Type) const override;
 		virtual void MarshalFloat(const float& srcElement, byte* destElement) const override;
+		virtual void MarshalBool(const bool& srcElement, byte* destElement) const override;
+		virtual void MarshalInt(const int32_t& srcElement, byte* destElement) const override;
+		virtual void MarshalUInt(const uint32_t& srcElement, byte* destElement) const override;
+		virtual void MarshalHalf(const uint16_t& srcElement, byte* destElement) const override;
+		virtual void MarshalDouble(const double& srcElement, byte* destElement) const override;
 		virtual void MarshalVector2(const BoulderLeaf::Math::Vector2& srcElement, byte* destElement) const override;
 		virtual void MarshalVector3(const BoulderLeaf::Math::Vector3& srcElement, byte* destElement) const override;
 		virtual void MarshalVector4(const BoulderLeaf::Math::Vector4& srcElement, byte* destElement) const override;
