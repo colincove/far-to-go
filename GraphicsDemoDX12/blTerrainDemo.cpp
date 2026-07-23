@@ -8,13 +8,17 @@ namespace BoulderLeaf::Graphics
 	blTerrainDemoScene::blTerrainDemoScene(API* graphicsAPI, Core::blWindow* window, blResourceContainer* resourceContainer)
 		: blDemoScene(graphicsAPI, window, resourceContainer), mCamera(1, 1000, 0.25f * PIf, window->AspectRatio())
 	{
-		static const uint32_t size = 2;
+		static const uint32_t size = 30;
+		static const uint32_t scale = 2;
 		SetMeshAndShaderData(CreateTerrainResource(resourceContainer, size));
-		
+	
 		for (blTerrainVertex& vert : blListResource::Iterator<blTerrainVertex>(mTerrainVertexBuffer.GetMutable()))
 		{
-			vert.Height = ((float) rand() / (float) RAND_MAX);
+			vert.Height = ((float) rand() / (float) RAND_MAX) * scale;
 		}
+
+		//calculate after settings height values
+		CalculateVertexNormalsForHeightMap(size, mTerrainMesh);
 
 		blResourceHandleOfType<blBufferDescriptionResource> constantBufferDesc = BufferDescriptionResource(
 			resourceContainer, { BufferFormat::BoulderLeaf, blTerrainObjectConstantsElementDescriptions, 256 });
@@ -32,6 +36,7 @@ namespace BoulderLeaf::Graphics
 		blTerrainObjectConstants& constantsRef = mObjectConstantBufferListResource->GetMutable<blTerrainObjectConstants>(0);
 		blTerrainVertex& terrainVertexRef = mTerrainVertexBuffer->GetMutable<blTerrainVertex>(0);
 
+		constantsRef.Transform = Matrix4x4::TranslationMatrix(-((float) size / 2), -1, -((float)size / 2));
 		CalculateHeightBoundsForTerrain(&terrainVertexRef, 
 			mTerrainVertexBuffer->mCount,
 			constantsRef.MinHeight,
@@ -102,8 +107,23 @@ namespace BoulderLeaf::Graphics
 	}
 	void blTerrainDemoScene::Update(const Metrics::blTime& gameTime)
 	{
-		mPassConstantBufferListResource->GetMutable<cbPass>(0) = CalculatePassData(mCamera, gameTime);
+		//this is a copy from the other demo scenes that render correctly. 
+		//but I am suspect that these values were already inverted.....
+		// and because we invert the matrix from the mVirtualCamera at a later time,
+		// we need to invert these here. 
+		//mCamera.mTranslation = Math::Vector4::Point3D(-0.660871327, 14.8207569, -13.4129944);
+		mCamera.mTranslation = Math::Vector4::Point3D(0.660871327, -14.8207569, 13.4129944);
+		mCamera.LookAt(Math::Vector4::Point3D(0, 0, 0));
+
+		cbPass& passData = mPassConstantBufferListResource->GetMutable<cbPass>(0);
+		passData = CalculatePassData(mCamera, gameTime);
 		mPassConstantBufferListResource.MarkDirty();
 		mPassConstantBufferResource.MarkDirty();
+
+		blTerrainObjectConstants& constantsRef = mObjectConstantBufferListResource->GetMutable<blTerrainObjectConstants>(0);
+		constantsRef.WorldViewProj = constantsRef.World * passData.viewProj;
+		constantsRef.WorldViewProjInverseTranspose = InverseTransposeForNormals(constantsRef.WorldViewProj);
+		mObjectConstantBufferListResource.MarkDirty();
+		mObjectConstantBufferResource.MarkDirty();
 	}
 }

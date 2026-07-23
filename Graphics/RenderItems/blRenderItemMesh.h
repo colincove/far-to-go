@@ -25,6 +25,7 @@ namespace BoulderLeaf::Graphics
 		blResourceHandleOfType<blArrayBufferResource> constantBuffer;
 		blResourceHandleOfType<blIndexedMeshResource> mesh;
 		blResourceHandleOfType<blMaterialResource> material;
+		blResourceHandleOfType<blConstantBufferResource> mConstantBuffers;
 	};
 
 	// Copy of RenderMeshDataInstanced for V2 render path. This variant uses the

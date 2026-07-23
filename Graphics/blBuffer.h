@@ -31,6 +31,17 @@ namespace BoulderLeaf::Graphics
 		DX12
 	};
 
+	enum class BufferElementSemantic
+	{
+		None,
+		Position,
+		Normal,
+		Tangent,
+		Colour,
+		TEXCOORD,
+		Height
+	};
+
 	enum class BufferElementType : int
 	{
 		Float,
@@ -50,6 +61,7 @@ namespace BoulderLeaf::Graphics
 	{
 		std::string Name;
 		BufferElementType ElementType;
+		BufferElementSemantic Semantic;
 	};
 
 	struct BufferDescription
@@ -63,6 +75,7 @@ namespace BoulderLeaf::Graphics
 	struct blBufferElementDescriptionResource : public blBaseResource
 	{
 		BufferElementType mElementType;
+		BufferElementSemantic mSemantic;
 		blStringResource mNameStringResource;
 
 		blBufferElementDescriptionResource(blResourceStream& stream, const BufferElementDescription& element);
@@ -102,10 +115,18 @@ namespace BoulderLeaf::Graphics
 		);
 	};
 
-	class blBufferElementAdapter
+	class blBufferElementFormatter
 	{
 	public:
 		virtual size_t SizeOfElement(BufferElementType Type) const = 0;
+		virtual BufferFormat GetFormat() const = 0;
+		virtual uint64_t SizeOf(const BufferDescription& descriptions) const;
+	};
+
+	class blBufferElementAdapter : public blBufferElementFormatter
+	{
+	public:
+		virtual size_t SizeOfElement(BufferElementType Type) const override = 0;
 		virtual void MarshalFloat(const float& srcElement, byte* destElement) const = 0;
 		virtual void MarshalVector2(const Math::Vector2& srcElement, byte* destElement) const = 0;
 		virtual void MarshalVector3(const Math::Vector3& srcElement, byte* destElement) const = 0;
@@ -117,9 +138,20 @@ namespace BoulderLeaf::Graphics
 		virtual void MarshalUInt(const uint32_t& srcElement, byte* destElement) const = 0;
 		virtual void MarshalHalf(const uint16_t& srcElement, byte* destElement) const = 0;
 		virtual void MarshalDouble(const double& srcElement, byte* destElement) const = 0;
-		virtual BufferFormat GetFormat() const = 0;
+		virtual BufferFormat GetFormat() const override = 0;
+	};
 
-		uint64_t SizeOf(const BufferDescription& descriptions) const;
+	//TODO: This does not make sense right now. Because the current adapter explicitly converts 
+	//BoulderLeaf buffer into another (eg. DX12).  We have no mechanism to convert back from DX12 into BoulderLeaf. 
+	//So most of this API does not make sense. TODO: Maybe finish this when I change the interface to convert 
+	//back and forth. 
+	class blDefaultBufferElementFormatter : public blBufferElementFormatter
+	{
+	public:
+		static const blDefaultBufferElementFormatter& Get();
+		virtual size_t SizeOfElement(BufferElementType Type) const override;
+		virtual BufferFormat GetFormat() const override;
+		virtual uint64_t SizeOf(const BufferDescription& descriptions) const override;
 	};
 
 	void MarshalBuffer(
@@ -137,7 +169,14 @@ namespace BoulderLeaf::Graphics
 
 	size_t GetBufferElementSize(
 		const std::vector<BufferElementDescription>& elementDescriptions,
-		const blBufferElementAdapter& adapter);
+		const blBufferElementFormatter& adapter);
+
+	bool BufferElementsContainSemantic(const std::vector<BufferElementDescription>& elementDescriptions,
+		BufferElementSemantic semantic);
+
+	uint64_t CalculateBufferElementsSemanticOffset(const std::vector<BufferElementDescription>& elementDescriptions,
+		BufferElementSemantic semantic,
+		const blBufferElementFormatter& adapter);
 
 	blResourceHandleOfType<blArrayBufferResource> CreateArrayBufferResource(
 		blResourceContainer* resourceContainer,

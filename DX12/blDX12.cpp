@@ -204,7 +204,8 @@ namespace BoulderLeaf::Graphics::DX12
 				mMeshInstancedRenderComponent->GetCommandList(),
 				mDX12ImguiRenderComponent->GetCommandList(),
 				mCompositeMeshRenderComponent->GetCommandList(),
-				mCompositeMeshRenderWithPassConstantsRenderComponent->GetCommandList()
+				mCompositeMeshRenderWithPassConstantsRenderComponent->GetCommandList(),
+				mMeshInstancedV2RenderComponent->GetCommandList()
 			}
 		);
 
@@ -245,10 +246,10 @@ namespace BoulderLeaf::Graphics::DX12
 		mMeshInstancedRenderComponent->Render(renderData);
 	}
 
-void blDX12::DrawMeshInstancedV2(const RenderMeshDataInstancedV2& renderData)
-{
-	mMeshInstancedV2RenderComponent->Render(renderData);
-}
+	void blDX12::DrawMeshInstancedV2(const RenderMeshDataInstancedV2& renderData)
+	{
+		mMeshInstancedV2RenderComponent->Render(renderData);
+	}
 
 	void blDX12::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData)
 	{

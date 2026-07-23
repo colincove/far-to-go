@@ -103,4 +103,20 @@ namespace BoulderLeaf::Math
 			origin.x, origin.y, origin.z, 1
 		);
 	}
+
+	// Should take in the world*view matrix that transforms positional vectors of a mesh. 
+	// I "think". Instructions not clear. 
+	// scratch that. maybe it needs to fully be the world*view*proj matrix. 
+	//it's so strange. I thought all of these calculation could be done on the world transforms. 
+	// but ofcourse, shaders motidy the orientation of these. So ofcourse, we need to transform everything first. 
+	inline Matrix4x4 InverseTransposeForNormals(Matrix4x4 matrix)
+	{
+		//typically, Vector4::Vector3D will have 0 in the last position (w). 
+		//this means that it is not modified by translations. 
+		//but, we don't want translation to "leak" into other matrices if we happen to use it
+		//in different contexts (concatenate to another matrix).
+		//so for safety, we are removing the translation component of this matrix. 
+		matrix.r3 = Vector4::Zero();
+		return matrix.Inverse().Transpose();
+	}
 }

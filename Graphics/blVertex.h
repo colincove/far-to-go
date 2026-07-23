@@ -10,7 +10,7 @@ namespace BoulderLeaf::Graphics
 	struct StandardVertex
 	{
 		Math::Vector3 Position;
-		Math::Vector3 Normal;
+		Math::Vector4 Normal;
 		Math::Vector3 Tangent;
 		Math::Vector4 Colour;
 		Math::Vector2 UV;

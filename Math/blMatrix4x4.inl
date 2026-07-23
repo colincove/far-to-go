@@ -297,10 +297,10 @@ namespace BoulderLeaf::Math
 			const Vector4 up = forward.Cross(right); // up
 
 			return Matrix4x4(
-				right.x, right.y, right.z, 0,
-				up.x, up.y, up.z, 0,
-				forward.x, forward.y, forward.z, 0,
-				-right.Dot(from), -up.Dot(from), -forward.Dot(from), 1);
+				right.x,			right.y,		right.z,			0,
+				up.x,				up.y,			up.z,				0,
+				forward.x,			forward.y,		forward.z,			0,
+				-right.Dot(from),	-up.Dot(from),	-forward.Dot(from), 1);
 		}
 
 		static inline Matrix4x4 LookAtRH(const Vector4& from, const Vector4& to, const Vector4& arbitraryUp)

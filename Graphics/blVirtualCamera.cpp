@@ -8,7 +8,8 @@ namespace BoulderLeaf::Graphics
 		m_nearPlane(nearPlane),
 		m_farPlane(farPlane),
 		m_viewAngle(viewAngle),
-		m_aspectRatio(aspectRatio)
+		m_aspectRatio(aspectRatio),
+		mRotation(0.0f, 1.0f, 0.0f, 0.0f)
 	{
 		assert(aspectRatio > 0);
 		assert(nearPlane < farPlane);
@@ -68,9 +69,52 @@ namespace BoulderLeaf::Graphics
 		);
 	}
 
+	Matrix4x4 VirtualCamera::GetTransform() const
+	{
+		const Matrix4x4 translation = Matrix4x4::TranslationMatrix(mTranslation.x, mTranslation.y, mTranslation.z);
+		const Matrix4x4 rotation = Quaternion::RotationMatrix4x4(mRotation);
+		return rotation * translation;
+	}
+
+	Matrix4x4 VirtualCamera::GetView() const
+	{
+		/*const Matrix4x4 transform = GetTransform();
+		const Matrix4x4 transformInverse = transform.Inverse();
+		return Matrix4x4(transformInverse.r0, transformInverse.r1, transformInverse.r2, transform.r3);*/
+
+		const Matrix4x4 rotation = Quaternion::RotationMatrix4x4(mRotation);
+		const Matrix4x4 rotationInv = rotation.Inverse();
+		const Matrix4x4 rotationInvView = Matrix4x4(rotationInv.r0, rotationInv.r1, rotationInv.r2, rotation.r3);
+
+		//const Matrix4x4 transform = GetTransform();
+		//const Matrix4x4 transformInv = transform.Inverse();
+		const Matrix4x4 translation = Matrix4x4::TranslationMatrix(mTranslation.x, mTranslation.y, mTranslation.z);
+		const Matrix4x4 translationInv = translation.Inverse();
+
+		return (rotation).Inverse();
+		//return rotationInv * translationInv;
+
+		//const Matrix4x4 transform = GetTransform();
+		//const Matrix4x4 transformInverse = transform.Inverse();
+		//return Matrix4x4(transformInverse.r0, transformInverse.r1, transformInverse.r2, transform.r3);
+	}
+
 	Vector4 VirtualCamera::ApplyProjectionMatrix(const Matrix4x4& matrix, const Vector4 point) const
 	{
 		return (point * matrix) / (point.z);
+	}
+
+	void VirtualCamera::LookAt(Math::Vector4 point)
+	{
+		// I am worried about the handedness here. Need some testing. 
+		// I am using this in place of 		
+		// const Matrix4x4 lookAtMatrix = Matrix4x4::LookAtLH(mTranslation, point, arbitraryUp);	
+		
+		mRotation = Quaternion::LookAt(
+			Vector3(mTranslation.x, mTranslation.y, mTranslation.z),
+			Vector3(point.x, point.y, point.z));
+
+		const Matrix4x4 lookAtMatrix = Matrix4x4::LookAtLH(mTranslation, point, arbitraryUp);	
 	}
 
 	float VirtualCamera::GetNearPlane() const

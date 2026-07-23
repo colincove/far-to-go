@@ -31,7 +31,7 @@ namespace BoulderLeaf::Graphics
 
 		float mTheta;
 		float mPhi;
-		float mRadius = 5.0f;
+		float mRadius = 20.0f;
 		VirtualCamera mCamera;
 
 	public:
@@ -118,14 +118,34 @@ namespace BoulderLeaf::Graphics
 			Vector4 target = Vector4::Zero();
 			Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 
-			const Matrix4x4 translate = Matrix4x4::TranslationMatrix(-2, 0, 3);
-			const Matrix4x4 translate2 = Matrix4x4::TranslationMatrix(0, 0, 5);
-			const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up) * translate;
+			
+
+
+			//const Matrix4x4 translate = Matrix4x4::TranslationMatrix(-2, 0, 3);
+			//const Matrix4x4 translate2 = Matrix4x4::TranslationMatrix(0, 0, 5);
+			const Matrix4x4 translate = Matrix4x4::TranslationMatrix(0, 0, 0);
+			const Matrix4x4 translate2 = Matrix4x4::TranslationMatrix(3, 3, 3);
+			//const Matrix4x4 view = Matrix4x4::ViewMatrix(pos, target, up) * translate;
 			const Matrix4x4 view2 = Matrix4x4::ViewMatrix(pos, target, up) * translate2;
-			const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
+			//const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3(35, 35, 35));
+			//const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3(-pos.x, -pos.y, -pos.z));
+			//const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
+			const Matrix4x4 world2 = Matrix4x4::TranslationMatrix(Vector3());
+
 			const Matrix4x4 proj = mCamera.GetProjectionMatrix();
-			const Matrix4x4 worldViewProj = world * view * proj;
-			const Matrix4x4 worldViewProj2 = world * view2 * proj;
+			//const Matrix4x4 worldViewProj = world * view * proj;
+			const Matrix4x4 worldViewProj2 = world2 * view2 * proj;
+
+			mCamera.mTranslation = pos;
+			mCamera.LookAt(target);
+			const Matrix4x4 view = mCamera.GetView();
+
+			const Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3(35, 35, 35));
+			const Matrix4x4 rotation = Quaternion::RotationMatrix4x4(mCamera.mRotation);
+			const Matrix4x4 translation = Matrix4x4::TranslationMatrix(mCamera.mTranslation.x, mCamera.mTranslation.y, mCamera.mTranslation.z);
+
+			const Matrix4x4 worldViewProj = world * (rotation * translation).Inverse() * proj;
+
 
 			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(0).WorldViewProj = worldViewProj;
 			mObjectConstantBufferListResource->GetMutable<blStandardObjectConstants>(1).WorldViewProj = worldViewProj2;

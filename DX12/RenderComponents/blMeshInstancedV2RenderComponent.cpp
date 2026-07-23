@@ -26,6 +26,11 @@ namespace BoulderLeaf::Graphics::DX12
 
 	void blMeshInstancedV2RenderComponent::Render(const RenderMeshDataInstancedV2& renderData)
 	{
+		if (!renderData.constantBuffers.IsValid())
+		{
+			return;
+		}
+
 		blGlobalRenderData& globalRenderData = *mGlobalRenderData;
 		blResourceContainer* container = renderData.mesh.GetContainer();
 
@@ -69,42 +74,33 @@ namespace BoulderLeaf::Graphics::DX12
 		CD3DX12_GPU_DESCRIPTOR_HANDLE cbvPassConstantsStartHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE();
 		size_t count = 0;
 
-		if (renderData.constantBuffers.IsValid())
-		{
-			const blDX12ConstantBufferDescriptorHeapCacheData& constantBufferDescriptorHeap =
-				globalRenderData.resourceCacheGlobalInterface->GetConstantBufferDescriptorHeapCacheData(renderData.constantBuffers);
+		const blDX12ConstantBufferDescriptorHeapCacheData& constantBufferDescriptorHeap =
+			globalRenderData.resourceCacheGlobalInterface->GetConstantBufferDescriptorHeapCacheData(renderData.constantBuffers);
 
-			ID3D12DescriptorHeap* descriptorHeaps[] = { constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get() };
-			mCommandList->SetDescriptorHeaps((UINT)_countof(descriptorHeaps), descriptorHeaps);
+		ID3D12DescriptorHeap* descriptorHeaps[] = { constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get() };
+		mCommandList->SetDescriptorHeaps((UINT)_countof(descriptorHeaps), descriptorHeaps);
 
-			cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
-			cbvPassConstantsStartHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
+		cbvPassConstantsStartHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(constantBufferDescriptorHeap.descriptorHeap->GetDescriptorHeap().Get()->GetGPUDescriptorHandleForHeapStart());
 
-			const UINT cbvStartOfFrameResouceOffset = (cbvDescSize * (constantBufferDescriptorHeap.instanceCount + constantBufferDescriptorHeap.numberOfConstantBuffers))
-				* globalRenderData.globalRenderFrameContext->GetCurrentFrameResource();
-			cbvHandle.Offset(cbvStartOfFrameResouceOffset);
-			cbvHandle.Offset(cbvDescSize * constantBufferDescriptorHeap.numberOfConstantBuffers);
-			cbvPassConstantsStartHandle.Offset(cbvStartOfFrameResouceOffset);
+		const UINT cbvStartOfFrameResouceOffset = (cbvDescSize * (constantBufferDescriptorHeap.instanceCount + constantBufferDescriptorHeap.numberOfConstantBuffers))
+			* globalRenderData.globalRenderFrameContext->GetCurrentFrameResource();
+		cbvHandle.Offset(cbvStartOfFrameResouceOffset);
+		cbvHandle.Offset(cbvDescSize * constantBufferDescriptorHeap.numberOfConstantBuffers);
+		cbvPassConstantsStartHandle.Offset(cbvStartOfFrameResouceOffset);
 
-			// Determine instance count from the instance constant buffer contained inside constantBuffers
-			auto cbContainer = renderData.constantBuffers.GetContainer();
-			const blResourceHandleOfType<blArrayBufferResource> instanceArrayBufferResource =
-				cbContainer->CreateHandleFromRefOfType<blArrayBufferResource>(renderData.constantBuffers->mInstanceConstantBuffer);
+		// Determine instance count from the instance constant buffer contained inside constantBuffers
+		auto cbContainer = renderData.constantBuffers.GetContainer();
+		const blResourceHandleOfType<blArrayBufferResource> instanceArrayBufferResource =
+			cbContainer->CreateHandleFromRefOfType<blArrayBufferResource>(renderData.constantBuffers->mInstanceConstantBuffer);
 
-			const blDX12ArrayBufferTranslationCacheData& instanceTranslationCacheData =
-				globalRenderData.resourceCacheGlobalInterface->GetArrayBufferTranslationCacheData(instanceArrayBufferResource);
+		const blDX12ArrayBufferTranslationCacheData& instanceTranslationCacheData =
+			globalRenderData.resourceCacheGlobalInterface->GetArrayBufferTranslationCacheData(instanceArrayBufferResource);
 
-			const blResourceHandleOfType<blListResource>& instanceListResource = cbContainer->CreateHandleFromRefOfType<blListResource>(
-				instanceTranslationCacheData.translatedArrayBuffer->mBufferResourceRef);
+		const blResourceHandleOfType<blListResource>& instanceListResource = cbContainer->CreateHandleFromRefOfType<blListResource>(
+			instanceTranslationCacheData.translatedArrayBuffer->mBufferResourceRef);
 
-			count = instanceListResource->mCount;
-		}
-
-		if (count == 0)
-		{
-			// Nothing to draw
-			return;
-		}
+		count = instanceListResource->mCount;
 
 		for (int i = 0; i < (int)count; ++i)
 		{
@@ -125,7 +121,7 @@ namespace BoulderLeaf::Graphics::DX12
 			mCommandList->DrawIndexedInstanced(
 				(UINT)indexListResource->mCount,
 				1, 0, 0, 0);
-			cbvHandle.Offset(globalRenderData.device->GetCbvSrvDescriptorSize());
+			cbvHandle.Offset(cbvDescSize);
 		}
 	}
 }

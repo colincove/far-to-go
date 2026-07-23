@@ -23,11 +23,6 @@ namespace BoulderLeaf::Graphics
 
 	}
 
-	void Headless::DrawMeshInstancedV2(const RenderMeshDataInstancedV2& renderData)
-	{
-
-	}
-
 	void Headless::DrawCompositeMeshInstanced(const RenderCompositeMeshDataInstanced& renderData)
 	{
 

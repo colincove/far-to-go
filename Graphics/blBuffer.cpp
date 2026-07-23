@@ -28,6 +28,56 @@ namespace BoulderLeaf::Graphics
 		}
 	}
 
+	const blDefaultBufferElementFormatter& blDefaultBufferElementFormatter::Get()
+	{
+		static blDefaultBufferElementFormatter gDefaultFormatter;
+		return gDefaultFormatter;
+	}
+
+	size_t blDefaultBufferElementFormatter::SizeOfElement(BufferElementType Type) const
+	{
+		switch (Type)
+		{
+		case BufferElementType::Float:
+			return sizeof(float);
+		case BufferElementType::Float2:
+			return sizeof(Math::Vector2);
+		case BufferElementType::Float3:
+			return sizeof(Math::Vector3);
+		case BufferElementType::Float4:
+			return sizeof(Math::Vector4);
+		case BufferElementType::Matrix3x3:
+			return sizeof(Math::Matrix3x3);
+		case BufferElementType::Matrix4x4:
+			return sizeof(Math::Matrix4x4);
+		case BufferElementType::Bool:
+			return sizeof(bool);
+		case BufferElementType::Int:
+			return sizeof(int32_t);
+		case BufferElementType::UInt:
+			return sizeof(uint32_t);
+		case BufferElementType::Half:
+			return sizeof(uint16_t);
+		case BufferElementType::Double:
+			return sizeof(double);
+		}
+
+		assert(false);
+		return 0;
+	}
+
+	BufferFormat blDefaultBufferElementFormatter::GetFormat() const
+	{
+		return BufferFormat::BoulderLeaf;
+	}
+
+	uint64_t blDefaultBufferElementFormatter::SizeOf(const BufferDescription& descriptions) const
+	{
+		// Ensure the description is for the BoulderLeaf format and compute the total size
+		assert(descriptions.format == BufferFormat::BoulderLeaf);
+		return GetBufferElementSize(descriptions.elementDescriptions, *this);
+	}
+
 	void MarshalBufferElement(
 		const std::vector<BufferElementDescription>& elementDescriptions,
 		byte* destVertex,
@@ -126,7 +176,7 @@ namespace BoulderLeaf::Graphics
 
 	size_t GetBufferElementSize(
 		const std::vector<BufferElementDescription>& elementDescriptions,
-		const blBufferElementAdapter& adapter)
+		const blBufferElementFormatter& adapter)
 	{
 		size_t elementSize = 0;
 		for (const BufferElementDescription& elementDescription : elementDescriptions)
@@ -137,7 +187,39 @@ namespace BoulderLeaf::Graphics
 		return elementSize;
 	}
 
-	uint64_t blBufferElementAdapter::SizeOf(const BufferDescription& description) const
+	bool BufferElementsContainSemantic(
+		const std::vector<BufferElementDescription>& elementDescriptions,
+		BufferElementSemantic semantic)
+	{
+		return std::find_if(elementDescriptions.begin(), elementDescriptions.end(), [&semantic](const BufferElementDescription& desc) 
+			{
+				return desc.Semantic == semantic;
+			}) != elementDescriptions.end();
+	}
+
+	uint64_t CalculateBufferElementsSemanticOffset(
+		const std::vector<BufferElementDescription>& elementDescriptions,
+		BufferElementSemantic semantic,
+		const blBufferElementFormatter& adapter)
+	{
+		assert(BufferElementsContainSemantic(elementDescriptions, semantic));
+
+		uint64_t offset = 0;
+
+		for (const BufferElementDescription& desc : elementDescriptions)
+		{
+			if (desc.Semantic == semantic)
+			{
+				break;
+			}
+
+			offset += adapter.SizeOfElement(desc.ElementType);
+		}
+
+		return offset;
+	}
+
+	uint64_t blBufferElementFormatter::SizeOf(const BufferDescription& description) const
 	{
 		assert(GetFormat() == description.format);
 		return GetBufferElementSize(description.elementDescriptions, *this);
@@ -148,6 +230,7 @@ namespace BoulderLeaf::Graphics
 		const BufferElementDescription& element)
 		: blBaseResource(stream), 
 		mElementType(element.ElementType), 
+		mSemantic(element.Semantic),
 		mNameStringResource(stream, element.Name)
 	{
 		
@@ -175,7 +258,7 @@ namespace BoulderLeaf::Graphics
 		desc.minStride = mMinStride;
 		for (const blBufferElementDescriptionResource& elementResource : blBufferDescriptionResource::ConstIterator(this))
 		{
-			desc.elementDescriptions.push_back({ std::string(elementResource.GetName()), elementResource.mElementType });
+			desc.elementDescriptions.push_back({ std::string(elementResource.GetName()), elementResource.mElementType, elementResource.mSemantic });
 		}
 		return desc;
 	}

@@ -31,32 +31,58 @@ namespace BoulderLeaf::Graphics
 
 	struct blTerrainObjectConstants
 	{
-		Math::Matrix4x4 Transform = Math::Matrix4x4::Identity();
+		Math::Matrix4x4 World = Math::Matrix4x4::Identity();
 		float Scale;
 		uint32_t Size;
 		float MinHeight;
 		float MaxHeight;
+		Math::Matrix4x4 WorldViewProj = Math::Matrix4x4::Identity();
+		Math::Matrix4x4 WorldViewProjInverseTranspose = Math::Matrix4x4::Identity();
 	};
 
 	static const std::vector<BufferElementDescription> blTerrainObjectConstantsElementDescriptions =
 	{
 		{
-				"Transform",
-				BufferElementType::Matrix4x4
+				"World",
+				BufferElementType::Matrix4x4,
+				BufferElementSemantic::None
 		},
 		{
 				"Scale",
-				BufferElementType::Float
+				BufferElementType::Float,
+				BufferElementSemantic::None
 		},
 		{
 				"Size",
-				BufferElementType::UInt
-		}
+				BufferElementType::UInt,
+				BufferElementSemantic::None
+		},
+		{
+				"MinHeight",
+				BufferElementType::Float,
+				BufferElementSemantic::None
+		},
+		{
+				"MaxHeight",
+				BufferElementType::Float,
+				BufferElementSemantic::None
+		},
+		{
+				"WorldViewProj",
+				BufferElementType::Matrix4x4,
+				BufferElementSemantic::None
+		},
+		{
+				"WorldViewProjInverseTranspose",
+				BufferElementType::Matrix4x4,
+				BufferElementSemantic::None
+		},
 	};
 
 	struct blTerrainVertex
 	{
 		float Height;
+		Math::Vector4 Normal;
 	};
 
 	void CalculateHeightBoundsForTerrain(const blTerrainVertex* data, uint32_t count, float& minOut, float& maxOut);
@@ -65,8 +91,14 @@ namespace BoulderLeaf::Graphics
 	{
 		{
 				"Height",
-				BufferElementType::Float
-		}
+				BufferElementType::Float,
+				BufferElementSemantic::Height
+		},
+		{
+				"Normal",
+				BufferElementType::Float4,
+				BufferElementSemantic::Normal
+		},
 	};
 
 	struct cbPass

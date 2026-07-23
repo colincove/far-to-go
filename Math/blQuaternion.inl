@@ -95,7 +95,7 @@ namespace BoulderLeaf::Math
 				2.0f * (q.real * q.real + q.x * q.x) - 1, 2.0f * (q.x * q.y - q.real * q.z), 2.0f * (q.x * q.z + q.real * q.y), 0,
 				2.0f * (q.x * q.y + q.real * q.z), 2.0f * (q.real * q.real + q.y * q.y) - 1.0f, 2.0f * (q.y * q.z - q.real * q.x), 0,
 				2.0f * (q.x * q.z - q.real * q.y), 2.0f * (q.y * q.z + q.real * q.x), 2.0f * (q.real * q.real + q.z * q.z) - 1.0f, 0,
-				0, 0, 0, 0);
+				0, 0, 0, 1);
 		}
 
 		static inline Matrix3x3 RotationMatrix3x3(const Quaternion q)
@@ -105,6 +105,38 @@ namespace BoulderLeaf::Math
 				2.0f * (q.real * q.real + q.x * q.x) - 1, 2.0f * (q.x * q.y - q.real * q.z), 2.0f * (q.x * q.z + q.real * q.y),
 				2.0f * (q.x * q.y + q.real * q.z), 2.0f * (q.real * q.real + q.y * q.y) - 1.0f, 2.0f * (q.y * q.z - q.real * q.x),
 				2.0f * (q.x * q.z - q.real * q.y), 2.0f * (q.y * q.z + q.real * q.x), 2.0f * (q.real * q.real + q.z * q.z) - 1.0f);
+		}
+
+		static Quaternion CreateFromAxisAngle(Vector3 axis, float angle)
+		{
+			float halfAngle = angle * .5f;
+			float s = std::sin(halfAngle);
+			Quaternion q;
+			q.x = axis.x * s;
+			q.y = axis.y * s;
+			q.z = axis.z * s;
+			q.t = std::cos(halfAngle);
+			return q;
+		}
+
+		static inline Quaternion LookAt(Vector3 sourcePoint, Vector3 destPoint)
+		{
+			Vector3 forwardVector = (destPoint - sourcePoint).Normalize();
+
+			float dot = Vector3::Forward().Dot(forwardVector);
+
+			if (std::abs(dot - (-1.0f)) < 0.000001f)
+			{
+				return Quaternion(Vector3::Up().x, Vector3::Up().y, Vector3::Up().z, PIf);
+			}
+			if (std::abs(dot - (1.0f)) < 0.000001f)
+			{
+				return Quaternion();
+			}
+
+			float rotAngle = std::acos(dot);
+			Vector3 rotAxis = Vector3::Forward().Cross(forwardVector).Normalize();
+			return CreateFromAxisAngle(rotAxis, rotAngle);
 		}
 
 		static inline Quaternion FromEuler(const Vector3 eulerAngles)

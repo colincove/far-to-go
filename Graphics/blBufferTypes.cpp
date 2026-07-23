@@ -7,7 +7,7 @@ namespace BoulderLeaf::Graphics
 {
 	const std::vector<BufferElementDescription> blStandardObjectConstantsDefinition::Description =
 	{
-		{ "WorldViewProj", BufferElementType::Matrix4x4 }
+		{ "WorldViewProj", BufferElementType::Matrix4x4, BufferElementSemantic::None }
 	};
 
 	cbPass CalculatePassData(const VirtualCamera& camera, const Metrics::blTime& gameTime)
@@ -18,12 +18,29 @@ namespace BoulderLeaf::Graphics
 		constexpr Vector4 up = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
 
 		//TODO: Get from camera
-		const static Matrix4x4 cameraTranslate = Matrix4x4::TranslationMatrix(-2, 0, 3);
-		const static Matrix4x4 world = Matrix4x4::TranslationMatrix(Vector3());
+		const Matrix4x4 view = camera.GetView();
+		bool hasInverse = view.HasValidInverse();
+		const Matrix4x4 viewInverted = view.Inverse();
+		float determinant = view.Determinant();
 
 		cbPass result;
 		result.Proj = camera.GetProjectionMatrix();
-		result.viewProj = (world * camera.GetProjectionMatrix());
+		result.invProj = result.Proj.Inverse();
+		result.view = camera.GetView();
+
+		Vector4 target = Vector4::Zero();
+		Vector4 pos = Vector4(-0.660871327, 14.8207569, -13.4129944, 1.0f);
+		const Matrix4x4 lookAtMatrix = Matrix4x4::LookAtRH(pos, target, up); // Camera to world
+		const Matrix4x4 lookAtMatrixInverse = lookAtMatrix.Inverse();
+		const Matrix4x4 inlineView = Matrix4x4(lookAtMatrixInverse.r0, lookAtMatrixInverse.r1, lookAtMatrixInverse.r2, lookAtMatrix.r3);
+		const Matrix4x4 inlineViewDirect = Matrix4x4::ViewMatrix(pos, target, up);
+		//result.view = Matrix4x4::ViewMatrix(pos, target, up);
+		//result.view = lookAtMatrixInverse;
+		result.view = inlineViewDirect;
+
+		result.invView = result.view.Inverse();
+		result.viewProj =  result.view * result.Proj;
+		result.invViewProj = result.viewProj.Inverse();
 
 		return result;
 	}

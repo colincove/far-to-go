@@ -8,7 +8,7 @@ ConstantBuffer<ObjectConstants> gObjConstants : register(b0);
 
 void VS(
     float3 iPosL        : POSITION,
-    float3 iNorm        : NORMAL,
+    float4 iNorm        : NORMAL,
     float3 iTan         : TANGENT,
     float4 iColor       : COLOR,
     float2 iUV          : TEXCOORD0,

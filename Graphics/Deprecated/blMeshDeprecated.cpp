@@ -233,7 +233,7 @@ namespace BoulderLeaf::Graphics
 			StandardMesh::Prototype& meshData)
 		{
 			unsigned int baseIndex = (unsigned int)meshData.vertices.size();
-			const Math::Vector3 Normal(0.0f, 1.0f, 0.0f);
+			const Math::Vector4 Normal(Math::Vector4::Vector3D(0.0f, 1.0f, 0.0f));
 			float y = 0.5f * height;
 			float dTheta = 2.0f * PIf / sliceCount;
 			// Duplicate cap ring vertices because the texture coordinates and
@@ -280,14 +280,14 @@ namespace BoulderLeaf::Graphics
 
 		static std::array<StandardVertex, 8> vertices =
 		{
-			StandardVertex({ Vector3(-1.0f, -1.0f, -1.0f), Vector3(), Vector3(), Vector4(Colours::White), Vector2() }),
-			StandardVertex({ Vector3(-1.0f, +1.0f, -1.0f), Vector3(), Vector3(), Vector4(Colours::Black), Vector2()}),
-			StandardVertex({ Vector3(+1.0f, +1.0f, -1.0f), Vector3(), Vector3(), Vector4(Colours::Red), Vector2() }),
-			StandardVertex({ Vector3(+1.0f, -1.0f, -1.0f), Vector3(), Vector3(), Vector4(Colours::Green), Vector2() }),
-			StandardVertex({ Vector3(-1.0f, -1.0f, +1.0f), Vector3(), Vector3(), Vector4(Colours::Blue), Vector2() }),
-			StandardVertex({ Vector3(-1.0f, +1.0f, +1.0f), Vector3(), Vector3(), Vector4(Colours::Yellow), Vector2() }),
-			StandardVertex({ Vector3(+1.0f, +1.0f, +1.0f), Vector3(), Vector3(), Vector4(Colours::Cyan), Vector2() }),
-			StandardVertex({ Vector3(+1.0f, -1.0f, +1.0f), Vector3(), Vector3(), Vector4(Colours::Magenta), Vector2()
+			StandardVertex({ Vector3(-1.0f, -1.0f, -1.0f), Vector4(), Vector3(), Vector4(Colours::White), Vector2() }),
+			StandardVertex({ Vector3(-1.0f, +1.0f, -1.0f), Vector4(), Vector3(), Vector4(Colours::Black), Vector2()}),
+			StandardVertex({ Vector3(+1.0f, +1.0f, -1.0f), Vector4(), Vector3(), Vector4(Colours::Red), Vector2() }),
+			StandardVertex({ Vector3(+1.0f, -1.0f, -1.0f), Vector4(), Vector3(), Vector4(Colours::Green), Vector2() }),
+			StandardVertex({ Vector3(-1.0f, -1.0f, +1.0f), Vector4(), Vector3(), Vector4(Colours::Blue), Vector2() }),
+			StandardVertex({ Vector3(-1.0f, +1.0f, +1.0f), Vector4(), Vector3(), Vector4(Colours::Yellow), Vector2() }),
+			StandardVertex({ Vector3(+1.0f, +1.0f, +1.0f), Vector4(), Vector3(), Vector4(Colours::Cyan), Vector2() }),
+			StandardVertex({ Vector3(+1.0f, -1.0f, +1.0f), Vector4(), Vector3(), Vector4(Colours::Magenta), Vector2()
 		})
 		};
 
@@ -347,7 +347,7 @@ namespace BoulderLeaf::Graphics
 				vertex.Tangent = Math::Vector3(-s, 0.0f, c);
 				float dr = bottomRadius - topRadius;
 				Math::Vector3 bitangent(dr * c, -height, dr * s);
-				vertex.Normal = vertex.Tangent.Cross(bitangent).Normalize();
+				vertex.Normal = Math::Vector4::Vector3D(vertex.Tangent.Cross(bitangent).Normalize());
 				prototype.vertices.push_back(vertex);
 			}
 		}
@@ -428,7 +428,7 @@ namespace BoulderLeaf::Graphics
 			// Project onto sphere.
 			Math::Vector3 p = n * radius;
 			meshData.vertices[i].Position = p;
-			meshData.vertices[i].Normal = n;
+			meshData.vertices[i].Normal = Math::Vector4::Vector3D(n);
 			// Derive texture coordinates from spherical coordinates.
 			float theta = atan2f(meshData.vertices[i].Position.z, meshData.vertices[i].Position.x);
 			// Put in [0, 2pi].

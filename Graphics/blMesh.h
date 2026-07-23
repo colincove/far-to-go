@@ -50,11 +50,11 @@ namespace BoulderLeaf::Graphics
 		void Write(uint16_t* indices, uint16_t offset) const
 		{
 			indices[0] = i0 + offset;
-			indices[1] = i1 + offset;
-			indices[2] = i2 + offset;
+			indices[1] = i2 + offset;
+			indices[2] = i1 + offset;
 			indices[3] = i2 + offset;
-			indices[4] = i1 + offset;
-			indices[5] = i3 + offset;
+			indices[4] = i3 + offset;
+			indices[5] = i1 + offset;
 		}
 	};
 
@@ -85,6 +85,18 @@ namespace BoulderLeaf::Graphics
 			blResourceRefOfType<blListResource> indexListRef,
 			blResourceRefOfType<blArrayBufferResource> arrayBufferResourceRef);
 	};
+
+	struct blIndexedMeshResourceExpanded
+	{
+		blResourceContainer* container;
+		blResourceHandleOfType<blIndexedMeshResource> indexedMesh;
+		blResourceHandleOfType<blArrayBufferResource> arrayBuffer;
+		blResourceHandleOfType<blListResource> vertexBuffer;
+		blResourceHandleOfType<blBufferDescriptionResource> bufferDescriptionResource;
+		blResourceHandleOfType<blListResource> indexBuffer;
+	};
+
+	blIndexedMeshResourceExpanded ExpandIndexedMeshResource(blResourceHandleOfType<blIndexedMeshResource> resource);
 
 	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
 		blResourceContainer* resourceContainer,
@@ -146,4 +158,38 @@ namespace BoulderLeaf::Graphics
 	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
 		blResourceHandleOfType<blIndexedMeshResource> sourceMeshHandle,
 		const blBufferElementAdapter& adapter);
+
+	Math::Vector4 ComputePositionForHeightMapVertex(
+		const uint32_t& sizeOfHeightMap,
+		const uint32_t& vertexId,
+		const float& heightValue
+	);
+
+	Math::Vector4 ComputeNormal(
+		const Math::Vector4& p0,
+		const Math::Vector4& p1,
+		const Math::Vector4& p2);
+
+	void CalculateVertexNormals(blResourceHandleOfType<blIndexedMeshResource> sourceMeshHandle);
+
+	void CalculateVertexNormals(
+		const uint16_t* indices,
+		uint32_t indexCount,
+		byte* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		uint64_t normalPropertyOffset,
+		uint64_t positionPropertyOffset);
+
+	void CalculateVertexNormalsForHeightMap(const uint32_t sizeOfHeightMap, blResourceHandleOfType<blIndexedMeshResource> sourceMeshHandle);
+
+	void CalculateVertexNormalsForHeightMap(
+		const uint32_t sizeOfHeightMap,
+		const uint16_t* indices,
+		uint32_t indexCount,
+		byte* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		uint64_t normalPropertyOffset,
+		uint64_t heightPropertyOffset);
 }

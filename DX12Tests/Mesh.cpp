@@ -13,11 +13,11 @@ namespace
 	{
 		StandardMesh mesh(5, 9);
 
-		const StandardVertex v0 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
-		const StandardVertex v1 = StandardVertex({ Math::Vector3(-1.0f, -5.0f, -6.0f), Math::Vector3(1, 1, 1), Math::Vector3(), Math::Vector4(1, 0.5f, 0.1f, 0), Math::Vector2(2, 2) });
-		const StandardVertex v2 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
-		const StandardVertex v3 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
-		const StandardVertex v4 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector3(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
+		const StandardVertex v0 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector4(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
+		const StandardVertex v1 = StandardVertex({ Math::Vector3(-1.0f, -5.0f, -6.0f), Math::Vector4::Vector3D(1, 1, 1), Math::Vector3(), Math::Vector4(1, 0.5f, 0.1f, 0), Math::Vector2(2, 2) });
+		const StandardVertex v2 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector4(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
+		const StandardVertex v3 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector4(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
+		const StandardVertex v4 = StandardVertex({ Math::Vector3(-1.0f, -1.0f, -1.0f), Math::Vector4(), Math::Vector3(), Math::Vector4(1, 1, 1, 1), Math::Vector2() });
 
 		mesh.GetVertexMutable(0) = v0;
 		mesh.GetVertexMutable(1) = v1;

@@ -1,10 +1,12 @@
 struct ObjectConstants
 {
-    float4x4 Transform;
+    float4x4 World;
     float Scale;
     uint Size;
     float MinHeight;
     float MaxHeight;
+    float4x4 WorldViewProj;
+    float4x4 WorldViewProjInverseTranspose;
     uint matIndex;
 };
 
@@ -32,15 +34,16 @@ ConstantBuffer<PassConstants> gPassContants : register(b1);
 
 void VS(
     float iHeight       : HEIGHT,
+    float4 iNormal      : NORMAL,
     uint vertexID       : SV_VertexID,
     out float4 oPosH    : SV_POSITION,
+    out float4 oNormal  : NORMAL,
     out float4 oColor   : COLOR)
 {
     
     uint sizePlusOne = gObjConstants.Size + 1;
     
     float scale = gObjConstants.Scale;
-    float heightWithScale = iHeight * scale;
     
     uint vertexIdPlusSize = vertexID + sizePlusOne;
     uint moduloResult = vertexIdPlusSize % sizePlusOne;
@@ -50,12 +53,17 @@ void VS(
     
     oPosH = float4(
         (moduloResult) * gObjConstants.Scale,
-        rounded * gObjConstants.Scale,
         iHeight * scale,
+        rounded * gObjConstants.Scale,
         1.0f);
     
-    oPosH = mul(oPosH, gPassContants.gViewProj);
+    oPosH = mul(oPosH, gObjConstants.World);
+    oPosH = mul(oPosH, gPassContants.gView); 
     oPosH = mul(oPosH, gPassContants.gProj);
     
-    oColor = float4((iHeight - gObjConstants.MinHeight) / (gObjConstants.MaxHeight - gObjConstants.MinHeight), 1.0f, 1.0f, 1.0f);
+    //oPosH = mul(oPosH, gPassContants.gView);
+    float HeightRange = gObjConstants.MaxHeight - gObjConstants.MinHeight;
+    float HeightValueFromMin = iHeight - gObjConstants.MinHeight;
+    float HeightFraction = HeightValueFromMin / HeightRange;
+    oColor = float4(HeightFraction, HeightFraction / 2, HeightFraction / 2, 1.0f);
 }

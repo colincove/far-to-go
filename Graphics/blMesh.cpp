@@ -69,6 +69,18 @@ namespace BoulderLeaf::Graphics
 
 	}
 
+	blIndexedMeshResourceExpanded ExpandIndexedMeshResource(blResourceHandleOfType<blIndexedMeshResource> resource)
+	{
+		blIndexedMeshResourceExpanded result;
+		result.container = resource.GetContainer();
+		result.arrayBuffer = result.container->CreateHandleFromRefOfType<blArrayBufferResource>(resource->mArrayBufferResourceRef);
+		result.vertexBuffer = result.container->CreateHandleFromRefOfType<blListResource>(result.arrayBuffer->mBufferResourceRef);
+		result.bufferDescriptionResource = result.container->CreateHandleFromRefOfType<blBufferDescriptionResource>(result.arrayBuffer->mDescriptionResourceRef);
+		result.indexBuffer = result.container->CreateHandleFromRefOfType<blListResource>(resource->mIndexListRef);
+		return result;
+	}
+
+
 	blResourceHandleOfType<blIndexedMeshResource> CreateIndexedMeshResource(
 		blResourceContainer* resourceContainer,
 		std::wstring name,
@@ -132,6 +144,8 @@ namespace BoulderLeaf::Graphics
 			vertexArrayResource.GetRef()
 		);
 
+		CalculateVertexNormals(meshResource);
+
 		return meshResource;
 	}
 
@@ -159,5 +173,153 @@ namespace BoulderLeaf::Graphics
 		);
 
 		return meshResource;
+	}
+
+	Math::Vector4 ComputePositionForHeightMapVertex(
+		const uint32_t& sizeOfHeightMap,
+		const uint32_t& vertexId,
+		const float& heightValue)
+	{
+		const uint32_t sizePlusOne = sizeOfHeightMap + 1;
+		const uint32_t vertexIdPlusSize = vertexId + sizePlusOne;
+		const uint32_t moduloResult = vertexIdPlusSize % sizePlusOne;
+
+		return Math::Vector4::Point3D(
+			moduloResult,
+			heightValue,
+			(float) round(vertexId / sizePlusOne));
+	}
+
+	Math::Vector4 ComputeNormal(
+		const Math::Vector4& p0,
+		const Math::Vector4& p1,
+		const Math::Vector4& p2)
+	{
+		Math::Vector4 u = p1 - p0;
+		Math::Vector4 v = p2 - p0;
+
+		return u.Cross(v).Normalize();
+	}
+
+	void CalculateVertexNormals(blResourceHandleOfType<blIndexedMeshResource> sourceMeshHandle)
+	{
+		blIndexedMeshResourceExpanded expandedResource = ExpandIndexedMeshResource(sourceMeshHandle);
+		BufferDescription desc = expandedResource.bufferDescriptionResource->GetBufferDescription();
+
+		CalculateVertexNormals(
+			&expandedResource.indexBuffer->Get<uint16_t>(0),
+			expandedResource.indexBuffer->mCount,
+			&expandedResource.vertexBuffer->GetMutable<byte>(0),
+			expandedResource.vertexBuffer->mElementSize,
+			expandedResource.vertexBuffer->mCount,
+			CalculateBufferElementsSemanticOffset(desc.elementDescriptions, BufferElementSemantic::Normal, blDefaultBufferElementFormatter::Get()),
+			CalculateBufferElementsSemanticOffset(desc.elementDescriptions, BufferElementSemantic::Position, blDefaultBufferElementFormatter::Get())
+		);
+	}
+
+	void CalculateVertexNormals(
+		const uint16_t* indices,
+		uint32_t indexCount,
+		byte* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		uint64_t normalPropertyOffset,
+		uint64_t positionPropertyOffset)
+	{
+		//reset all normals to start from zero
+		for (uint32_t vertexId = 0; vertexId < vertexCount; ++vertexId)
+		{
+			Math::Vector4& normal = *reinterpret_cast<Math::Vector4*>(vertices + (normalPropertyOffset + (vertexSize * vertexId)));
+			normal = Math::Vector4::Zero();
+		}
+
+		for (uint16_t i = 0; i < indexCount; i+=3)
+		{
+			const Triangle& face = *reinterpret_cast<const Triangle*>(indices + i);
+
+			Math::Vector4& p0 = *reinterpret_cast<Math::Vector4*>(positionPropertyOffset + vertices + (vertexSize * face.i0));
+			Math::Vector4& p1 = *reinterpret_cast<Math::Vector4*>(positionPropertyOffset + vertices + (vertexSize * face.i1));
+			Math::Vector4& p2 = *reinterpret_cast<Math::Vector4*>(positionPropertyOffset + vertices + (vertexSize * face.i2));
+
+			Math::Vector4& n0 = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * face.i0));
+			Math::Vector4& n1 = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * face.i1));
+			Math::Vector4& n2 = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * face.i2));
+
+			Math::Vector4 faceNormal = ComputeNormal(p0, p1, p2);
+
+			n0 += faceNormal;
+			n1 += faceNormal;
+			n2 += faceNormal;
+		}
+
+		for (uint32_t vertexId = 0; vertexId < vertexCount; ++vertexId)
+		{
+			Math::Vector4& normal = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * vertexId));
+			normal = normal.Normalize();
+		}
+	}
+
+	void CalculateVertexNormalsForHeightMap(const uint32_t sizeOfHeightMap, blResourceHandleOfType<blIndexedMeshResource> sourceMeshHandle)
+	{
+		blIndexedMeshResourceExpanded expandedResource = ExpandIndexedMeshResource(sourceMeshHandle);
+		BufferDescription desc = expandedResource.bufferDescriptionResource->GetBufferDescription();
+
+		CalculateVertexNormalsForHeightMap(
+			sizeOfHeightMap,
+			&expandedResource.indexBuffer->Get<uint16_t>(0),
+			expandedResource.indexBuffer->mCount,
+			&expandedResource.vertexBuffer->GetMutable<byte>(0),
+			expandedResource.vertexBuffer->mElementSize,
+			expandedResource.vertexBuffer->mCount,
+			CalculateBufferElementsSemanticOffset(desc.elementDescriptions, BufferElementSemantic::Normal, blDefaultBufferElementFormatter::Get()),
+			CalculateBufferElementsSemanticOffset(desc.elementDescriptions, BufferElementSemantic::Height, blDefaultBufferElementFormatter::Get())
+		);
+	}
+
+	void CalculateVertexNormalsForHeightMap(
+		const uint32_t sizeOfHeightMap,
+		const uint16_t* indices,
+		uint32_t indexCount,
+		byte* vertices,
+		uint64_t vertexSize,
+		uint32_t vertexCount,
+		uint64_t normalPropertyOffset,
+		uint64_t heightPropertyOffset)
+	{
+		//reset all normals to start from zero
+		for (uint32_t vertexId = 0; vertexId < vertexCount; ++vertexId)
+		{
+			Math::Vector4& normal = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * vertexId));
+			normal = Math::Vector4::Zero();
+		}
+
+		for (uint16_t i = 0; i < indexCount; i += 3)
+		{
+			const Triangle& face = *reinterpret_cast<const Triangle*>(indices + i);
+
+			float& h0 = *reinterpret_cast<float*>(heightPropertyOffset + vertices + (vertexSize * face.i0));
+			float& h1 = *reinterpret_cast<float*>(heightPropertyOffset + vertices + (vertexSize * face.i1));
+			float& h2 = *reinterpret_cast<float*>(heightPropertyOffset + vertices + (vertexSize * face.i2));
+
+			Math::Vector4 p0 = ComputePositionForHeightMapVertex(sizeOfHeightMap, face.i0, h0);
+			Math::Vector4 p1 = ComputePositionForHeightMapVertex(sizeOfHeightMap, face.i1, h1);
+			Math::Vector4 p2 = ComputePositionForHeightMapVertex(sizeOfHeightMap, face.i2, h2);
+
+			Math::Vector4& n0 = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * face.i0));
+			Math::Vector4& n1 = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * face.i1));
+			Math::Vector4& n2 = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * face.i2));
+
+			Math::Vector4 faceNormal = ComputeNormal(p0, p1, p2);
+
+			n0 += faceNormal;
+			n1 += faceNormal;
+			n2 += faceNormal;
+		}
+
+		for (uint32_t vertexId = 0; vertexId < vertexCount; ++vertexId)
+		{
+			Math::Vector4& normal = *reinterpret_cast<Math::Vector4*>(normalPropertyOffset + vertices + (vertexSize * vertexId));
+			normal = normal.Normalize();
+		}
 	}
 }

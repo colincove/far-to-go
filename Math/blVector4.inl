@@ -114,6 +114,21 @@ namespace BoulderLeaf::Math
 		{
 			return Vector4(0, 0, 0, 0);
 		}
+
+		static inline Vector4 Forward()
+		{
+			return Vector3D(1, 0, 0);
+		}
+
+		static inline Vector4 Up()
+		{
+			return Vector3D(0, 1, 0);
+		}
+
+		static inline Vector4 Left()
+		{
+			return Vector3D(0, 0, 1);
+		}
  	};
 
 
