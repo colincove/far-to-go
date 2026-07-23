@@ -11,6 +11,10 @@ add_executable(
 	CylinderDemoScene.h
 	GeosphereDemoScene.cpp
 	GeosphereDemoScene.h
+	blMaterialAndLightingDemoScene.cpp
+	blMaterialAndLightingDemoScene.h
+	blDemoImguiDropdown.cpp
+	blDemoImguiDropdown.h
 	MeshDemoSceneBase.h
 	blTerrainDemo.h
 	blTerrainDemo.cpp

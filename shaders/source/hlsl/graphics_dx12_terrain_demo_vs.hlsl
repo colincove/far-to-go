@@ -57,11 +57,8 @@ void VS(
         rounded * gObjConstants.Scale,
         1.0f);
     
-    oPosH = mul(oPosH, gObjConstants.World);
-    oPosH = mul(oPosH, gPassContants.gView); 
-    oPosH = mul(oPosH, gPassContants.gProj);
-    
-    //oPosH = mul(oPosH, gPassContants.gView);
+    oPosH = mul(oPosH, gObjConstants.WorldViewProj);
+   
     float HeightRange = gObjConstants.MaxHeight - gObjConstants.MinHeight;
     float HeightValueFromMin = iHeight - gObjConstants.MinHeight;
     float HeightFraction = HeightValueFromMin / HeightRange;

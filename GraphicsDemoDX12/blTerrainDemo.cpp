@@ -36,7 +36,7 @@ namespace BoulderLeaf::Graphics
 		blTerrainObjectConstants& constantsRef = mObjectConstantBufferListResource->GetMutable<blTerrainObjectConstants>(0);
 		blTerrainVertex& terrainVertexRef = mTerrainVertexBuffer->GetMutable<blTerrainVertex>(0);
 
-		constantsRef.Transform = Matrix4x4::TranslationMatrix(-((float) size / 2), -1, -((float)size / 2));
+		constantsRef.World = Matrix4x4::TranslationMatrix(-((float) size / 2), -1, -((float)size / 2));
 		CalculateHeightBoundsForTerrain(&terrainVertexRef, 
 			mTerrainVertexBuffer->mCount,
 			constantsRef.MinHeight,
